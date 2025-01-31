@@ -6,4 +6,4 @@ Team members:
 - Adriana643 | Adriana Ruscitti-Titto (40239627)
 - jinglebell55555 | Jing-Ning Chen (40281215)
 - xidxnx | Aidana Abdybaeva (40281501)
-- | draya | Andrea Nicole Torres (40289711) |
+- draya | Andrea Nicole Torres (40289711)
