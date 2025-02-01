@@ -8,3 +8,4 @@ Team members:
 - xidxnx | Aidana Abdybaeva (40281501)
 - draya | Andrea Nicole Torres (40289711)
 - LEMMYYYYY | Remi Cardinal Jubinville (40228517)
+- ibti-m | Ibtihal Mossa (40239097)
