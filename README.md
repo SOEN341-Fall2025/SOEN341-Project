@@ -10,12 +10,14 @@ Team members:
 - LEMMYYYYY | Remi Cardinal Jubinville (40228517)
 - ibti-m | Ibtihal Mossa (40239097)
 
-Project description:
-We are building a platform for users to communicate easily in group channels and private messages, something like Discord or Slack. For any kind of team collaboration, community discussions, and personal conversations, this platform provides a simple and organized way to stay connected.
+Description:
+This project implements a platform where users can communicate in an individual and group manner. Users are allowed to message people privately (1-on-1) and to create a group channel for people or friends to communicate with one another. Other features will be added for users' entertainment. 
 
-Main features:
-- Text Channels for Group Communication.
-- Direct Messaging Between Users.
-- Role-Based User Permissions.
-  
-Languages/techniques: TBD
+Objective:
+
+The group will be implementing 3 core features that the customers are requiring to use:
+
+- Text Channels for Group Communication
+- Direct Messaging Between Users
+- Role-Based User Permissions
+
