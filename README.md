@@ -7,7 +7,8 @@ Team members:
 - jinglebell55555 | Jing-Ning Chen (40281215)
 - xidxnx | Aidana Abdybaeva (40281501)
 - draya | Andrea Nicole Torres (40289711)
-
+- LEMMYYYYY | Remi Cardinal Jubinville (40228517)
+- ibti-m | Ibtihal Mossa (40239097)
 
 Description:
 This project implements a platform where users can communicate in an individual and group manner. Users are allowed to message people privately (1-on-1) and to create a group channel for people or friends to communicate with one another. Other features will be added for users' entertainment. 
@@ -19,3 +20,4 @@ The group will be implementing 3 core features that the customers are requiring 
 - Text Channels for Group Communication
 - Direct Messaging Between Users
 - Role-Based User Permissions
+
