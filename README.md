@@ -9,3 +9,13 @@ Team members:
 - draya | Andrea Nicole Torres (40289711)
 - LEMMYYYYY | Remi Cardinal Jubinville (40228517)
 - ibti-m | Ibtihal Mossa (40239097)
+
+Project description:
+We are building a platform for users to communicate easily in group channels and private messages, something like Discord or Slack. For any kind of team collaboration, community discussions, and personal conversations, this platform provides a simple and organized way to stay connected.
+
+Main features:
+- Text Channels for Group Communication.
+- Direct Messaging Between Users.
+- Role-Based User Permissions.
+  
+Languages/techniques: TBD
