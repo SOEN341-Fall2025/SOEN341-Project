@@ -17,7 +17,7 @@ Objective:
 
 The group will be implementing 3 core features that the customers are requiring to use:
 
-- Text Channels for Group Communication
+- Website UI/UX Layout
 - Direct Messaging Between Users
-- Role-Based User Permissions
+- Role-Based Channel Permissions
 
