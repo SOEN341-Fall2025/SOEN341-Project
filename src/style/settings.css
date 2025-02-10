@@ -1,0 +1,41 @@
+* {
+    border-width: 0 !important;
+}
+body{
+    height: 100vh;
+    width: 100vw;
+    background-color: azure;
+}
+label{
+    font-variant-caps: all-petite-caps;
+    font-weight: bold;
+}
+.close-button{
+    position: absolute;
+    right: 50;
+    top: 50;
+}
+.settings-nav{
+    background-color: rgba(127, 255, 212, 0.425);
+    height: 100vh;
+}.settings-nav .list-group-item.active{ background-color: rgba(79, 160, 133, 0.37) !important;
+}.settings-nav .list-group-item:not(.active){ background-color: transparent !important;
+}.settings-nav button{border-radius: 10px !important;}
+.tab-content{    
+    background-color: azure;
+    height: 100vh;
+}
+.settings-nav-list{
+    background-color: transparent;
+}
+
+.ps-30{
+    padding-left: 30% !important;
+}
+.pe-10{
+    padding-right: 10% !important;
+}
+.py-10{
+    padding-top: 10% !important;
+    padding-bottom: 10% !important;    
+}
