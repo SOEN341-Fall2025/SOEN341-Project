@@ -18,7 +18,7 @@ Objective:
 The group will be implementing 3 core features that the customers are requiring to use:
 
 - Website UI/UX Layout
-- Direct Messaging Between Users
+- User/System Actions
 - Role-Based Channel Permissions
 
 ## Setting up project
