@@ -17,7 +17,34 @@ Objective:
 
 The group will be implementing 3 core features that the customers are requiring to use:
 
-- Text Channels for Group Communication
-- Direct Messaging Between Users
-- Role-Based User Permissions
+- Website UI/UX Layout
+- User/System Actions
+- Role-Based Channel Permissions
 
+## Setting up project
+
+To install all the dependencies, run the following commands:
+
+`npm install`
+
+To connect to database:
+
+Create `.env` file in `src\backend`. 
+Copy API key from database onto file.
+
+E.g. `SUPABASE_KEY="insert api key here"`
+
+### Additional information
+
+This section explains why the following packages/modules are used.
+
+<b>Node</b>: Important to download to use `npm` commands.
+Follow this tutorial for installation: https://www.youtube.com/watch?v=06X51c6WHsQ
+
+<b>Cors</b>: Allows to run two hosts at the same time. The backend and frontend will run on two hosts since we're using React and Node.
+
+<b>React</b>: Frontend library.
+
+<b>Dotenv</b>: Allows a safe storage location for important variables such as API keys.
+
+<b>Express</b>: This is used to connect the frontend to the backend.
