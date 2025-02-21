@@ -31,6 +31,11 @@ input.form-control-color{
     border-radius: 10px !important;
     border-color: black;
 }
+.close-button{
+    position: absolute;
+    right: 50;
+    top: 50;
+}
 .settings-nav{
     background-color: var(--color-accent);
     height: 100vh;
