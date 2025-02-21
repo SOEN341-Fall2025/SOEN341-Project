@@ -33,7 +33,7 @@ To install all the dependencies, run the following commands:
 
 To connect to database:
 
-Create `.env` file in `src\backend`. 
+Create `.env` file in `backend/src`. 
 Copy API key from database onto file.
 
 E.g. `SUPABASE_KEY="insert api key here"`
