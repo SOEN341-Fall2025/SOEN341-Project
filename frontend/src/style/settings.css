@@ -1,0 +1,88 @@
+* {
+    border-width: 0 !important;
+}
+body{
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--color-bkg);
+    overflow: hidden;
+}
+img.form-control{
+    border-width: 5px !important;
+    border-color: var(--color-accent);
+    width: fit-content;
+    height: auto !important;
+}
+.label{
+    font-variant-caps: all-petite-caps;
+    font-weight: bold;    
+}
+label.labelnav{    
+    /*color: black;*/
+}
+label.form-control-color{
+    width: fit-content !important;
+    background-color: transparent;
+    color: var(--color-bkg) !important;
+}
+input.form-control-color{
+    padding: 0 !important;
+    border-width: 2px !important;
+    border-radius: 10px !important;
+    border-color: black;
+}
+.close-button{
+    position: absolute;
+    right: 50;
+    top: 50;
+}
+.settings-nav{
+    background-color: var(--color-accent);
+    height: 100vh;
+}.settings-nav .list-group-item.active{ background-color: #7fffd46c !important;
+}.settings-nav .list-group-item:not(.active){ background-color: transparent !important;
+}.settings-nav button{border-radius: 10px !important;}
+.tab-content{    
+    background-color: var(--color-bkg);
+    height: 100vh;
+}.tab-pane{height: 100vh;}
+.settings-nav-list{
+    background-color: transparent;
+}
+
+.ps-30{
+    padding-left: 30% !important;
+}
+.pe-10{
+    padding-right: 10% !important;
+}
+.pt-10{
+    padding-top: 5% !important;
+}
+.py-10{
+    padding-top: 10% !important;
+    padding-bottom: 10% !important;    
+}
+.justify-between, .justify-between *{
+    display: flex !important;
+    justify-content: space-between !important;
+}
+.justify-between *{
+    max-width: 30% !important;
+}
+.justify-end, .justify-end *{
+    display: flex !important;
+    justify-content: end !important;
+}
+.btn.edit{
+    background-color: transparent !important;
+}
+.btn-close{
+    position: absolute !important;
+    top: 25%;
+    right: 5%;
+    z-index: 999;
+}
+.divframe{
+    padding: 10%;
+}
