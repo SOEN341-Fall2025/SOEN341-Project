@@ -20,6 +20,10 @@ The group will be implementing 3 core features that the customers are requiring 
 - Website UI/UX Layout
 - User/System Actions
 - Role-Based Channel Permissions
+  
+Languages and Techniques:
+
+For this project, we will be using HTML, CSS, and JavaScript to create a responsive and visually appealing UI/UX layout. The front end will be built with React.js, allowing for a dynamic and interactive user experience. For the backend, we will use Supabase as our database and authentication provider, enabling real-time messaging and efficient data storage. Additional techniques such as role-based access control will be implemented to manage channel permissions, ensuring secure and structured communication within the platform.
 
 ## Setting up project
 
