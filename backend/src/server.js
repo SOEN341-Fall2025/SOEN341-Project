@@ -19,7 +19,7 @@ const supabaseKey = process.env.SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Test route
-app.get("/", (req, res) => res.send("Bublii is now running."));
+app.get("/", (req, res) => res.send("Bubbli is now running."));
 
 // Start server
 const PORT = 4000;
