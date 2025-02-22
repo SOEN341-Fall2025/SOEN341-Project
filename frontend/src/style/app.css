@@ -1,7 +1,7 @@
 :root{
   --color-accent: #c9ffed;
   --color-bkg: azure;
-  --user-sidebar-length: 3vw;
+  --user-sidebar-length: 3.5vw;
 }
 
 .App {
@@ -29,16 +29,17 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
 .App-link {
-  color: #61dafb;
+  color: var(--color-accent);
 }
 hr{
   margin: 0 !important;
   padding: 0 !important;
   border-width: 2px !important;
 }
-#sidebar{
+
+
+#sidebar-resizable{
   position: absolute;
   left: 0;
   top: 0;
@@ -47,26 +48,48 @@ hr{
   width: var(--user-sidebar-length);
   overflow: hidden !important;
 }
-#sidebar .nav-pills{
-  height: 100vh !important;
-}
-#sidebar a{
-  width: 20vw !important;
-  height: fit-content !important;
-}
-#sidebar-col{
+#sidebar-list{
   width: 100%;
   height: 100%;
   overflow: hidden !important;
-}
-#sidebar .channel-icon{  
+}#sidebar-list .nav-pills{
+  height: 100vh !important;
+}#sidebar-list .channel-icon{  
   padding-left: 5px !important;
   padding-right: 20px !important;
   text-align: center !important;
 }
-#settings-modal{
+#sidebar-list .nav-pills a{
+  width: 19vw !important;
+  height: fit-content !important;
+}
+#settings-modal, #sidebar-resizable, #status-modal{
   padding: 0 !important;
   margin: 0 !important;
+}
+#main-container{
+  background-image: url("../../img1.jpg");
+  /*position: absolute;
+  z-index: 1;
+  height: 100vh;
+  width: 100vw;*/
+
+}
+#pages{
+  backdrop-filter: brightness(80%) sepia(50%);
+  height: 100vh;
+  width: 100vw;
+  /*z-index: 2;
+  position: absolute;
+  top: 0;
+  left: var(--user-sidebar-length);*/
+  padding: 5%;
+}
+#pages-content{
+  background-color: var(--color-accent);
+  opacity: 80%;
+  height: 100%;
+  width: 100%;
 }
 
 #settings-close-button{
@@ -74,7 +97,12 @@ hr{
   right: 50px !important;
   top: 50px !important;
 }
-
+#settings-modal .modal-header, #settings-modal .modal-body, #status-modal .modal-header, #status-modal .modal-body{
+  margin: 0 !important;
+  padding: 0 !important;
+}#status-modal{
+  width: 30% !important;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
