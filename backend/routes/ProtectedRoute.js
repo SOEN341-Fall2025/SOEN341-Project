@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 // Registration route 
-app.post("/api/auth/register", async (req, res) => {
+router.post("/api/auth/register", async (req, res) => {
     const { email, password } = req.body;
 
     const { data, error } = await supabase.auth.signUp({
@@ -18,7 +18,7 @@ app.post("/api/auth/register", async (req, res) => {
 });
 
 // Login route
-app.post("/api/auth/login", async (req, res) => {
+router.post("/api/auth/login", async (req, res) => {
     const { email, password } = req.body;
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -34,7 +34,7 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 // Get user info 
-app.get("/api/auth/me", async (req, res) => {
+router.get("/api/auth/me", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
 
     if (!token) return res.status(401).json({ msg: "Unauthorized" });
@@ -47,7 +47,7 @@ app.get("/api/auth/me", async (req, res) => {
 });
 
 // Logout route
-app.post("/api/auth/logout", async (req, res) => {
+router.post("/api/auth/logout", async (req, res) => {
     const { error } = await supabase.auth.signOut();
 
     if (error) return res.status(400).json({ msg: error.message });
@@ -55,7 +55,7 @@ app.post("/api/auth/logout", async (req, res) => {
     res.json({ msg: "Logged out successfully" });
 });
 
-app.get("/api/test", async ( req, res ) => {
+router.get("/api/test", async ( req, res ) => {
 
     const { data, error } = await supabase
     .from('Users')
