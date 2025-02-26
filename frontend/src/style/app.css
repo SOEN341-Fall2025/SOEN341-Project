@@ -1,0 +1,116 @@
+:root{
+  --color-accent: #c9ffed;
+  --color-bkg: azure;
+  --user-sidebar-length: 3.5vw;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+.App-link {
+  color: var(--color-accent);
+}
+hr{
+  margin: 0 !important;
+  padding: 0 !important;
+  border-width: 2px !important;
+}
+.carousel-caption{
+  width: 100% !important;
+  height: auto;
+}
+
+#sidebar-resizable{
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100vh !important;
+  background-color: var(--color-accent) !important;
+  width: var(--user-sidebar-length);
+  overflow: hidden !important;
+}
+#sidebar-list{
+  width: 100%;
+  height: 100%;
+  overflow: hidden !important;
+}#sidebar-list .nav-pills{
+  height: 100vh !important;
+}#sidebar-list .channel-icon{  
+  padding-left: 5px !important;
+  padding-right: 20px !important;
+  text-align: center !important;
+}
+#sidebar-list .nav-pills a{
+  width: 19vw !important;
+  height: fit-content !important;
+}
+#settings-modal, #sidebar-resizable, #status-modal{
+  padding: 0 !important;
+  margin: 0 !important;
+}
+#main-container{
+  background-image: url("../assets/img1.jpg");
+  /*position: absolute;
+  z-index: 1;
+  height: 100vh;
+  width: 100vw;*/
+
+}
+#pages{
+  backdrop-filter: brightness(80%) sepia(50%);
+  height: 100vh;
+  width: 100vw;
+  /*z-index: 2;
+  position: absolute;
+  top: 0;
+  left: var(--user-sidebar-length);*/
+  padding: 5%;
+}
+#pages-content{
+  background-color: var(--color-accent);
+  opacity: 80%;
+  height: 100%;
+  width: 100%;
+}
+
+#settings-close-button{
+  position: absolute !important;
+  right: 50px !important;
+  top: 50px !important;
+}
+#settings-modal .modal-header, #settings-modal .modal-body, #status-modal .modal-header, #status-modal .modal-body{
+  margin: 0 !important;
+  padding: 0 !important;
+}#status-modal{
+  width: 30% !important;
+}
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
