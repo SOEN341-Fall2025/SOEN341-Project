@@ -6,16 +6,22 @@ router.use(express.json());
 
 // Registration route 
 router.post("/api/auth/register", async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;
 
     if (!email || !password ) {
         return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-    });
+    const { data, error } = await supabase.auth.signUp(
+        {
+            email,
+            password,
+        },
+        {
+            data: {
+                username
+            }
+        });
 
     //Adding data to our own table
     const { error: databaseError } = await supabase
@@ -24,6 +30,7 @@ router.post("/api/auth/register", async (req, res) => {
                 user_id: data.user?.id,
                 Created_at: new Date().toISOString(),
                 email: email, 
+                username : username,
                 password: password 
             }]);
 
