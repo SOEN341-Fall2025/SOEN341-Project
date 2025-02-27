@@ -1,5 +1,5 @@
-import './style/App.css';
-import './style/Settings.css';
+import './style/app.css';
+import './style/settings.css';
 import React, { useState } from 'react';
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
@@ -13,6 +13,9 @@ import * as icons from 'lucide-react';
 import { LoaderPinwheel } from 'lucide-react';
 import { CircleUser } from 'lucide-react';
 import { MessageCircleDashed } from 'lucide-react';
+import { Camera } from 'lucide-react';
+import { CirclePlus } from 'lucide-react';
+import { Mic } from 'lucide-react';
 
 function App() {    
       
@@ -127,8 +130,41 @@ function App() {
               
               <Col id="pages">
               <Tab.Content id="pages-content">
-                    <Tab.Pane eventKey="page-dm">
-                      <h3>Direct Messages</h3>       
+                    <Tab.Pane eventKey="page-dm" className="no-parent-padding">
+                    <div id="mainpage-dms">
+                      <div id="sidebar-dms">
+                        
+                      <Tab.Container>
+                    <Col id="sidebar-dm">
+                      <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                        <Row id="sidebar-dm-options">
+                          <Col style={{}}>Private</Col>
+                        </Row>
+                        <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
+                        <Nav.Link>🎁</Nav.Link>
+                        <Nav.Link>Private</Nav.Link>
+                        <Nav.Link>Private</Nav.Link>
+
+                      </Nav>
+
+                      
+                      
+                    </Col>
+
+                    </Tab.Container>
+                      </div>
+                      <div id="mainview-dms">
+                        <div id="chat-box">
+                          <span id="elements-chat-box">
+                          <span id="plus"><icons.Plus/></span> 
+                          <span id="camera"><Camera/></span>
+                          <span id ="mic"><Mic/></span>
+                          <span><input id="message-box" type="text" placeholder="Send a message" required/></span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
                       <Form.Group className="divframe"></Form.Group>
                     </Tab.Pane>  
                     <Tab.Pane eventKey="page-1">

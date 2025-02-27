@@ -86,7 +86,7 @@ hr{
   position: absolute;
   top: 0;
   left: var(--user-sidebar-length);*/
-  padding: 5%;
+  padding: 1%;
 }
 #pages-content{
   background-color: var(--color-accent);
@@ -113,4 +113,84 @@ hr{
   to {
     transform: rotate(360deg);
   }
+}
+#sidebar-dm{
+  background-color: white;
+  padding-left: 12px;
+  max-height: 100% !important;
+  height: 100px;
+  width: 300px;
+}
+#sidebar-dm-options{
+  font-weight: bolder;
+  background-color: white;
+  text-align: center;
+  width: 300px;
+  height: 100%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+
+}
+
+*:has(.no-parent-padding.active){
+  padding: 0 !important;
+  opacity: 100% !important;
+  max-height: 100%;
+  position: relative !important;
+}
+
+#sidebar-dms {
+  background-color: white;
+  float: left;
+  width: 300px;
+  height: 1000px;
+}
+
+#mainview-dms{
+  background-color: wheat;
+  float: left;
+  width: max-content;
+}
+
+/* Clear floats after the columns */
+#mainpage-dms:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+
+#elements-chat-box{
+  display: flexbox;
+  column-gap: 10px !important;
+  justify-content: space-between !important;
+  align-items: flex-end;
+}
+
+#chat-box{
+  height: min-content;
+  position: absolute;
+  bottom: 0;
+  padding: 0.5%;
+  padding-left: 1%;
+  width: 100%;
+  text-align: left;
+  border-radius: 30px 30px 30px 30px;
+}
+
+#message-box{
+  border-radius: 30px 30px 30px 30px;
+  padding-left: 10px;
+  left: 0px;
+  width: 1400px;
+}
+
+#camera,#mic,#plus,#message-box{
+  position: sticky;
+  background-color: rgb(191, 191, 241);
+  text-align: center;
+  border-radius: 40px 40px 40px 40px;
+  padding: 7px;
+  margin-left: 10px;
 }

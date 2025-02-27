@@ -1,4 +1,4 @@
-import '../style/Settings.css';
+import '../style/settings.css';
 import React from 'react';
 import AppContext from '../AppContext';
 import { useContext } from 'react';
