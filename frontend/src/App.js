@@ -136,14 +136,14 @@ function App() {
                         
                       <Tab.Container>
                     <Col id="sidebar-dm">
-                      <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                      <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
                         <Row id="sidebar-dm-options">
                           <Col style={{}}>Private</Col>
                         </Row>
                         <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                        <Nav.Link>🎁</Nav.Link>
-                        <Nav.Link>Private</Nav.Link>
-                        <Nav.Link>Private</Nav.Link>
+                        <Nav.Link><icons.User/> John Doe</Nav.Link>
+                        <Nav.Link><icons.User/> Jane Doe</Nav.Link>
+                        <Nav.Link><icons.User/> Julie Doe</Nav.Link>
 
                       </Nav>
 
@@ -154,6 +154,9 @@ function App() {
                     </Tab.Container>
                       </div>
                       <div id="mainview-dms">
+                        <div id="top-box">
+                          <Nav.Link><icons.User/> John Doe</Nav.Link>
+                        </div>
                         <div id="chat-box">
                           <span id="elements-chat-box">
                           <span id="plus"><icons.Plus/></span> 

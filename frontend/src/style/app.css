@@ -194,3 +194,18 @@ hr{
   padding: 7px;
   margin-left: 10px;
 }
+
+#dm-list Nav.Link{
+  border-color: #282c34 ;
+  border-style: dashed;
+}
+#top-box{
+  background-color: white;
+  height: min-content;
+  position: absolute;
+  top: 0;
+  padding: 0.5%;
+  padding-left: 1%;
+  width: 100%;
+  text-align: left;
+}
