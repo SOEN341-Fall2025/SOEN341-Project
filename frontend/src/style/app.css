@@ -133,6 +133,8 @@ hr{
 }
 
 *:has(.no-parent-padding.active){
+  background-image: url("../assets/img1.jpg");
+  backdrop-filter: brightness(80%) sepia(50%) !important;
   padding: 0 !important;
   opacity: 100% !important;
   max-height: 100%;
@@ -147,9 +149,8 @@ hr{
 }
 
 #mainview-dms{
-  background-color: wheat;
   float: left;
-  width: max-content;
+
 }
 
 /* Clear floats after the columns */
@@ -159,53 +160,59 @@ hr{
   clear: both;
 }
 
-
-
-#elements-chat-box{
-  display: flexbox;
-  column-gap: 10px !important;
-  justify-content: space-between !important;
-  align-items: flex-end;
-}
-
 #chat-box{
   height: min-content;
   position: absolute;
   bottom: 0;
   padding: 0.5%;
   padding-left: 1%;
-  width: 100%;
   text-align: left;
-  border-radius: 30px 30px 30px 30px;
 }
 
-#message-box{
-  border-radius: 30px 30px 30px 30px;
-  padding-left: 10px;
-  left: 0px;
-  width: 1400px;
-}
-
-#camera,#mic,#plus,#message-box{
-  position: sticky;
-  background-color: rgb(191, 191, 241);
-  text-align: center;
+#camera,#mic,#plus{
+  background-color: white;
   border-radius: 40px 40px 40px 40px;
   padding: 7px;
   margin-left: 10px;
+  border: 1px solid black !important;
+  opacity: 80%;
 }
 
-#dm-list Nav.Link{
-  border-color: #282c34 ;
-  border-style: dashed;
+#message-box{
+  background-color: white;
+  border-radius: 40px 40px 40px 40px;
+  padding: 7px;
+  margin-left: 10px;
+  border: 1px solid black !important;
+  opacity: 80%;
 }
+#message-box-input{
+  border-radius: 40px 40px 40px 40px;
+  text-align: left;
+  padding-left: 10px;
+  width: 1000px;
+}
+
 #top-box{
   background-color: white;
-  height: min-content;
+  height: 50px;
   position: absolute;
   top: 0;
+  left: 312px;
   padding: 0.5%;
   padding-left: 1%;
   width: 100%;
   text-align: left;
 }
+
+#messages-view{
+  position: absolute;
+  background-color: beige !important;
+  top: 50px;
+  left: 312px;
+  height: 100% !important;
+  width: 100% !important;
+  opacity: 80% !important;
+}
+
+

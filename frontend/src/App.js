@@ -6,7 +6,7 @@ import Settings from './pages/Settings.js';
 
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
-import { Image, Modal, Tab, Col, Row, Button, Nav, Form } from 'react-bootstrap'
+import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
 
 
 import * as icons from 'lucide-react';
@@ -135,36 +135,41 @@ function App() {
                       <div id="sidebar-dms">
                         
                       <Tab.Container>
-                    <Col id="sidebar-dm">
-                      <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
-                        <Row id="sidebar-dm-options">
-                          <Col style={{}}>Private</Col>
-                        </Row>
-                        <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                        <Nav.Link><icons.User/> John Doe</Nav.Link>
-                        <Nav.Link><icons.User/> Jane Doe</Nav.Link>
-                        <Nav.Link><icons.User/> Julie Doe</Nav.Link>
+                      <Col id="sidebar-dm">
+                        <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                          <Row id="sidebar-dm-options">
+                            <Col>Private</Col>
+                          </Row>
+                          <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
+                          <Nav.Link><icons.User/> John Doe</Nav.Link>
+                          <Nav.Link><icons.User/> Jane Doe</Nav.Link>
+                          <Nav.Link><icons.User/> Julie Doe</Nav.Link>
 
-                      </Nav>
+                        </Nav>
 
-                      
-                      
-                    </Col>
+                      </Col>
 
                     </Tab.Container>
                       </div>
                       <div id="mainview-dms">
-                        <div id="top-box">
+                        <TabContainer>
+                        <Col>
+                        <Row id="top-box">
                           <Nav.Link><icons.User/> John Doe</Nav.Link>
-                        </div>
-                        <div id="chat-box">
-                          <span id="elements-chat-box">
-                          <span id="plus"><icons.Plus/></span> 
-                          <span id="camera"><Camera/></span>
-                          <span id ="mic"><Mic/></span>
-                          <span><input id="message-box" type="text" placeholder="Send a message" required/></span>
-                          </span>
-                        </div>
+                        </Row>
+
+                        <Row id="messages-view">
+
+                        </Row>
+                        <Row id="chat-box">
+                          <Col id="plus"><icons.Plus/></Col> 
+                          <Col id="camera"><Camera/></Col>
+                          <Col id ="mic"><Mic/></Col>
+                          <Col id="message-box"><input id="message-box-input" type="text" placeholder="Send a message" required/></Col>
+                          
+                        </Row>
+                        </Col>
+                        </TabContainer>
                       </div>
                     </div>
                     
