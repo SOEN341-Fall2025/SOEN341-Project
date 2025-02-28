@@ -152,24 +152,44 @@ function App() {
                     </Tab.Container>
                       </div>
                       <div id="mainview-dms">
-                        <TabContainer>
-                        <Col>
-                        <Row id="top-box">
+                        <div id="top-box">
                           <Nav.Link><icons.User/> John Doe</Nav.Link>
-                        </Row>
+                        </div>
 
-                        <Row id="messages-view">
+                        
+                        <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
+      {/* Go Back Button */}
+      <div className="back-button flex items-center cursor-pointer mb-2">
+        <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+        <span className="text-gray-700">Go Back</span>
+      </div>
 
-                        </Row>
-                        <Row id="chat-box">
-                          <Col id="plus"><icons.Plus/></Col> 
-                          <Col id="camera"><Camera/></Col>
-                          <Col id ="mic"><Mic/></Col>
-                          <Col id="message-box"><input id="message-box-input" type="text" placeholder="Send a message" required/></Col>
-                          
-                        </Row>
-                        </Col>
-                        </TabContainer>
+      {/* Chat Box */}
+      <div className="chat-box border rounded-lg p-4 bg-gray-100">
+        <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">*Chat Name*</div>
+
+        {/* Messages */}
+        <div className="message user flex items-center my-2">
+          <img src="images/background.png" alt="User" className="w-10 h-10 rounded-full" />
+          <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
+        </div>
+
+        <div className="message recipient flex items-center justify-end my-2">
+          <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
+          <img src="images/background.png" alt="Recipient" className="w-10 h-10 rounded-full" />
+        </div>
+      </div>
+
+      {/* Input Box */}
+      <div className="chat-input flex justify-between absolute bottom-5 w-full px-4">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          className="w-4/5 p-2 rounded-md border border-gray-300"
+        />
+        <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+      </div>
+    </div>
                       </div>
                     </div>
                     
