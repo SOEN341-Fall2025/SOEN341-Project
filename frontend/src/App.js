@@ -153,7 +153,7 @@ function App() {
               
               <Col id="pages">
               <Tab.Content id="pages-content">
-                    <Tab.Pane eventKey="page-dm">
+                    <Tab.Pane eventKey="page-dm" className="no-parent-padding">
                     <div id="mainpage-dms">
                       <div id="sidebar-dms">
                         

@@ -114,3 +114,182 @@ hr{
     transform: rotate(360deg);
   }
 }
+
+#sidebar-dm{
+  background-color: white;
+  padding-left: 12px;
+  max-height: 100% !important;
+  height: 100px;
+  width: 300px;
+}
+#sidebar-dm-options{
+  font-weight: bolder;
+  background-color: white;
+  text-align: center;
+  width: 300px;
+  height: 100%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+
+}
+
+*:has(.no-parent-padding.active){
+  background-image: url("../assets/img1.jpg");
+  backdrop-filter: brightness(80%) sepia(50%) !important;
+  padding: 0 !important;
+  opacity: 100% !important;
+  max-height: 100%;
+  position: relative !important;
+}
+
+#sidebar-dms {
+  background-color: white;
+  float: left;
+  width: 300px;
+  height: 1000px;
+}
+
+.chat-container {
+  
+  height: 713px;
+  position: absolute;
+  bottom: 20px; /* Distance from bottom */
+  right: 20px;  /* Distance from right */
+  width: 1100px;
+  background: #c3e7ed; /* Light blue */
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+
+  
+}
+
+/* Back Button */
+.back-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.back-button img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+/* Chat Header */
+.chat-header {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px;
+  background: linear-gradient(to right, #cdffd8, #94b9ff);
+  color: rgb(15, 12, 12);
+  border-radius: 5px;
+}
+
+/* Chat Messages */
+.message {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+
+
+.message img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Message Bubbles */
+.text {
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 60%;
+}
+
+.blue {
+  background-color: #4facfe;
+  color: white;
+  margin-left: 10px;
+}
+
+/* User message (blue) */
+.message.user {
+  flex-direction: row; /* Keep image on the left side */
+}
+
+.message.user .text {
+  margin-left: 10px;
+    
+    background-color:#5592ed 
+}
+
+/* Recipient message (green) */
+.message.recipient {
+  flex-direction: row-reverse; /* Moves the image to the right */
+}
+
+.message.recipient .text {
+  margin-right: 10px;
+  background-color: #7ed957;
+  color: rgb(12, 10, 10);
+  flex-direction: row-reverse;
+}
+
+
+/* Chat Input */
+.chat-input {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 20px;
+  width: 100%; /* Make the input take the full width */
+  padding: 0 0px;
+}
+
+.chat-input input {
+  width: 80%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.chat-input button {
+  padding: 10px;
+  border: none;
+  background: #4facfe;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+
+#dm-list Nav.Link{
+  border-color: #282c34 ;
+  border-style: dashed;
+}
+#top-box{
+  background-color: white;
+  height: 50px;
+  position: absolute;
+  top: 0;
+  left: 312px;
+  padding: 0.5%;
+  padding-left: 1%;
+  width: 100%;
+  text-align: left;
+}
+
+#messages-view{
+  position: absolute;
+  background-color: beige !important;
+  top: 50px;
+  left: 312px;
+  height: 100% !important;
+  width: 100% !important;
+  opacity: 80% !important;
+}
