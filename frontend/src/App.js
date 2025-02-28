@@ -1,12 +1,30 @@
+<<<<<<< Updated upstream
 import './style/App.css';
 import './style/Settings.css';
 import React, { useState } from 'react';
+=======
+import './style/app.css';
+import './style/settings.css';
+import React, { useState, useRef } from 'react';
+>>>>>>> Stashed changes
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
+import './style/style.css';
+import Login from './pages/Login.js';
 
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
+<<<<<<< Updated upstream
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form } from 'react-bootstrap'
+=======
+import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+>>>>>>> Stashed changes
 
 
 import * as icons from 'lucide-react';
@@ -101,9 +119,23 @@ function App() {
       Displayname: "Johnny Dough",
       Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = (username, password) => {
+    // Here, you can add authentication logic (API call or checking credentials)
+    // For now, just set it to true to simulate successful login
+    if (username && password) {
+      setIsLoggedIn(true);
+    }
+  };
   return(
       <section>      
-        <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
+
+        {/* Step 3: Conditionally render Login page or App page */}
+      {isLoggedIn ? (
+        <section>
+          <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
             <Row className='justify-content-start' id="main-container">
               <Resizable id="sidebar-resizable" maxWidth="20vw" minWidth="3vw" enable={{ right:true }}
               size={{ width, height }}
@@ -162,6 +194,11 @@ function App() {
                 </Modal.Body>
             </Modal.Dialog>
           </Modal>
+
+        </section>
+      ) : (
+        <Login onLogin={handleLogin} />
+      )}
       </section>
     );
 }
