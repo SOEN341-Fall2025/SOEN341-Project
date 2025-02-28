@@ -1,12 +1,8 @@
-<<<<<<< Updated upstream
-import './style/App.css';
-import './style/Settings.css';
-import React, { useState } from 'react';
-=======
+
 import './style/app.css';
 import './style/settings.css';
 import React, { useState, useRef } from 'react';
->>>>>>> Stashed changes
+
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
 import './style/style.css';
@@ -14,9 +10,7 @@ import Login from './pages/Login.js';
 
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
-<<<<<<< Updated upstream
-import { Image, Modal, Tab, Col, Row, Button, Nav, Form } from 'react-bootstrap'
-=======
+
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
 import {
   BrowserRouter as Router,
@@ -24,7 +18,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
->>>>>>> Stashed changes
+
 
 
 import * as icons from 'lucide-react';
@@ -160,7 +154,67 @@ function App() {
               <Col id="pages">
               <Tab.Content id="pages-content">
                     <Tab.Pane eventKey="page-dm">
-                      <h3>Direct Messages</h3>       
+                    <div id="mainpage-dms">
+                      <div id="sidebar-dms">
+                        
+                      <Tab.Container>
+                      <Col id="sidebar-dm">
+                        <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                          <Row id="sidebar-dm-options">
+                            <Col>Private</Col>
+                          </Row>
+                          <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
+                          <Nav.Link><icons.User/> John Doe</Nav.Link>
+                          <Nav.Link><icons.User/> Jane Doe</Nav.Link>
+                          <Nav.Link><icons.User/> Julie Doe</Nav.Link>
+
+                        </Nav>
+
+                      </Col>
+
+                    </Tab.Container>
+                      </div>
+                      <div id="mainview-dms">
+                        <div id="top-box">
+                          <Nav.Link><icons.User/> John Doe</Nav.Link>
+                        </div>
+
+                        
+                        <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
+      {/* Go Back Button */}
+      <div className="back-button flex items-center cursor-pointer mb-2">
+        <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+        <span className="text-gray-700">Go Back</span>
+      </div>
+
+      {/* Chat Box */}
+      <div className="chat-box border rounded-lg p-4 bg-gray-100">
+        <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">*Chat Name*</div>
+
+        {/* Messages */}
+        <div className="message user flex items-center my-2">
+          <img src="images/background.png" alt="User" className="w-10 h-10 rounded-full" />
+          <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
+        </div>
+
+        <div className="message recipient flex items-center justify-end my-2">
+          <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
+          <img src="images/background.png" alt="Recipient" className="w-10 h-10 rounded-full" />
+        </div>
+      </div>
+
+      {/* Input Box */}
+      <div className="chat-input flex justify-between absolute bottom-5 w-full px-4">
+        <input
+          type="text"
+          placeholder="Type a message..."
+          className="w-4/5 p-2 rounded-md border border-gray-300"
+        />
+        <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+      </div>
+    </div>
+                      </div>
+                    </div>     
                       <Form.Group className="divframe"></Form.Group>
                     </Tab.Pane>  
                     <Tab.Pane eventKey="page-1">
