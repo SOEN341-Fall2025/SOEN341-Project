@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
 
+
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
@@ -14,8 +15,9 @@ import { LoaderPinwheel } from 'lucide-react';
 import { CircleUser } from 'lucide-react';
 import { MessageCircleDashed } from 'lucide-react';
 import { Camera } from 'lucide-react';
-import { CirclePlus } from 'lucide-react';
 import { Mic } from 'lucide-react';
+import { ArrowLeft} from 'lucide-react';
+import { User } from 'lucide-react';
 
 function App() {    
       
@@ -160,7 +162,7 @@ function App() {
                         <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
       {/* Go Back Button */}
       <div className="back-button flex items-center cursor-pointer mb-2">
-        <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+      <ArrowLeft className="icon" />
         <span className="text-gray-700">Go Back</span>
       </div>
 
@@ -170,25 +172,38 @@ function App() {
 
         {/* Messages */}
         <div className="message user flex items-center my-2">
-          <img src="images/background.png" alt="User" className="w-10 h-10 rounded-full" />
+        <User className="icon" />
           <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
         </div>
 
         <div className="message recipient flex items-center justify-end my-2">
           <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
-          <img src="images/background.png" alt="Recipient" className="w-10 h-10 rounded-full" />
+          <User className="icon" />
         </div>
       </div>
 
-      {/* Input Box */}
-      <div className="chat-input flex justify-between absolute bottom-5 w-full px-4">
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="w-4/5 p-2 rounded-md border border-gray-300"
-        />
-        <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
-      </div>
+      <Row id="chat-box" className="d-flex align-items-center">
+  {/* Icons (Plus, Camera, Mic) */}
+  <Col className="d-flex gap-2">
+    <div id="plus"><icons.Plus /></div>
+    <div id="camera"><Camera /></div>
+    <div id="mic"><Mic /></div>
+  </Col>
+
+  {/* Input Box and Send Button */}
+  <Col className="flex-grow-1">
+    <div className="chat-input d-flex gap-2 align-items-center">
+      <input
+        type="text"
+        placeholder="Type a message..."
+        className="flex-grow-1 p-2 rounded border"
+      />
+      <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+    </div>
+  </Col>
+</Row>
+      
+      
     </div>
                       </div>
                     </div>

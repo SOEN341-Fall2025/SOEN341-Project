@@ -71,7 +71,7 @@ hr{
   margin: 0 !important;
 }
 #main-container{
-  background-image: url("../assets/img1.jpg");
+  background-image: url("../assets/background.png");
   /*position: absolute;
   z-index: 1;
   height: 100vh;
@@ -150,11 +150,11 @@ hr{
 
 .chat-container {
   
-  height: 713px;
+  height: 704px;
   position: absolute;
   bottom: 20px; /* Distance from bottom */
   right: 20px;  /* Distance from right */
-  width: 1100px;
+  width: 1081px;
   background: #c3e7ed; /* Light blue */
   border-radius: 10px;
   padding: 15px;
@@ -227,8 +227,10 @@ hr{
     background-color:#5592ed 
 }
 
+
 /* Recipient message (green) */
 .message.recipient {
+  
   flex-direction: row-reverse; /* Moves the image to the right */
 }
 
@@ -241,29 +243,35 @@ hr{
 
 
 /* Chat Input */
-.chat-input {
-  display: flex;
-  justify-content: space-between;
-  position: absolute;
-  bottom: 20px;
-  width: 100%; /* Make the input take the full width */
-  padding: 0 0px;
+#plus, #camera, #mic {
+  cursor: pointer; /* Make icons clickable */
+  padding: 8px; /* Add padding around icons */
+  border-radius: 50%; /* Circular icons */
+  background-color: #e0e0e0; /* Light gray background */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+#plus:hover, #camera:hover, #mic:hover {
+  background-color: #d0d0d0; /* Darker gray on hover */
 }
 
 .chat-input input {
-  width: 80%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #ccc; /* Light border for input */
+  outline: none; /* Remove default outline */
+}
+
+.chat-input input:focus {
+  border-color: #4facfe; /* Highlight input on focus */
 }
 
 .chat-input button {
-  padding: 10px;
-  border: none;
-  background: #4facfe;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
+  border: none; /* Remove default button border */
+  cursor: pointer; /* Make button clickable */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.chat-input button:hover {
+  background-color: #3a8fd9; /* Darker blue on hover */
 }
 
 
@@ -291,6 +299,17 @@ hr{
   height: 100% !important;
   width: 100% !important;
   opacity: 80% !important;
+}
+
+#chat-box{
+  height: min-content;
+  position: absolute;
+  bottom: 0;
+  padding: 0.5%;
+  padding-left: 1%;
+  width: 100%;
+  text-align: left;
+  border-radius: 30px 30px 30px 30px;
 }
 
 
