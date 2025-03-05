@@ -4,6 +4,39 @@ import { supabase } from "../server.js";
 
 //Retrieve private DM (When user is receiving message)
 
+router.get("/dm/retrieve", async (req, res) => {
+
+    const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+    if (error || !user) {
+        return res.status(401).json(error);
+    }
+
+    const { email } = req.body;
+
+    const receiverInfo = await fetch(`http://localhost:4000/api/userid/${email}`);
+    const receiverData = await receiverInfo.json();
+    const receiverId = receiverData.data.user_id;
+
+    console.log(user.id);
+    console.log(receiverId);
+
+    const { data, error: databaseError } = await supabase
+        .from('DMs')
+        .select('*')
+        .or(
+            `and(BubblerID.eq.${user.id},PopperID.eq.${receiverId}),and(BubblerID.eq.${receiverId},PopperID.eq.${user.id})`
+        );
+
+    console.log("data here: " + data);
+
+    if (databaseError) {
+        return res.status(500).json({msg:"Messages could not be fetched.", databaseError});
+    }
+
+    res.json({ msg: "DMs were fetched.", data });
+
+});
 
 
 //Save private DM (When user is sending message)
@@ -13,7 +46,7 @@ router.post("/dm/save", async (req, res) => {
 
     if (error || !user) {
         return res.status(401).json(error);
-      }
+    }
 
     const { email, message } = req.body;
 
@@ -65,7 +98,7 @@ router.get("/api/userid/:email", async (req, res) => {
 
     res.status(200).json({ msg: "Uuid was retrieved.", data });
 
-})
+});
 
 
 
