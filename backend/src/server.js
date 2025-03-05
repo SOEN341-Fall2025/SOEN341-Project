@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 
 // Initialize Supabase client
 const supabaseUrl = "https://syipugxeidvveqpbpnum.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5aXB1Z3hlaWR2dmVxcGJwbnVtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTMzMTc4MSwiZXhwIjoyMDU0OTA3NzgxfQ._HzFV9tDQ-ncpLCxeS4Pjj3Q-1NyryKDJ1Mn3gU3H_I";
+const supabaseKey = process.env.SUPABASE_KEY;
 
 //Initializes the cover page (Login page)
 app.get('/login', (req, res) => {
