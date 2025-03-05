@@ -1,18 +1,23 @@
-import './style/App.css';
-import './style/Settings.css';
+import './style/app.css';
+import './style/settings.css';
 import React, { useState } from 'react';
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
 
+
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
-import { Image, Modal, Tab, Col, Row, Button, Nav, Form } from 'react-bootstrap'
+import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
 
 
 import * as icons from 'lucide-react';
 import { LoaderPinwheel } from 'lucide-react';
 import { CircleUser } from 'lucide-react';
 import { MessageCircleDashed } from 'lucide-react';
+import { Camera } from 'lucide-react';
+import { Mic } from 'lucide-react';
+import { ArrowLeft} from 'lucide-react';
+import { User } from 'lucide-react';
 
 function App() {    
       
@@ -127,8 +132,82 @@ function App() {
               
               <Col id="pages">
               <Tab.Content id="pages-content">
-                    <Tab.Pane eventKey="page-dm">
-                      <h3>Direct Messages</h3>       
+                    <Tab.Pane eventKey="page-dm" className="no-parent-padding">
+                    <div id="mainpage-dms">
+                      <div id="sidebar-dms">
+                        
+                      <Tab.Container>
+                      <Col id="sidebar-dm">
+                        <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                          <Row id="sidebar-dm-options">
+                            <Col>Private</Col>
+                          </Row>
+                          <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
+                          <Nav.Link><icons.User/> John Doe</Nav.Link>
+                          <Nav.Link><icons.User/> Jane Doe</Nav.Link>
+                          <Nav.Link><icons.User/> Julie Doe</Nav.Link>
+
+                        </Nav>
+
+                      </Col>
+
+                    </Tab.Container>
+                      </div>
+                      <div id="mainview-dms">
+                        <div id="top-box">
+                          <Nav.Link><icons.User/> John Doe</Nav.Link>
+                        </div>
+
+                        
+                        <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
+      {/* Go Back Button */}
+      <div className="back-button flex items-center cursor-pointer mb-2">
+      <ArrowLeft className="icon" />
+        <span className="text-gray-700">Go Back</span>
+      </div>
+
+      {/* Chat Box */}
+      <div className="chat-box border rounded-lg p-4 bg-gray-100">
+        <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">*Chat Name*</div>
+
+        {/* Messages */}
+        <div className="message user flex items-center my-2">
+        <User className="icon" />
+          <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
+        </div>
+
+        <div className="message recipient flex items-center justify-end my-2">
+          <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
+          <User className="icon" />
+        </div>
+      </div>
+
+      <Row id="chat-box" className="d-flex align-items-center">
+  {/* Icons (Plus, Camera, Mic) */}
+  <Col className="d-flex gap-2">
+    <div id="plus"><icons.Plus /></div>
+    <div id="camera"><Camera /></div>
+    <div id="mic"><Mic /></div>
+  </Col>
+
+  {/* Input Box and Send Button */}
+  <Col className="flex-grow-1">
+    <div className="chat-input d-flex gap-2 align-items-center">
+      <input
+        type="text"
+        placeholder="Type a message..."
+        className="flex-grow-1 p-2 rounded border"
+      />
+      <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+    </div>
+  </Col>
+</Row>
+      
+      
+    </div>
+                      </div>
+                    </div>
+                    
                       <Form.Group className="divframe"></Form.Group>
                     </Tab.Pane>  
                     <Tab.Pane eventKey="page-1">
