@@ -1,29 +1,32 @@
-const express = require("express");
-
+import express from "express";
 // Initialize Router element
 const router = express.Router();
+import { supabase } from "./server.js";
 
-router.put("/api/update-username", async (req, res) => {
-    const { id, newUsername } = req.body; // Get the user ID and new username from the request body
+router.use(express.json());
 
-    // Validate input
-    if (!id || !newUsername) {
-        return res.status(400).json({ msg: "User ID and new username are required" });
-    }
+router.put("/api/newusername", async (req, res) => {
+  const { user_id, newUsername } = req.body; // Get the user ID and new username from the request body
 
-    // Update the username in the database
-    const { data, error } = await supabase
-        .from('Users')
-        .update({ username: newUsername })
-        .eq('id', id); // Update the user with the matching ID
+  // Validate input
+  if (!user_id || !newUsername) {
+    return res
+      .status(400)
+      .json({ msg: "User ID and new username are required" });
+  }
 
-    if (error) {
-        return res.status(400).json({ msg: error.message });
-    }
+  // Update the username in the database
+  const { data, error: databaseError } = await supabase
+    .from("Users")
+    .update({ username: newUsername })
+    .eq("user_id", user_id); // Update the user with the matching ID
 
-    // Return success response
-    res.json({ msg: "Username updated successfully", data });
+  if (databaseError) {
+    return res.status(400).json({ msg: error.message });
+  }
+
+  // Return success response
+  res.status(200).json({ msg: "Username updated successfully", data });
 });
 
-module.exports = router;
-
+export default router;
