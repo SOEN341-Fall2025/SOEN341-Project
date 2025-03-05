@@ -5,11 +5,18 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { createClient } from "@supabase/supabase-js";
+import deleteMessageRoute from "./deleteMessage.js";
 
 dotenv.config();
 
 // Initialize Express app
 const app = express();
+
+//Importing routes
+import ProtectedRoute from "./routes/ProtectedRoute.js";
+import User from "./user.js";
+app.use(ProtectedRoute);
+app.use(User);
 
 //Retrieves information of the current directory
 const __filename = fileURLToPath(import.meta.url);
@@ -87,6 +94,8 @@ app.post("/api/auth/logout", async (req, res) => {
 
     res.json({ msg: "Logged out successfully" });
 });
+
+app.use(deleteMessageRoute);
 
 // Start server
 const PORT = 4000;
