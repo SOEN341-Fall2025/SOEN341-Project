@@ -5,7 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { createClient } from "@supabase/supabase-js";
-import deleteMessageRoute from "./deleteMessage.js";
+//import deleteMessageRoute from "./deleteMessage.js";
 
 dotenv.config();
 
@@ -34,6 +34,10 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 // Initialize Supabase client
 const supabaseUrl = "https://syipugxeidvveqpbpnum.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5aXB1Z3hlaWR2dmVxcGJwbnVtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTMzMTc4MSwiZXhwIjoyMDU0OTA3NzgxfQ._HzFV9tDQ-ncpLCxeS4Pjj3Q-1NyryKDJ1Mn3gU3H_I";
+<<<<<<< HEAD
+=======
+
+>>>>>>> b75f4cc (server update)
 
 //Initializes the cover page (Login page)
 app.get('/login', (req, res) => {
@@ -107,4 +111,8 @@ app.use(deleteMessageRoute);
 const PORT = 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+<<<<<<< HEAD
 export const supabase = createClient(supabaseUrl, supabaseKey);
+=======
+const supabase = createClient(supabaseUrl, supabaseKey);
+>>>>>>> b75f4cc (server update)
