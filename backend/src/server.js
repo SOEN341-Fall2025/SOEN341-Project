@@ -13,7 +13,9 @@ const app = express();
 
 //Importing routes
 import ProtectedRoute from "./routes/ProtectedRoute.js";
+import MessagingRoute from "./routes/MessagingRoute.js";
 app.use(ProtectedRoute);
+app.use(MessagingRoute);
 
 //Retrieves information of the current directory
 const __filename = fileURLToPath(import.meta.url);
