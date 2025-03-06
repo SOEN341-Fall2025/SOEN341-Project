@@ -14,7 +14,7 @@ router.get("/dm/retrieve", async (req, res) => {
 
     const { email } = req.body;
 
-    const receiverInfo = await fetch(`http://localhost:4000/api/userid/${email}`);
+    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid/${email}`);
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
@@ -45,7 +45,7 @@ router.post("/dm/save", async (req, res) => {
 
     const { email, message } = req.body;
 
-    const receiverInfo = await fetch(`http://localhost:4000/api/userid/${email}`);
+    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid/${email}`);
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
@@ -73,31 +73,67 @@ router.post("/dm/save", async (req, res) => {
 });
 
 
-//List of previously DM'd people
+//List of previously DM'd people (all the people you have previously DM-ed)
 router.get("/dm/contacts", async (req, res) => {
 
-    const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+        const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
-    if (error || !user) {
-        return res.status(401).json(error);
-    }
+        if (error || !user) {
+            return res.status(401).json({ msg: "Unauthorized", error });
+        }
 
-    const { data, error: databaseError } = await supabase
-        .from('DMs')
-        .select('*')
-        .or(
-            `and(BubblerID.eq.${user.id},and(PopperID.eq.${user.id})`
-        );
+        // Fetch messages involving the user
+        const { data, error: databaseError } = await supabase
+            .from("DMs")
+            .select("*")
+            .or(`BubblerID.eq.${user.id},PopperID.eq.${user.id}`);
 
-    console.log("data here: " + data);
+        const contacts = await processDMs(data, user.id);
 
-    if (databaseError) {
-        return res.status(500).json({msg:"Contacts could not be fetched.", databaseError});
-    }
+        if (databaseError) {
+            return res.status(500).json({ msg: "Contacts could not be fetched.", error: databaseError });
+        }
 
-    res.json({ msg: "Contacts were fetched.", data });
+        res.json({ msg: "Contacts were fetched.", data: contacts });
 
 });
+
+async function processDMs(messages, userid) {
+
+    messages.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+
+    let uniqueContacts = new Set();
+
+    for (let msg of messages) {
+        if (msg.BubblerID !== userid) {
+            uniqueContacts.add(msg.BubblerID);
+        }
+        if (msg.PopperID !== userid) {
+            uniqueContacts.add(msg.PopperID);
+        }
+    }
+
+    let contactsArray = await Promise.all(
+        Array.from(uniqueContacts).map(async (uuid) => {
+            const username = await processContacts(uuid);
+            return { username };
+        })
+    );
+
+    return contactsArray;
+}
+
+async function processContacts(uuid){
+    try {
+        const response = await fetch(`http://localhost:4000/api/get/username-id/${uuid}`);
+        const result = await response.json();
+        return result.data?.username;
+    } catch (error) {
+        console.error("Username could not be retrieved.", error);
+        return "Unknown User";
+    } 
+}
+
 
 //Retrieve User uuid using a user's email
 router.get("/api/get/userid/:email", async (req, res) => {
