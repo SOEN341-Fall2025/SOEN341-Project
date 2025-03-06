@@ -2,8 +2,8 @@ import express from "express";
 const router = express.Router();
 import { supabase } from "../server.js";
 
-//Retrieve private DM (When user is receiving message)
 
+//Retrieve private DM (When user is receiving message)
 router.get("/dm/retrieve", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
@@ -18,17 +18,12 @@ router.get("/dm/retrieve", async (req, res) => {
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
-    console.log(user.id);
-    console.log(receiverId);
-
     const { data, error: databaseError } = await supabase
         .from('DMs')
         .select('*')
         .or(
             `and(BubblerID.eq.${user.id},PopperID.eq.${receiverId}),and(BubblerID.eq.${receiverId},PopperID.eq.${user.id})`
         );
-
-    console.log("data here: " + data);
 
     if (databaseError) {
         return res.status(500).json({msg:"Messages could not be fetched.", databaseError});
@@ -78,8 +73,34 @@ router.post("/dm/save", async (req, res) => {
 });
 
 
+//List of previously DM'd people
+router.get("/dm/contacts", async (req, res) => {
+
+    const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+    if (error || !user) {
+        return res.status(401).json(error);
+    }
+
+    const { data, error: databaseError } = await supabase
+        .from('DMs')
+        .select('*')
+        .or(
+            `and(BubblerID.eq.${user.id},and(PopperID.eq.${user.id})`
+        );
+
+    console.log("data here: " + data);
+
+    if (databaseError) {
+        return res.status(500).json({msg:"Contacts could not be fetched.", databaseError});
+    }
+
+    res.json({ msg: "Contacts were fetched.", data });
+
+});
+
 //Retrieve User uuid using a user's email
-router.get("/api/userid/:email", async (req, res) => {
+router.get("/api/get/userid/:email", async (req, res) => {
 
     const { email } = req.params;
 
@@ -101,5 +122,48 @@ router.get("/api/userid/:email", async (req, res) => {
 });
 
 
+//Retrieve username using a user's email
+router.get("/api/get/username-email/:email", async (req, res) => {
+
+    const { email } = req.params;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email was not received." });
+    }
+    const { data, error } = await supabase
+    .from('Users')
+    .select('username') 
+    .eq('email', email)
+    .single();
+
+    if (error) {
+        return res.status(400).json({ msg: error.message });
+    }
+
+    res.status(200).json({ msg: "Username was retrieved.", data });
+
+});
+
+//Retrieve username using a user's uuid
+router.get("/api/get/username-id/:uuid", async (req, res) => {
+
+    const { uuid } = req.params;
+
+    if (!uuid) {
+        return res.status(400).json({ error: "Uuid was not received." });
+    }
+    const { data, error } = await supabase
+    .from('Users')
+    .select('username') 
+    .eq('user_id', uuid)
+    .single();
+
+    if (error) {
+        return res.status(400).json({ msg: error.message });
+    }
+
+    res.status(200).json({ msg: "Username was retrieved.", data });
+
+});
 
 export default router;
