@@ -5,7 +5,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { createClient } from "@supabase/supabase-js";
-//import deleteMessageRoute from "./deleteMessage.js";
 
 dotenv.config();
 
@@ -15,15 +14,10 @@ const app = express();
 //Importing routes
 import ProtectedRoute from "./routes/ProtectedRoute.js";
 import User from "./user.js";
+import Admin from "./admin.js";
 app.use(ProtectedRoute);
 app.use(User);
-
-
-//Importing routes
-import ProtectedRoute from "./routes/ProtectedRoute.js";
-import User from "./user.js";
-app.use(ProtectedRoute);
-app.use(User);
+app.use(Admin);
 
 //Retrieves information of the current directory
 const __filename = fileURLToPath(import.meta.url);
@@ -38,7 +32,6 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 const supabaseUrl = "https://syipugxeidvveqpbpnum.supabase.co";
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5aXB1Z3hlaWR2dmVxcGJwbnVtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTMzMTc4MSwiZXhwIjoyMDU0OTA3NzgxfQ._HzFV9tDQ-ncpLCxeS4Pjj3Q-1NyryKDJ1Mn3gU3H_I";
 
-
 //Initializes the cover page (Login page)
 app.get('/login', (req, res) => {
    
@@ -52,4 +45,4 @@ app.get("/", (req, res) => res.send("Bublii is now running."));
 const PORT = 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
