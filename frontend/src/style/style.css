@@ -9,14 +9,14 @@ body{
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url(img1.jpg) no-repeat;
+    background: url('../assets/img1.jpg') no-repeat;
     background-size: cover;
     background-position: center;
 }
 .wrapper{
     width: 420px;
     background: transparent;
-    border: 2px solid #0052A5;
+    border: 2px solid #0052A5 !important;
     backdrop-filter: blur(15px);
     box-shadow: 10px rgba(0,0,0, .5);
     color: #0052A5;
@@ -39,7 +39,7 @@ body{
     background: transparent;
     border: none;
     outline: none;
-    border: 2px solid #0052A5;
+    border: 2px solid #0052A5 !important;
     border-radius: 40px;
     font-size: 16px;
     color: #0052A5;
@@ -68,6 +68,7 @@ body{
 .text a{
    color: #0052A5;
    text-decoration: none;
+   
 }
 .text a:hover{
     text-decoration: underline;

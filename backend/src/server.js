@@ -13,11 +13,14 @@ const app = express();
 
 //Importing routes
 import ProtectedRoute from "./routes/ProtectedRoute.js";
+import MessagingRoute from "./routes/MessagingRoute.js";
 import User from "./user.js";
 import Admin from "./admin.js";
 app.use(ProtectedRoute);
+app.use(MessagingRoute);
 app.use(User);
 app.use(Admin);
+
 
 //Retrieves information of the current directory
 const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +33,7 @@ app.use(express.static(path.join(__dirname, '../../frontend')));
 
 // Initialize Supabase client
 const supabaseUrl = "https://syipugxeidvveqpbpnum.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5aXB1Z3hlaWR2dmVxcGJwbnVtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczOTMzMTc4MSwiZXhwIjoyMDU0OTA3NzgxfQ._HzFV9tDQ-ncpLCxeS4Pjj3Q-1NyryKDJ1Mn3gU3H_I";
+const supabaseKey = process.env.SUPABASE_KEY;
 
 //Initializes the cover page (Login page)
 app.get('/login', (req, res) => {
