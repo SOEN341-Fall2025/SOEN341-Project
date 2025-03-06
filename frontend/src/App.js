@@ -114,13 +114,37 @@ function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = (username, password) => {
+  const handleLogin = async (email, password) => {
     // Here, you can add authentication logic (API call or checking credentials)
     // For now, just set it to true to simulate successful login
-    if (username && password) {
+
+    console.log("DEBUG: handleLogin called with:", email, password);
+
+    try{
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!data.token) {
+        console.log("Login was unsuccessful.", data);
+        setIsLoggedIn(false);
+        return;
+      }
+
+      console.log("Login was successful.", data);
       setIsLoggedIn(true);
+
+    }catch(error){
+      console.error("There was an error during login.");
     }
   };
+
   return(
       <section>      
 
