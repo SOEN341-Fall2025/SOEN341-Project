@@ -14,14 +14,21 @@ const app = express();
 //Importing routes
 import ProtectedRoute from "./routes/ProtectedRoute.js";
 import MessagingRoute from "./routes/MessagingRoute.js";
+import User from "./user.js";
+import Admin from "./admin.js";
 app.use(ProtectedRoute);
 app.use(MessagingRoute);
+app.use(User);
+app.use(Admin);
+
 
 //Retrieves information of the current directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-app.use(cors());
+app.use(
+    cors()
+  );
 app.use(express.json());
 //Gives access to the JS and CSS
 app.use(express.static(path.join(__dirname, '../../frontend')));

@@ -3,13 +3,14 @@ import '../style/style.css'
 
 function Login({onLogin}){
 
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     // Handle form submission
     const handleSubmit = (e) => {
-    e.preventDefault();
-    onLogin(username, password);  // Call onLogin passed from the parent (App)
+        console.log("DEBUG: handleSubmit has been called.");
+        e.preventDefault();
+        onLogin(email, password);  // Call onLogin passed from the parent (App)
     };
 
     
@@ -30,7 +31,7 @@ function Login({onLogin}){
             <form id = "loginForm" onSubmit={handleSubmit}>
                 <h1>Login</h1>
                 <div class="input-box">
-                    <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}required/>
+                    <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}required/>
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
