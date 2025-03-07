@@ -284,10 +284,6 @@ function App() {
     }
   };
 
-  return(
-      <section>      
-
-
   return (
     <section>
     
