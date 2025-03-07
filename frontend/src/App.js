@@ -196,58 +196,54 @@ function App() {
 
                     </Tab.Container>
                       </div>
-                      <div id="mainview-dms">
-                        <div id="top-box">
-                          <Nav.Link><icons.User/> John Doe</Nav.Link>
-                        </div>
-
-                        
-                        <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
+<div id="mainview-dms">
+                                              
+                        <div className="chat-container">
       {/* Go Back Button */}
-      <div className="back-button flex items-center cursor-pointer mb-2">
-        <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+      <div className="back-button">
+        <ArrowLeft className="w-10 h-10 mr-2" />
         <span className="text-gray-700">Go Back</span>
       </div>
 
       {/* Chat Box */}
-      <div className="chat-box border rounded-lg p-4 bg-gray-100">
-        <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">*Chat Name*</div>
+      <div className="chat-box">
+        <div className="chat-header">*Chat Name*</div>
 
         {/* Messages */}
-        <div className="message user flex items-center my-2">
+        <div className="message user ">
         <User className="icon" />
-          <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
+          <div className="text">Hello! How are you?</div>
         </div>
 
-        <div className="message recipient flex items-center justify-end my-2">
-          <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
+        <div className="message recipient ">
+          <div className="text ">I'm good, thanks!</div>
           <User className="icon" />
         </div>
-      </div>
+        </div>
 
-      <Row id="chat-box" className="d-flex align-items-center">
-  {/* Icons (Plus, Camera, Mic) */}
-  <Col className="d-flex gap-2">
-    <div id="plus"><icons.Plus /></div>
-    <div id="camera"><Camera /></div>
-    <div id="mic"><Mic /></div>
-  </Col>
+         <Row id="chat-box" className="d-flex align-items-center">
+         {/* Icons (Plus, Camera, Mic) */}
+         <Col className="d-flex gap-2">
+        <div id="plus"><icons.Plus /></div>
+        <div id="camera"><Camera /></div>
+        <div id="mic"><Mic /></div>
+        </Col>
 
-  {/* Input Box and Send Button */}
-  <Col className="flex-grow-1">
-    <div className="chat-input d-flex gap-2 align-items-center">
-      <input
-        type="text"
-        placeholder="Type a message..."
-        className="flex-grow-1 p-2 rounded border"
-      />
-      <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
-    </div>
-  </Col>
-</Row>
+        {/* Input Box and Send Button */}
+        <Col className="flex-grow-1">
+        <div className="chat-input">
+         <input
+           type="text"
+           placeholder="Type a message..."
+           className="flex-grow-1 p-2 rounded border"
+         />
+          <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+        </div>
+        </Col>
+        </Row>
       
       
-    </div>
+</div>
                       </div>
                     </div>
                     
