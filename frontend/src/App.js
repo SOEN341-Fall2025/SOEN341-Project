@@ -30,6 +30,7 @@ function App() {
   const [newName, setNewName] = useState("");
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
+  const [newMessage, setNewMessage] = useState("");
   const handleClose = () => setShow(false);
   function handleClick(key) {
     setShow(key);
@@ -197,6 +198,28 @@ function App() {
     );
   };
 
+  const MessageList = ({ messages }) => {
+    return (
+      <span>
+        {messages.map((item, index) =>
+          <div className="message recipient flex items-center justify-end my-2">
+            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">{item.message}</div>
+            <User className="icon" />
+          </div>
+        )}
+      </span>
+    )
+  };
+
+  const handleMessages = (newMessage) => {
+    setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
+  };
+
+  const handleSubmitMessages = (event) => {
+    event.preventDefault();  // Prevents page reload on submit
+    handleMessages(newMessage);  // Pass the new name and any other parameters
+  };
+
   // VARIABLES AND DATA
   const [width, setWidth] = React.useState("3.5");
   const [height, setHeight] = React.useState(200);
@@ -236,6 +259,10 @@ function App() {
     { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
   );
 
+  const [directMessages, setDirectMessages] = useState([
+    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
+  ]);
+
   const userProfile = {
     // GET items from database
     username: "@John",
@@ -257,7 +284,7 @@ function App() {
     // Here, you can add authentication logic (API call or checking credentials)
     // For now, just set it to true to simulate successful login
 
-    console.log("DEBUG: handleLogin called with:", email, password);
+    /*console.log("DEBUG: handleLogin called with:", email, password);
 
     try{
       const response = await fetch("/api/auth/login", {
@@ -281,16 +308,13 @@ function App() {
 
     }catch(error){
       console.error("There was an error during login.");
-    }
+    }*/
+    setIsLoggedIn(true);
   };
-
-  return(
-      <section>      
-
 
   return (
     <section>
-    
+
       {/* Step 3: Conditionally render Login page or App page */}
       {isLoggedIn ? (
         <section>
@@ -367,6 +391,7 @@ function App() {
                               <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
                               <User className="icon" />
                             </div>
+                            <MessageList messages={directMessages} />
                           </div>
 
                           <Row id="chat-box" className="d-flex align-items-center">
@@ -379,14 +404,18 @@ function App() {
 
                             {/* Input Box and Send Button */}
                             <Col className="flex-grow-1">
-                              <div className="chat-input d-flex gap-2 align-items-center">
-                                <input
-                                  type="text"
-                                  placeholder="Type a message..."
-                                  className="flex-grow-1 p-2 rounded border"
-                                />
-                                <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
-                              </div>
+                              <form onSubmit={handleSubmitMessages}>
+                                <div className="chat-input d-flex gap-2 align-items-center">
+                                  <input
+                                    type="text"
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    placeholder="Type a message..."
+                                    className="flex-grow-1 p-2 rounded border"
+                                  />
+                                  <button type="submit" className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+                                </div>
+                              </form>
                             </Col>
                           </Row>
 
