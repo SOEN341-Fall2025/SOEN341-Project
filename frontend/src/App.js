@@ -287,6 +287,10 @@ function App() {
   return(
       <section>      
 
+
+  return (
+    <section>
+    
       {/* Step 3: Conditionally render Login page or App page */}
       {isLoggedIn ? (
         <section>
