@@ -3,15 +3,46 @@ import React from 'react';
 import AppContext from '../AppContext';
 import { useContext } from 'react';
 import { useState } from 'react';
+
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
 function Settings() {
     
       const [modalState, setModalState] = useState("close");
+     const { AboutMe, setNewAboutme, user_id } = useContext(AppContext);
+      const [newAboutMe, setNewAboutMe] = useState("");
       const handleClose = () => setModalState(false);
       function handleClick(key) {
           setModalState(key);
       }
+      const changeAboutMe = async (user_id, newAboutMe) => {
+        console.log("Sending data:", { user_id, newAboutMe }); // Log the data being sent
+        try {
+          const response = await fetch("/api/newaboutme", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id, newAboutMe }), // Send user_id and newAboutMe to the backend
+          });
+      
+          const data = await response.json();
+          console.log("Response from backend:", data); // Log the response
+      
+          if (!response.ok) {
+            console.log("Update was unsuccessful.", data);
+            return;
+          }
+      
+          console.log("Update was successful.", data);
+          setNewAboutme(newAboutMe); // Update the context with the new About Me text
+          setNewAboutMe(""); // Clear the textarea after successful update
+         handleClose();
+        } catch (error) {
+          console.error("There was an error in updating about me.", error);
+        }
+      };
+
       const { ProfilePic, Username, Displayname, Aboutme } = useContext(AppContext);
     return (      
       <section>
@@ -90,10 +121,24 @@ function Settings() {
                     <Modal show={modalState === "modal-profile-3"} onHide={handleClose} eventKey="modal-profile-3" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
                           <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
-                          <Modal.Body>                      
-                            <h5 className="text-center">Change Your About Me</h5>
-                          </Modal.Body>
-                      </Modal.Dialog>
+                          <Modal.Body>
+          
+                           <div>
+    
+                             <label>
+                                <textarea
+                                name="postContent"
+                                value={newAboutMe}
+                                onChange={(e) => setNewAboutMe(e.target.value)}
+                                rows={4}
+                                 cols={40}
+      
+                                /> 
+                                 </label>
+    <Button onClick={() => changeAboutMe(user_id, newAboutMe)}>Update About Me</Button>
+  </div>
+          </Modal.Body>
+        </Modal.Dialog>
                     </Modal>
                     <Modal show={modalState === "modal-profile-4"} onHide={handleClose} eventKey="modal-profile-4" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
