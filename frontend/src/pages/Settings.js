@@ -112,9 +112,13 @@ function Settings() {
                     <Modal show={modalState === "modal-profile-2"} onHide={handleClose} eventKey="modal-profile-2" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
                           <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
-                          <Modal.Body>                      
-                            <h5 className="text-center">Change Your Username</h5>
-                            <h6 className="label text-center">Enter Modified Name and Password</h6>
+                          <Modal.Body> 
+                            <Form>      
+                               <Form.Group>   
+                               <Form.Control name="username" id="username" placeholder="Enter new username" />
+                               <Button type="submit" className="btn btn-primary">Update username</Button>
+                               </Form.Group> 
+                             </Form>         
                           </Modal.Body>
                       </Modal.Dialog>
                     </Modal>
