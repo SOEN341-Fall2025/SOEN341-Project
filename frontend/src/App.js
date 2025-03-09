@@ -1,6 +1,6 @@
 import './style/app.css';
 import './style/settings.css';
-import React, { useState } from 'react';
+import React, { useState, createContext } from 'react';
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
 import './style/style.css';
@@ -23,11 +23,12 @@ import { Mic } from 'lucide-react';
 import { ArrowLeft } from 'lucide-react';
 import { User } from 'lucide-react';
 import { Plus } from 'lucide-react';
-
 function App() {
 
   const [showState, setShow] = useState("close");
   const [newName, setNewName] = useState("");
+
+const [newAboutme, setNewAboutme] = useState("Initial about me text");
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const handleClose = () => setShow(false);
@@ -248,11 +249,12 @@ function App() {
     ProfilePic: ProfilePic,
     Username: "@John_Doe77",
     Displayname: "Johnny Dough",
-    Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
+    Aboutme: newAboutme,
+    setNewAboutme: setNewAboutme,
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [user_id, setUserId] = useState(null);
   const handleLogin = async (email, password) => {
     // Here, you can add authentication logic (API call or checking credentials)
     // For now, just set it to true to simulate successful login
@@ -278,12 +280,13 @@ function App() {
 
       console.log("Login was successful.", data);
       setIsLoggedIn(true);
+      setUserId(data.user_id);
 
     }catch(error){
       console.error("There was an error during login.");
     }
   };
-
+  
   return (
     <section>
     
@@ -465,3 +468,4 @@ function App() {
 }
 
 export default App;
+
