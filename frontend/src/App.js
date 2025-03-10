@@ -284,7 +284,7 @@ function App() {
     // Here, you can add authentication logic (API call or checking credentials)
     // For now, just set it to true to simulate successful login
 
-    /*console.log("DEBUG: handleLogin called with:", email, password);
+    console.log("DEBUG: handleLogin called with:", email, password);
 
     try{
       const response = await fetch("/api/auth/login", {
@@ -308,8 +308,9 @@ function App() {
 
     }catch(error){
       console.error("There was an error during login.");
-    }*/
-    setIsLoggedIn(true);
+    }
+      
+    //setIsLoggedIn(true);
   };
 
   return (

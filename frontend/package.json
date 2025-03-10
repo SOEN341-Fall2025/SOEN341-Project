@@ -6,7 +6,7 @@
     "@restart/ui": "^1.9.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
+    "@testing-library/react": "^19.0.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
     "jquery": "^3.7.1",
@@ -46,8 +46,7 @@
     ]
   },
   
-  "options": {
-    "allowedHosts": ["localhost", ".localhost"],
+  
     "proxy": "http://localhost:4000/"
-  }
+  
 }

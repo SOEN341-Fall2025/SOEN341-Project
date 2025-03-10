@@ -31,7 +31,8 @@ app.use(
   );
 app.use(express.json());
 //Gives access to the JS and CSS
-app.use(express.static(path.join(__dirname, '../../frontend')));
+//app.use(express.static(path.join(__dirname, '../../frontend')));
+app.use(express.static(path.join(__dirname, '../../frontend/build'))); 
 
 // Initialize Supabase client
 const supabaseUrl = "https://syipugxeidvveqpbpnum.supabase.co";
@@ -40,7 +41,8 @@ const supabaseKey = process.env.SUPABASE_KEY;
 //Initializes the cover page (Login page)
 app.get('/login', (req, res) => {
    
-    res.sendFile(path.join(__dirname, '../../frontend/Login.html'));
+    //res.sendFile(path.join(__dirname, '../../frontend/Login.html'));
+    res.sendFile(path.join(__dirname, '../frontend/build/Login.html'));
 });
 
 // Test route
