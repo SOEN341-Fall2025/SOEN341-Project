@@ -2,9 +2,11 @@
 import '../style/app.css';
 import '../style/settings.css';
 import '../style/style.css';
-import React, { useState } from 'react';
-import AppContext from '../AppContext';
+import React, { useState, useEffect } from 'react';
+import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToPX } from '../AppContext';
 import Settings from './Settings.js';
+import Gallery from './Gallery.js';
+import ChatContainer from './ChatContainer.js';
 
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
@@ -12,36 +14,63 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 
-function Main() {    
+function Main({ userData, galleries}) {    
       
-  const [showState, setShow] = useState("close");
+  
+  // VARIABLES AND DATA  
+  const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
-  const handleClose = () => setShow(false);
-  function handleClick(key) {
-    setShow(key);
+  const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
+  const [dmNavWidth, setDmNavWidth] = useState(17);  
+  const [userGalleries, setUserGalleries] = useState([
+    { name: 'Gift Ideas', icon: '' },
+    { name: 'Music Channel', icon: 'Music' },
+    { name: 'Work Server', icon: '' },
+  ]); 
+  
+  const [userChannels, setUserChannels] = useState([
+    { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
+    { galleryName: 'Work Server', channelName: 'Cook', icon: '' }
+]);   
+  const [galleryChannels, setGalleryChannels] = useState([
+    { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
+  );
+  
+ const uservar = {
+    sizeGallerySidebar: "3.5vw",
+    sizeInnerSidebar: "17vw",
+    clrAccent: '#c9ffed',
+  };
+  console.log(userData);
+  console.log(galleries);
+
+
+  /*SECTION - FUNCTIONS */
+   const handleClose = () => setShowState(false);
+   function handleClick(key) { setShowState(key); }
+  const handleChannels = (newGalleryName, newChannelName, newIcon) => {
+    setUserChannels([...userChannels, { galleryName: newGalleryName, channelName: newChannelName, icon: newIcon }]);
+  };
+
+  const handleSubmitChannel = (event) => {
+    event.preventDefault();
+    handleChannels(newGalleryName, newChannelName, '');
   }
-  const findClosestIcon = (name) => {
-    const iconNames = Object.keys(icons);
-    const words = name.toLowerCase().split(' ');
 
-    for (const word of words) {
-      const match = iconNames.find(iconName =>
-        iconName.toLowerCase().includes(word)
-      );
-      if (match) return match;
-    }
-
-    return 'HelpCircle'; // Default icon if no match found
+  const handleGalleries = (newname, newicon) => {
+    setUserGalleries([...userGalleries, { name: newname, icon: newicon }]);
   };
-
-  // ELEMENTS
-  const Icon = ({ name, ...props }) => {
-    const iconName = name || findClosestIcon(props.alt || '');
-    const LucideIcon = icons[iconName];
-    return LucideIcon ? <LucideIcon {...props} /> : null;
+  
+  const handleSubmitGallery = (event) => {
+    event.preventDefault();  // Prevents page reload on submit
+    handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
+  
+  
+  /*SECTION - ELEMENTS */
+
   const ProfilePic = () => {
     let picUrl = userProfile.profilepic;
     let name = userProfile.displayname;
@@ -65,164 +94,69 @@ function Main() {
 
   const GalleryList = ({ galleries }) => {
     return (
-      <span>
-        {galleries.map((item, index) => (
+        galleries.map((item, index) => (
           <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
             <span className="channel-icon">
-              <Icon name={item.icon || findClosestIcon(item.name)} size={24} />
+              <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
             </span>
             {item.name}
           </Nav.Link>
-        ))}
-      </span>
+        ))
     );
   };
-
-
+  const GalleryChannelList = ({ galleries }) => {
+    return (
+        galleries.map((item, index) => (
+          <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
+            <span className="channel-icon">
+              <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
+            </span>
+            {item.name}
+          </Nav.Link>
+        ))
+    );
+  };
   const GalleryPageList = ({ galleries }) => {
     return (
       galleries.map((item, index) => (
-        <Tab.Pane eventKey={item.name}>
-          <div id="mainpage-dms">
-            <div id="sidebar-dms">
-
-              <Tab.Container>
-                <Col id="sidebar-dm">
-                  <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
-                    <Row id="sidebar-dm-options">
-                      <Col>Channels</Col>
-                    </Row>
-                    <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                    <Nav.Link><icons.Gamepad2Icon /> Game Room</Nav.Link>
-                    <GalleryChannelsList galleryName={item.name} channels={userChannels} />
-                    <Nav.Link onClick={() => handleClick('addChannel-modal')} className="add-channel"><span className="channel-icon"><Plus /></span> Add a Channel</Nav.Link>
-
-                  </Nav>
-
-                </Col>
-
-              </Tab.Container>
-            </div>
-            <div id="mainview-dms">
-              <div id="top-box">
-                <Nav.Link><icons.User /> John Doe</Nav.Link>
-              </div>
-
-
-              <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
-                {/* Go Back Button */}
-                <div className="back-button flex items-center cursor-pointer mb-2">
-                  <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
-                  <span className="text-gray-700">Go Back</span>
-                </div>
-
-                {/* Chat Box */}
-                <div className="chat-box border rounded-lg p-4 bg-gray-100">
-                  <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">*Chat Name*</div>
-
-                  {/* Messages */}
-                  <div className="message user flex items-center my-2">
-                    <User className="icon" />
-                    <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
-                  </div>
-
-                  <div className="message recipient flex items-center justify-end my-2">
-                    <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
-                    <User className="icon" />
-                  </div>
-                </div>
-
-                <Row id="chat-box" className="d-flex align-items-center">
-                  {/* Icons (Plus, Camera, Mic) */}
-                  <Col className="d-flex gap-2">
-                    <div id="plus"><icons.Plus /></div>
-                    <div id="camera"><Camera /></div>
-                    <div id="mic"><Mic /></div>
-                  </Col>
-
-                  {/* Input Box and Send Button */}
-                  <Col className="flex-grow-1">
-                    <div className="chat-input d-flex gap-2 align-items-center">
-                      <input
-                        type="text"
-                        placeholder="Type a message..."
-                        className="flex-grow-1 p-2 rounded border"
-                      />
-                      <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
-                    </div>
-                  </Col>
-                </Row>
-
-
-              </div>
-            </div>
-          </div>
-          <Form.Group className="divframe"></Form.Group>
-        </Tab.Pane>
+        <Gallery item={item} index={index} userChannels={userChannels} gallerySize={galleryNavWidth} user={uservar}/>
       ))
-
+    
     );
   };
-
-  const GalleryChannelsList = ({ galleryName, channels }) => {
-    return (
-      <span>
-        {channels.map((item, index) => {
-          // Check if the galleryName matches the item's galleryName
-          if (galleryName === item.galleryName) {
-            return (
-              <Nav.Link key={index} eventKey={item.channelName}>
-                <span className="channel-icon">
-                  <Icon name={item.icon || findClosestIcon(item.channelName)} size={24} />
-                </span>
-                {item.channelName}
-              </Nav.Link>
-            );
-          }
-          return null; // Ensure the map function returns something in all cases
-        })}
-      </span>
+  
+  const ModalAddGallery = () => {
+    return(
+        <Modal.Body> 
+            <h5 className="text-center">Create a Gallery</h5>
+            <form onSubmit={handleSubmitGallery}>
+            <Col>
+                <Row><label>Name:</label></Row>
+                <Row><input type='text' id='newName-gallery' value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder='Name of your new Gallery' /></Row>
+                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
+            </Col>
+            </form>
+        </Modal.Body>
     );
   };
-
-  // VARIABLES AND DATA
-  const [width, setWidth] = React.useState("3.5");
-  const [height, setHeight] = React.useState(200);
-  const updateStyle = (styleProperty, newValue) => document.documentElement.style.setProperty(styleProperty, newValue);
-
-  const [userGalleries, setUserGalleries] = useState([
-    { name: 'Gift Ideas', icon: '' },
-    { name: 'Music Channel', icon: 'Music' },
-    { name: 'Work Server', icon: '' },
-  ]);
-
-  const [userChannels, setUserChannels] = useState([
-    { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
-    { galleryName: 'Work Server', channelName: 'Cook', icon: '' }
-  ]);
-
-  const handleChannels = (newGalleryName, newChannelName, newIcon) => {
-    setUserChannels([...userChannels, { galleryName: newGalleryName, channelName: newChannelName, icon: newIcon }]);
+  const ModalAddChannel = () => {
+    return(
+        <Modal.Body> 
+            <h5 className="text-center">Create a Channel</h5>
+            <form onSubmit={handleSubmitChannel}>
+              <Col>
+                <Row><label>Name:</label></Row>
+                <Row><input type='text' id='newName-channel' value={newChannelName}
+                  onChange={(e) => setNewChannelName(e.target.value)}
+                  placeholder='Name of your new Channel' /></Row>
+                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
+              </Col>
+            </form>
+        </Modal.Body>
+    );
   };
-
-  const handleSubmitChannel = (event) => {
-    event.preventDefault();
-    handleChannels(newGalleryName, newChannelName, '');
-  }
-
-  const handleGalleries = (newname, newicon) => {
-    setUserGalleries([...userGalleries, { name: newname, icon: newicon }]);
-  };
-
-  const handleSubmitGallery = (event) => {
-    event.preventDefault();  // Prevents page reload on submit
-    handleGalleries(newName, '');  // Pass the new name and any other parameters
-  };
-
-
-  const [galleryChannels, setGalleryChannels] = useState([
-    { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
-  );
 
   const userProfile = {
     // GET items from database
@@ -239,152 +173,64 @@ function Main() {
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
   
-
   return(
     <section>
       <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
         <Row className='justify-content-start' id="main-container">
-          <Resizable id="sidebar-resizable" maxWidth="20vw" minWidth="3vw" enable={{ right: true }}
-            size={{ width, height }}
-            onResizeStop={(e, direction, ref, d) => {
-              setHeight(height + d.height);
-              let ratio = (100 * d.width / window.innerWidth);
-              let w = (parseInt(width, 10) + ratio) + 'vw';
-              updateStyle("--user-sidebar-length", w);
-              setWidth(w);
+          <Resizable id="gallery-sidebar-resizable" maxWidth={"15vw"} minWidth={"3vw"} enable={{ right: true }} size={{ width: ToPX(galleryNavWidth) }}
+            onResizeStop={(e, direction, ref, d) => {  
+                if(d.width != 0){      
+                    let ratio = Number((100 * (d.width) / window.innerWidth).toFixed(2));
+                    let prev = Number(parseFloat(galleryNavWidth));
+                    let newWidth = (prev + ratio).toFixed(2);           
+                    setGalleryNavWidth(newWidth);
+                }
             }}>
             <Col id="sidebar-list">
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
                 <Nav.Link eventKey="page-dm"><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
                 <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
                 <GalleryList galleries={userGalleries} />
-                <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-channel"><span className="channel-icon"><Plus /></span> Add a Channel</Nav.Link>
+                <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
                 <Nav.Link onClick={() => handleClick('status-modal')} className="mt-auto user-status"><span className="channel-icon"><CircleUser /></span> Me</Nav.Link>
                 <Nav.Link onClick={() => handleClick('settings-modal')} className=""><span className="channel-icon"><LoaderPinwheel /></span> Settings</Nav.Link>
               </Nav>
             </Col>
           </Resizable>
-
           <Col id="pages">
-            <Tab.Content id="pages-content">
-              <Tab.Pane eventKey="page-dm" className="no-parent-padding">
-                <div id="mainpage-dms">
-                  <div id="sidebar-dms">
-
-                    <Tab.Container>
-                      <Col id="sidebar-dm">
-                        <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
-                          <Row id="sidebar-dm-options">
-                            <Col>Private</Col>
-                          </Row>
-                          <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                          <Nav.Link><icons.User /> John Doe</Nav.Link>
-                          <Nav.Link><icons.User /> Jane Doe</Nav.Link>
-                          <Nav.Link><icons.User /> Julie Doe</Nav.Link>
-
-                        </Nav>
-
-                      </Col>
-
-                    </Tab.Container>
-                  </div>
-                  <div id="mainview-dms">
-                    <div id="top-box">
-                      <Nav.Link><icons.User /> John Doe</Nav.Link>
-                    </div>
-
-
-                    <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
-                      {/* Go Back Button */}
-                      <div className="back-button flex items-center cursor-pointer mb-2">
-                        <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
-                        <span className="text-gray-700">Go Back</span>
-                      </div>
-
-                      {/* Chat Box */}
-                      <div className="chat-box border rounded-lg p-4 bg-gray-100">
-                        <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">*Chat Name*</div>
-
-                        {/* Messages */}
-                        <div className="message user flex items-center my-2">
-                          <User className="icon" />
-                          <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">Hello! How are you?</div>
-                        </div>
-
-                        <div className="message recipient flex items-center justify-end my-2">
-                          <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
-                          <User className="icon" />
-                        </div>
-                      </div>
-
-                      <Row id="chat-box" className="d-flex align-items-center">
-                        {/* Icons (Plus, Camera, Mic) */}
-                        <Col className="d-flex gap-2">
-                          <div id="plus"><icons.Plus /></div>
-                          <div id="camera"><Camera /></div>
-                          <div id="mic"><Mic /></div>
-                        </Col>
-
-                        {/* Input Box and Send Button */}
-                        <Col className="flex-grow-1">
-                          <div className="chat-input d-flex gap-2 align-items-center">
-                            <input
-                              type="text"
-                              placeholder="Type a message..."
-                              className="flex-grow-1 p-2 rounded border"
-                            />
-                            <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
-                          </div>
-                        </Col>
-                      </Row>
-
-
-                    </div>
-                  </div>
-                </div>
-
-                <Form.Group className="divframe"></Form.Group>
-              </Tab.Pane>
+            <Tab.Content id="pages-content">                  
+                <Tab.Pane eventKey="page-dm" className="no-parent-padding">
+                    <Col id="sidebar-dm">
+                    <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                        <Row id="sidebar-dm-options">
+                        <Col>Private</Col>
+                        </Row>
+                        <Nav.Link className="separator" disabled><hr /><hr /></Nav.Link>
+                        <Nav.Link><icons.User /> John Doe</Nav.Link>
+                        <Nav.Link><icons.User /> Jane Doe</Nav.Link>
+                        <Nav.Link><icons.User /> Julie Doe</Nav.Link>
+                    </Nav>                      
+                    </Col>
+                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={uservar}/>
+                </Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
             </Tab.Content>
           </Col>
         </Row >
       </Tab.Container>
-      <Modal show={showState === 'addGallery-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
+      <Modal show={showState === 'addGallery-modal'} onHide={handleClose} id="addGallery-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-          <Modal.Body>
-            <h5 className="text-center">Create a Gallery</h5>
-            <form onSubmit={handleSubmitGallery}>
-              <Col>
-                <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-gallery' value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder='Name of your new Gallery' /></Row>
-                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
-              </Col>
-            </form>
-          </Modal.Body>
+          <ModalAddGallery />
         </Modal.Dialog>
       </Modal>
-      <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
+      <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-          <Modal.Body>
-            <h5 className="text-center">Create a Channel</h5>
-            <form onSubmit={handleSubmitChannel}>
-              <Col>
-                <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-channel' value={newChannelName}
-                  onChange={(e) => setNewChannelName(e.target.value)}
-                  placeholder='Name of your new Channel' /></Row>
-                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
-              </Col>
-            </form>
-          </Modal.Body>
+          <ModalAddChannel />
         </Modal.Dialog>
       </Modal>
-      <Modal show={showState === 'status-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
+      <Modal show={showState === 'status-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
           <Modal.Body>
