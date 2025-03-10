@@ -28,8 +28,10 @@ function App() {
           
           if (!loginResponse.ok) throw new Error('Login failed');
           const { token } = await loginResponse.json();
-          //if (!token.token) { console.error("Invalid login response:", loginResponse); throw new Error('No token received'); }
-          console.log("Login Success:", JSON.stringify({ email, password }));   
+          
+          //console.log("Login Success:", JSON.stringify({ email, password }));   
+
+
           // Step 2: Get user info using token
           const userResponse = await fetch('/api/auth/me', {
             method: 'GET',
@@ -38,15 +40,16 @@ function App() {
           if (!userResponse.ok) throw new Error('Failed to fetch user info');
           const userInfo = await userResponse.json();
           setUserData(userInfo); // Save user info
-          console.log("userResponse Success:", userInfo);   
+          //console.log("userResponse Success:", userInfo);   
           // Step 3: Fetch galleries using user ID
-          const galleriesResponse = await fetch(`/api/user/galleries?id=${userInfo.user.id}`, {
+          const galleriesResponse = await fetch(`/api/user/galleries`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${token}` }, // Pass token in Authorization header
           });
           if (!galleriesResponse.ok) throw new Error('Failed to fetch galleries');
           const galleryData = await galleriesResponse.json();
-          console.log("galleriesResponse Success:", galleryData);   
+          //console.log("galleriesResponse Success:", galleryData);   
+          
           setGalleries(galleryData); // Save galleries
           setIsLoggedIn(true); // Mark as logged in 
           
@@ -55,35 +58,6 @@ function App() {
           setIsLoggedIn(false);
         }      
   };
-  
-  /* Wrap fetchUserData with useCallback to stabilize its reference
-  const fetchUserData = useCallback(async () => {
-    console.log("DEBUG: getUserData called with:", userEmail);
-
-    try {
-      const response = await fetch(`/api/auth/me?email=${userEmail}`, {
-        method: "GET",
-        headers: { 
-          "Content-Type": "application/json", 
-          Accept: 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      const data = await response.json();
-      //console.log("Successful:", data);
-      setUserData(data);
-      return data;
-    } catch (error) {
-      console.error("Error during fetching user data:", error);
-      setUserData({});
-    }
-  }, [userEmail, token]); // Dependencies for useCallback
-*/
   return (
     <section>
     

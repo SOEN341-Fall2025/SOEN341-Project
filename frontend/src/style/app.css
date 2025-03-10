@@ -4,7 +4,6 @@
   --user-sidebar-length: 3.5vw;
   --user-dm-length: 2.5vw;
 }
-
 .App {
   text-align: center;
 }
@@ -37,6 +36,15 @@ hr{
   margin: 0 !important;
   padding: 0 !important;
   border-width: 2px !important;
+}
+html, section{
+  width: 100%;
+}
+body{
+  background-image: url("../assets/background.png") !important;
+  backdrop-filter: brightness(90%) sepia(20%) !important;
+  background-repeat: no-repeat !important;
+  width: 100% !important;
 }
 .carousel-caption{
   width: 100% !important;
@@ -77,15 +85,15 @@ hr{
   top: 0;
 }
 #main-container{
-  background-image: url("../assets/background.png");
+  /*background-image: url("../assets/background.png");
   background-repeat: no-repeat !important;
-  background-size: cover !important;
+  background-size: cover !important;*/
   width: 100vw;
 }
 #pages{
-  backdrop-filter: brightness(90%) sepia(20%);
+ /* backdrop-filter: brightness(90%) sepia(20%);*/
   height: 100vh;
-  width: 100%;
+  width: 100% !important;
   /*z-index: 2;
   position: absolute;
   top: 0;
@@ -99,9 +107,11 @@ hr{
   background-size: cover !important;*/
   opacity: 100%;
   height: 100%;
-  width: 100%;
+  width: 100vw;
 }
-
+.gallery-pane{
+  width: 100% !important;
+}
 #settings-close-button{
   position: absolute !important;
   right: 50px !important;
@@ -146,7 +156,6 @@ hr{
   max-height: 100%;
   position: relative !important;
 }
-
 #sidebar-channels {
   background-color: white;
   /*float: left;

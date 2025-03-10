@@ -17,7 +17,7 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
             <span>
             {channels.map((item, index) => {
                 // Check if the galleryName matches the item's galleryName
-                if (galleryName === item.galleryName) {
+                if (galleryName === item.GalleryName) {
                 return (
                     <Nav.Link key={index} eventKey={item.channelName}>
                     <span className="channel-icon">
@@ -35,7 +35,7 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
       
 
   return (
-    <Tab.Pane eventKey={item.name} id="">
+    <Tab.Pane eventKey={item.GalleryName} className="gallery-pane">
           <Tab.Container id="">
             <Col id="sidebar-channels" style={{ width: user.sizeInnerSidebar}} >
               <Nav
@@ -55,7 +55,7 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
                   <icons.Gamepad2Icon /> Game Room
                 </Nav.Link>
                 <GalleryChannelsList
-                  galleryName={item.name}
+                  galleryName={item.GalleryName}
                   channels={userChannels}
                 />
                 <Nav.Link

@@ -2,3 +2,6 @@ node_modules
 .env
 .clj-kondo
 frontend/react-dev-server.log
+*.db
+*.log
+/.q_file_picker

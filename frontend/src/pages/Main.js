@@ -24,11 +24,7 @@ function Main({ userData, galleries}) {
   const [newGalleryName, setNewGalleryName] = useState("");
   const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
   const [dmNavWidth, setDmNavWidth] = useState(17);  
-  const [userGalleries, setUserGalleries] = useState([
-    { name: 'Gift Ideas', icon: '' },
-    { name: 'Music Channel', icon: 'Music' },
-    { name: 'Work Server', icon: '' },
-  ]); 
+  const [userGalleries, setUserGalleries] = useState(Object.values(galleries)); 
   
   const [userChannels, setUserChannels] = useState([
     { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
@@ -42,9 +38,8 @@ function Main({ userData, galleries}) {
     sizeGallerySidebar: "3.5vw",
     sizeInnerSidebar: "17vw",
     clrAccent: '#c9ffed',
+    userGalleries: JSON.stringify(galleries)
   };
-  console.log(userData);
-  console.log(galleries);
 
 
   /*SECTION - FUNCTIONS */
@@ -91,22 +86,23 @@ function Main({ userData, galleries}) {
       );
     }
   };
-
-  const GalleryList = ({ galleries }) => {
-    return (
-        galleries.map((item, index) => (
-          <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
+  const GalleryList = () => {
+    const galleryNames = userGalleries.map((membership) => membership.GalleryName);
+    console.log("Gallery Names:", galleryNames);
+    return (        
+        userGalleries.map((item, index) => (
+          <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
             <span className="channel-icon">
-              <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
+              <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
             </span>
-            {item.name}
+            {item.GalleryName}
           </Nav.Link>
         ))
     );
   };
-  const GalleryChannelList = ({ galleries }) => {
+  const GalleryChannelList = ({ g }) => {
     return (
-        galleries.map((item, index) => (
+        g.map((item, index) => (
           <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
             <span className="channel-icon">
               <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
@@ -117,9 +113,9 @@ function Main({ userData, galleries}) {
     );
   };
   const GalleryPageList = ({ galleries }) => {
-    return (
-      galleries.map((item, index) => (
-        <Gallery item={item} index={index} userChannels={userChannels} gallerySize={galleryNavWidth} user={uservar}/>
+    return (        
+        galleries.map((item, index) => (
+        <Gallery item={item} key={index} userChannels={userChannels} gallerySize={galleryNavWidth} user={uservar}/>
       ))
     
     );
@@ -190,7 +186,7 @@ function Main({ userData, galleries}) {
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
                 <Nav.Link eventKey="page-dm"><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
                 <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                <GalleryList galleries={userGalleries} />
+                <GalleryList />
                 <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
                 <Nav.Link onClick={() => handleClick('status-modal')} className="mt-auto user-status"><span className="channel-icon"><CircleUser /></span> Me</Nav.Link>
                 <Nav.Link onClick={() => handleClick('settings-modal')} className=""><span className="channel-icon"><LoaderPinwheel /></span> Settings</Nav.Link>

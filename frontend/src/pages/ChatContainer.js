@@ -16,8 +16,8 @@ function ChatContainer({barSizes, user, header}) {
         </Nav.Link>
       </div>
       
-      <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{ position: 'absolute', right: '1vw', backgroundColor: bg,
-       height: '80vh', bottom: '8vh', maxWidth: '95%', left: `calc(${user.sizeInnerSidebar} + 1vw)` }}
+      <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{ position: 'absolute', right: '2vw', backgroundColor: bg,
+       height: '80vh', bottom: '8vh', maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)` }}
       >
         {/* Go Back Button */}
         <div className="back-button flex items-center cursor-pointer mb-2">
