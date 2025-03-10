@@ -59,5 +59,5 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 // Log all registered routes
 //console.log("Routes:", app._router.stack.map(r => r.route?.path || r.name).filter(Boolean));
 // Start server
-const PORT = 2000;
+const PORT = 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
