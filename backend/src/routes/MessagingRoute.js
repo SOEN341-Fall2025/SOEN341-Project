@@ -136,7 +136,7 @@ async function processContacts(uuid){
 
 
 //Retrieve User uuid using a user's email
-router.get("/api/get/userid/:email", async (req, res) => {
+router.get("/get/userid/:email", async (req, res) => {
 
     const { email } = req.params;
 
@@ -159,7 +159,7 @@ router.get("/api/get/userid/:email", async (req, res) => {
 
 
 //Retrieve username using a user's email
-router.get("/api/get/username-email/:email", async (req, res) => {
+router.get("/get/username-email/:email", async (req, res) => {
 
     const { email } = req.params;
 
@@ -181,7 +181,7 @@ router.get("/api/get/username-email/:email", async (req, res) => {
 });
 
 //Retrieve username using a user's uuid
-router.get("/api/get/username-id/:uuid", async (req, res) => {
+router.get("/get/username-id/:uuid", async (req, res) => {
 
     const { uuid } = req.params;
 

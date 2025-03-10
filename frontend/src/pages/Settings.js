@@ -1,6 +1,6 @@
 import '../style/settings.css';
 import React from 'react';
-import AppContext from '../AppContext';
+import { AppContext } from '../AppContext';
 import { useContext } from 'react';
 import { useState } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
@@ -214,5 +214,5 @@ function Settings() {
       </section>
     );
   }
-
+  
   export default Settings;

@@ -2,6 +2,7 @@
   --color-accent: #c9ffed;
   --color-bkg: azure;
   --user-sidebar-length: 3.5vw;
+  --user-dm-length: 2.5vw;
 }
 
 .App {
@@ -42,14 +43,14 @@ hr{
   height: auto;
 }
 
-#sidebar-resizable{
-  position: absolute;
-  left: 0;
-  top: 0;
+#gallery-sidebar-resizable{
   height: 100vh !important;
   background-color: var(--color-accent) !important;
-  width: var(--user-sidebar-length);
   overflow: hidden !important;
+  /*position: absolute !important;
+  left: 0;
+  top: 0;
+  z-index: 15;*/
 }
 #sidebar-list{
   width: 100%;
@@ -66,22 +67,25 @@ hr{
   width: 19vw !important;
   height: fit-content !important;
 }
-#settings-modal, #sidebar-resizable, #status-modal{
+#settings-modal, #gallery-sidebar-resizable, #status-modal{
   padding: 0 !important;
   margin: 0 !important;
 }
+.tab-content{  
+  position: absolute;
+  z-index: 1;
+  top: 0;
+}
 #main-container{
   background-image: url("../assets/background.png");
-  /*position: absolute;
-  z-index: 1;
-  height: 100vh;
-  width: 100vw;*/
-
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  width: 100vw;
 }
 #pages{
-  backdrop-filter: brightness(80%) sepia(50%);
+  backdrop-filter: brightness(90%) sepia(20%);
   height: 100vh;
-  width: 100vw;
+  width: 100%;
   /*z-index: 2;
   position: absolute;
   top: 0;
@@ -89,8 +93,10 @@ hr{
   padding: 0;
 }
 #pages-content{
-  background-color: var(--color-accent);
+  /*background-color: var(--color-accent);
   background-image: url("../assets/background.png");
+  background-repeat: no-repeat !important;
+  background-size: cover !important;*/
   opacity: 100%;
   height: 100%;
   width: 100%;
@@ -119,51 +125,52 @@ hr{
   background-color: white;
   padding-left: 12px;
   max-height: 100% !important;
-  height: 100px;
-  width: 300px;
+  height: 100vh !important;
+  width: 17vw !important;
 }
 #sidebar-dm-options{
   font-weight: bolder;
   background-color: white;
   text-align: center;
   width: 300px;
-  height: 100%;
+  height: fit-content;
   padding-top: 5%;
-  padding-bottom: 5%;
 
 }
 
 *:has(.no-parent-padding.active){
-  background-image: url("../assets/img1.jpg");
-  backdrop-filter: brightness(80%) sepia(50%) !important;
+  /*background-image: url("../assets/img1.jpg");
+  backdrop-filter: brightness(80%) sepia(50%) !important;*/
   padding: 0 !important;
   opacity: 100% !important;
   max-height: 100%;
   position: relative !important;
 }
 
-#sidebar-dms {
+#sidebar-channels {
   background-color: white;
-  float: left;
-  width: 300px;
-  height: 1000px;
+  /*float: left;
+  margin-left: 20px;*/
+  height: 100vh !important;
+  width: var(--user-dm-length);
+  overflow: hidden;  
+  /*position: absolute !important;
+  top: 0;
+  z-index: 5;
+  left: var(--user-sidebar-length);*/
 }
-
+/*
 .chat-container {
   
-  height: 704px;
+  height: 80vh;
+  bottom: 8vh; 
+  max-width: 90vw;
+  background: var(--color-accent);  Light blue 
   position: absolute;
-  bottom: 20px; /* Distance from bottom */
-  right: 20px;  /* Distance from right */
-  width: 1081px;
-  background: #c3e7ed; /* Light blue */
   border-radius: 10px;
-  padding: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
-
-  
-}
+}*/
 
 /* Back Button */
 .back-button {
@@ -275,21 +282,21 @@ hr{
   background-color: #3a8fd9; /* Darker blue on hover */
 }
 
-
 #dm-list Nav.Link{
   border-color: #282c34 ;
   border-style: dashed;
 }
+#dm-list a{
+  width: 28vw;
+}
 #top-box{
-  background-color: white;
-  height: 50px;
+  height: 5vh;  
   position: absolute;
-  top: 0;
-  left: 312px;
-  padding: 0.5%;
-  padding-left: 1%;
-  width: 100%;
-  text-align: left;
+  top: 3vh;
+  right: 5vw;
+  width: 50%;
+  margin: auto;
+  text-align: center;
 }
 
 #messages-view{
