@@ -7,7 +7,6 @@ dotenv.config();
 const router = express.Router();
 
 
-
 // DELETE message route
 router.delete("/api/messages/:channelId", async (req, res) => {
     const { channelId } = req.params;
