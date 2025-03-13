@@ -246,7 +246,7 @@ function App() {
   // SHARED ELEMENT LIST
   const contextValue = {
     ProfilePic: ProfilePic,
-    Displayname: "Johnny Dough",
+   // Displayname: "Johnny Dough",
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);

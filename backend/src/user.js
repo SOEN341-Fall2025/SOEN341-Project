@@ -50,4 +50,24 @@ router.post("/api/newaboutme", async (req, res) => {
 
   return res.status(200).json({ msg: "About me updated successfully" });
 });
+
+router.post("/api/newpassword", async (req, res) => {
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+  const { newPassword } = req.body; // Get the user ID and new username from the request body
+
+  if (error || !user) {
+    return res.status(401).json(error);
+}
+  // Update password
+  const{ data, error: databaseError} = await supabase
+  .from('Users')
+  .update({password: newPassword}  )
+  .eq("user_id", user.id);
+
+  if (databaseError) {
+    return res.status(400).json({ msg: databaseError.message });
+  }
+
+  return res.status(200).json({ msg: "Password updated successfully" });
+});
 export default router;
