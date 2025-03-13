@@ -16,7 +16,6 @@ import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, Arr
 
 function Main({ userData, galleries}) {    
       
-  
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
@@ -88,7 +87,7 @@ function Main({ userData, galleries}) {
   };
   const GalleryList = () => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
-    console.log("Gallery Names:", galleryNames);
+    //console.log("Gallery Names:", galleryNames);
     return (        
         userGalleries.map((item, index) => (
           <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
