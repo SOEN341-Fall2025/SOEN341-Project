@@ -16,6 +16,9 @@ router.delete("/gal/delete", async (req, res) => {
     const galleryID = await fetch(`http://localhost:4000/gal/getID/${galleryName}`);
     const galleryIDres = await galleryID.json();
     const gallId = galleryIDres.data.GalleryID;
+    if(gallId == null){
+        res.status(200).json({msg:"Gallery does not exist."});
+    }
 
     //Helper call
     const verifyUser = await fetch('http://localhost:4000/gal/verifyCreator', {
@@ -158,7 +161,7 @@ router.get("/gal/getID/:galleryName", async (req, res) => {
     .single();
 
     if (error) {
-        return res.status(400).json({ msg: error.message });
+        return res.status(400).json({ msg: error.message ,  data: {"GalleryID":null}});
     }
 
     res.status(200).json({ msg: "Gallery ID was retrieved.", data });
