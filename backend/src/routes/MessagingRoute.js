@@ -143,6 +143,7 @@ router.get("/api/get/userid/:email", async (req, res) => {
     if (!email) {
         return res.status(400).json({ error: "Email was not received." });
     }
+    
     const { data, error } = await supabase
     .from('Users')
     .select('user_id') 
