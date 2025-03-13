@@ -10,6 +10,8 @@ function Settings() {
     
       const [modalState, setModalState] = useState("close");
       const [newAboutMe, setNewAboutMe] = useState("About me text");
+      const [newUsername, setNewUsername] = useState("Enter new username");
+
       const handleClose = () => setModalState(false);
       function handleClick(key) {
           setModalState(key);
@@ -29,6 +31,38 @@ function Settings() {
              
             },
             body: JSON.stringify({ newAboutMe }), 
+          });
+      
+          const data = await response.json();
+          console.log("Response from backend:", data); 
+      
+          if (!response.ok) {
+            console.log("Update was unsuccessful.", data);
+            return;
+          }
+      
+          console.log("Update was successful.", data);
+
+         handleClose();
+        } catch (error) {
+          console.error("There was an error in updating about me.", error);
+        }
+      };
+      const changeusername = async ( newUsername) => {
+
+
+        try {
+
+        const token = localStorage.getItem("authToken");
+         console.log("Sending data:", { token, newUsername }); 
+          const response = await fetch("/api/newusername", {
+            method: "PUT",
+            headers: {
+               'Authorization': `Bearer ${token}`,
+              "Content-Type": "application/json"
+             
+            },
+            body: JSON.stringify({ newUsername }), 
           });
       
           const data = await response.json();
@@ -76,7 +110,7 @@ function Settings() {
                       </div>                    
                       <Form.Label className="label px-1">User Name</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control type="text" plaintext defaultValue={Username} id="user-name" disabled />
+                        <Form.Control type="textarea" row={1} placeholder={newUsername} disabled />
                         <Button variant="secondary" id="modal-profile-2" onClick={() => handleClick('modal-profile-2')}>🖊</Button>
                       </div>                    
                       <Form.Label className="label px-1">About Me</Form.Label>
@@ -119,8 +153,17 @@ function Settings() {
                           <Modal.Body> 
                             <Form>      
                                <Form.Group>   
-                               <Form.Control name="username" id="username" placeholder="Enter new username" />
-                               <Button type="submit" className="btn btn-primary">Update username</Button>
+                               <label>
+                                <textarea
+                                name="postContent"
+                                placeholder={newUsername}
+                                onChange={(e) => setNewUsername(e.target.value)}
+                                rows={1}
+                                 cols={40}
+      
+                                /> 
+                                 </label>
+                               <Button onClick={() => changeusername(newUsername)}>Update Username</Button>
                                </Form.Group> 
                              </Form>         
                           </Modal.Body>

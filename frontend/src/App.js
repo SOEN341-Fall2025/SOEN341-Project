@@ -28,7 +28,6 @@ function App() {
   const [showState, setShow] = useState("close");
   const [newName, setNewName] = useState("");
 
-const [newAboutme, setNewAboutme] = useState("Initial about me text");
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const handleClose = () => setShow(false);
@@ -247,12 +246,10 @@ const [newAboutme, setNewAboutme] = useState("Initial about me text");
   // SHARED ELEMENT LIST
   const contextValue = {
     ProfilePic: ProfilePic,
-    Username: "@John_Doe77",
     Displayname: "Johnny Dough",
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user_id, setUserId] = useState(null);
 
   const handleLogin = async (email, password) => {
 
@@ -279,7 +276,6 @@ const [newAboutme, setNewAboutme] = useState("Initial about me text");
 
       console.log("Login was successful.", data);
       setIsLoggedIn(true);
-      setUserId(data.user_id);
       localStorage.setItem("authToken", data.token);
     }catch(error){
       console.error("There was an error during login.");
