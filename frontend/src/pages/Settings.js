@@ -9,25 +9,30 @@ import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap
 function Settings() {
     
       const [modalState, setModalState] = useState("close");
-     const { AboutMe, setNewAboutme, user_id } = useContext(AppContext);
-      const [newAboutMe, setNewAboutMe] = useState("");
+      const [newAboutMe, setNewAboutMe] = useState("About me text");
       const handleClose = () => setModalState(false);
       function handleClick(key) {
           setModalState(key);
       }
-      const changeAboutMe = async (user_id, newAboutMe) => {
-        console.log("Sending data:", { user_id, newAboutMe }); // Log the data being sent
+      const changeAboutMe = async ( newAboutMe) => {
+
+
         try {
+
+        const token = localStorage.getItem("authToken");
+         console.log("Sending data:", { token, newAboutMe }); 
           const response = await fetch("/api/newaboutme", {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+               'Authorization': `Bearer ${token}`,
+              "Content-Type": "application/json"
+             
             },
-            body: JSON.stringify({ user_id, newAboutMe }), // Send user_id and newAboutMe to the backend
+            body: JSON.stringify({ newAboutMe }), 
           });
       
           const data = await response.json();
-          console.log("Response from backend:", data); // Log the response
+          console.log("Response from backend:", data); 
       
           if (!response.ok) {
             console.log("Update was unsuccessful.", data);
@@ -35,8 +40,7 @@ function Settings() {
           }
       
           console.log("Update was successful.", data);
-          setNewAboutme(newAboutMe); // Update the context with the new About Me text
-          setNewAboutMe(""); // Clear the textarea after successful update
+
          handleClose();
         } catch (error) {
           console.error("There was an error in updating about me.", error);
@@ -77,7 +81,7 @@ function Settings() {
                       </div>                    
                       <Form.Label className="label px-1">About Me</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control as="textarea" rows={5} placeholder={Aboutme} disabled />
+                        <Form.Control as="textarea" rows={5} placeholder={newAboutMe} disabled />
                         <Button variant="secondary" id="modal-profile-3" onClick={() => handleClick('modal-profile-3')}>🖊</Button>
                       </div>      
                       <Form.Label className="label px-1">Avatar</Form.Label>   
@@ -132,14 +136,14 @@ function Settings() {
                              <label>
                                 <textarea
                                 name="postContent"
-                                value={newAboutMe}
+                                placeholder={newAboutMe}
                                 onChange={(e) => setNewAboutMe(e.target.value)}
                                 rows={4}
                                  cols={40}
       
                                 /> 
                                  </label>
-    <Button onClick={() => changeAboutMe(user_id, newAboutMe)}>Update About Me</Button>
+    <Button onClick={() => changeAboutMe(newAboutMe)}>Update About Me</Button>
   </div>
           </Modal.Body>
         </Modal.Dialog>

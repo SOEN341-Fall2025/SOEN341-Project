@@ -125,7 +125,7 @@ const [newAboutme, setNewAboutme] = useState("Initial about me text");
               <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
                 {/* Go Back Button */}
                 <div className="back-button flex items-center cursor-pointer mb-2">
-                  <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+                  <img src="" alt="Go Back" className="w-10 h-10 mr-2" />
                   <span className="text-gray-700">Go Back</span>
                 </div>
 
@@ -249,15 +249,12 @@ const [newAboutme, setNewAboutme] = useState("Initial about me text");
     ProfilePic: ProfilePic,
     Username: "@John_Doe77",
     Displayname: "Johnny Dough",
-    Aboutme: newAboutme,
-    setNewAboutme: setNewAboutme,
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user_id, setUserId] = useState(null);
+
   const handleLogin = async (email, password) => {
-    // Here, you can add authentication logic (API call or checking credentials)
-    // For now, just set it to true to simulate successful login
 
     console.log("DEBUG: handleLogin called with:", email, password);
 
@@ -278,10 +275,12 @@ const [newAboutme, setNewAboutme] = useState("Initial about me text");
         return;
       }
 
+  
+
       console.log("Login was successful.", data);
       setIsLoggedIn(true);
       setUserId(data.user_id);
-
+      localStorage.setItem("authToken", data.token);
     }catch(error){
       console.error("There was an error during login.");
     }

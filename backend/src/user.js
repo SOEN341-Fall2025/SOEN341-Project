@@ -33,18 +33,22 @@ router.put("/api/newusername", async (req, res) => {
 
 
 router.post("/api/newaboutme", async (req, res) => {
-  const { user_id, newAboutme } = req.body; // Get the user ID and new username from the request body
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+  const { newAboutMe } = req.body; // Get the user ID and new username from the request body
 
+  if (error || !user) {
+    return res.status(401).json(error);
+}
   // Update user's about me
   const{data, error: databaseError} = await supabase
   .from('Users')
-  .update({about_me: newAboutme}  )
-  .eq("user_id", user_id);
+  .update({about_me: newAboutMe}  )
+  .eq("user_id", user.id);
 
   if (databaseError) {
-    return res.status(400).json({ msg: databasError.message });
+    return res.status(400).json({ msg: databaseError.message });
   }
-  
+
   return res.status(200).json({ msg: "About me updated successfully" });
 });
 export default router;
