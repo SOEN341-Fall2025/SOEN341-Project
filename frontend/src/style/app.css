@@ -235,7 +235,7 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
 /* Recipient message (green) */
 .message.recipient {
   
-  flex-direction: row-reverse; /* Moves the image to the right */
+  flex-direction: row; 
 }
 
 .message.recipient .text {
@@ -253,6 +253,7 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
   border-radius: 50%; /* Circular icons */
   background-color: #e0e0e0; /* Light gray background */
   transition: background-color 0.3s ease; /* Smooth hover effect */
+  flex-direction: row-reverse;
 }
 
 #plus:hover, #camera:hover, #mic:hover {
@@ -262,6 +263,8 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
 .chat-input input {
   border: 1px solid #ccc; /* Light border for input */
   outline: none; /* Remove default outline */
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
 .chat-input input:focus {
@@ -278,6 +281,20 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
   background-color: #3a8fd9; /* Darker blue on hover */
 }
 
+@media (max-width: 768px) {
+  .chat-input {
+    flex-direction: column; /* Stack input and button vertically on small screens */
+    gap: 8px; /* Add spacing between stacked elements */
+  }
+
+  .chat-input input {
+    width: 100%; /* Make input take full width */
+  }
+
+  .chat-input button {
+    width: 100%; /* Make button take full width */
+  }
+}
 
 #dm-list Nav.Link{
   border-color: #282c34 ;
