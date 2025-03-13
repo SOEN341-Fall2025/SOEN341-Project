@@ -371,7 +371,7 @@ function App() {
                         <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
                           {/* Go Back Button */}
                           <div className="back-button flex items-center cursor-pointer mb-2">
-                            <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+                            < icons.ArrowLeft alt="Go Back" className="w-10 h-10 mr-2" />
                             <span className="text-gray-700">Go Back</span>
                           </div>
 

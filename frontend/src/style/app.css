@@ -163,7 +163,10 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
   border-radius: 10px;
   padding: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
+  
+  flex-grow: 1; /* Allow the chat box to take up remaining space */
+
+  overflow-y: auto; /* Enable vertical scrolling */
 
   
 }
