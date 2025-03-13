@@ -17,7 +17,7 @@ router.delete("/gal/delete", async (req, res) => {
     const galleryIDres = await galleryID.json();
     const gallId = galleryIDres.data.GalleryID;
     if(gallId == null){
-        res.status(200).json({msg:"Gallery does not exist."});
+        return res.status(200).json({msg:"Gallery does not exist."});
     }
 
     //Helper call
