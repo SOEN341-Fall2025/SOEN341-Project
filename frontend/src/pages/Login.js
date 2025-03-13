@@ -35,7 +35,7 @@ function Login({onLogin}){
                     <i class='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
-                    <input type="text" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}required/>
+                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}required/>
                     <i class='bx bxs-lock-alt' ></i>
                 </div>
                 <div class="text">

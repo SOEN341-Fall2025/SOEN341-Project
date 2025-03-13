@@ -1,6 +1,6 @@
 import './style/app.css';
 import './style/settings.css';
-import React, { useState } from 'react';
+import React, { useState, createContext } from 'react';
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
 import './style/style.css';
@@ -23,11 +23,11 @@ import { Mic } from 'lucide-react';
 import { ArrowLeft } from 'lucide-react';
 import { User } from 'lucide-react';
 import { Plus } from 'lucide-react';
-
 function App() {
 
   const [showState, setShow] = useState("close");
   const [newName, setNewName] = useState("");
+
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const handleClose = () => setShow(false);
@@ -124,7 +124,7 @@ function App() {
               <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
                 {/* Go Back Button */}
                 <div className="back-button flex items-center cursor-pointer mb-2">
-                  <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+                  <img src="" alt="Go Back" className="w-10 h-10 mr-2" />
                   <span className="text-gray-700">Go Back</span>
                 </div>
 
@@ -246,16 +246,12 @@ function App() {
   // SHARED ELEMENT LIST
   const contextValue = {
     ProfilePic: ProfilePic,
-    Username: "@John_Doe77",
-    Displayname: "Johnny Dough",
-    Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
+   // Displayname: "Johnny Dough",
   };
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async (email, password) => {
-    // Here, you can add authentication logic (API call or checking credentials)
-    // For now, just set it to true to simulate successful login
 
     console.log("DEBUG: handleLogin called with:", email, password);
 
@@ -276,14 +272,16 @@ function App() {
         return;
       }
 
+  
+
       console.log("Login was successful.", data);
       setIsLoggedIn(true);
-
+      localStorage.setItem("authToken", data.token);
     }catch(error){
       console.error("There was an error during login.");
     }
   };
-
+  
   return (
     <section>
     
@@ -465,3 +463,4 @@ function App() {
 }
 
 export default App;
+
