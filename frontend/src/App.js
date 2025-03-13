@@ -46,7 +46,7 @@ function App() {
       if (match) return match;
     }
 
-    return 'HelpCircle'; // Default icon if no match found
+    return 'HelpCircle'; 
   };
 
   // ELEMENTS
@@ -158,6 +158,8 @@ function App() {
                     <div className="chat-input d-flex gap-2 align-items-center">
                       <input
                         type="text"
+                        value={newMessage} // Bind the input value to newMessage
+                        onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type a message..."
                         className="flex-grow-1 p-2 rounded border"
                       />
@@ -217,7 +219,8 @@ function App() {
 
   const handleSubmitMessages = (event) => {
     event.preventDefault();  // Prevents page reload on submit
-    handleMessages(newMessage);  // Pass the new name and any other parameters
+    handleMessages(newMessage); 
+    setNewMessage("");
   };
 
   // VARIABLES AND DATA
