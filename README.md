@@ -37,6 +37,8 @@ Create `.env` file in `src\backend`.
 Copy API key from database onto file.
 
 E.g. `SUPABASE_KEY="insert api key here"`
+Copy database url from database onto file.
+E.g. `SUPABASE_URL="https://syipugxeidvveqpbpnum.supabase.co"`
 
 ### Additional information
 
