@@ -1,3 +1,4 @@
+
 :root{
   --color-accent: #c9ffed;
   --color-bkg: azure;
@@ -70,14 +71,7 @@ hr{
   padding: 0 !important;
   margin: 0 !important;
 }
-#main-container{
-  background-image: url("../assets/background.png");
-  /*position: absolute;
-  z-index: 1;
-  height: 100vh;
-  width: 100vw;*/
 
-}
 #pages{
   backdrop-filter: brightness(80%) sepia(50%);
   height: 100vh;
@@ -150,6 +144,10 @@ hr{
 #mainview-dms {
 display: grid;
 grid-template-columns: auto auto; grid-column-gap: 30px;
+
+justify-content: center;
+align-items: center;
+
 }
 .chat-container {
   
@@ -163,12 +161,9 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
   border-radius: 10px;
   padding: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  
   flex-grow: 1; /* Allow the chat box to take up remaining space */
 
   overflow-y: auto; /* Enable vertical scrolling */
-
-  
 }
 
 /* Back Button */
@@ -336,4 +331,22 @@ grid-template-columns: auto auto; grid-column-gap: 30px;
   border-radius: 30px 30px 30px 30px;
 }
 
+@media (max-width: 768px) {
+  .chat-container {
+    height: 90vh; /* Adjust height for smaller screens */
+    max-width: 95vw; /* Adjust max-width for smaller screens */
+  }
+
+  .chat-input {
+    flex-direction: column; /* Stack input and button vertically on small screens */
+  }
+
+  .chat-input input {
+    width: 100%; /* Make input take full width */
+  }
+
+  .chat-input button {
+    width: 100%; /* Make button take full width */
+  }
+}
 

@@ -281,7 +281,7 @@ function App() {
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogin = async (email, password) => {
     // Here, you can add authentication logic (API call or checking credentials)
