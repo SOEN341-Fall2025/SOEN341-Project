@@ -7,98 +7,91 @@ const router = express.Router();
 // Multer setup: Store files in memory before uploading
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Upload user profile picture
+// Allowed image mime types and their corresponding extensions
+const allowedMimeTypes = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/gif": ".gif"
+};
+
+// Upload profile picture
 router.post("/api/upload/profile-picture", upload.single("file"), async (req, res) => {
-  const { userId } = req.body;
+  const { user_id } = req.body;
   const file = req.file;
 
-  if (!file || !userId) {
-    return res.status(400).json({ error: "Missing file or userId" });
+  if (!file || !user_id) {
+    return res.status(400).json({ error: "Missing file or user_id" });
   }
 
-  const fileExt = file.originalname.split(".").pop();
-  const fileName = `${userId}.${fileExt}`; // Unique filename per user
+  // Validate file type
+  if (!allowedMimeTypes[file.mimetype]) {
+    return res.status(400).json({ error: "Invalid file type. Only JPEG, PNG, and GIF images are allowed." });
+  }
 
-  const { data, error } = await supabase.storage
+  // Normalize the file extension to lowercase
+  const fileExt = allowedMimeTypes[file.mimetype];
+  const fileName = `${user_id}${fileExt}`; // Unique filename per user
+
+  // Check if a profile picture already exists for this user with a different extension
+  const { data: existingFiles, error: listError } = await supabase.storage
+    .from("profile_pictures")
+    .list("", { search: user_id });
+
+  if (listError) {
+    return res.status(500).json({ error: listError.message });
+  }
+
+  // If an existing file exists with a different extension, delete it
+  if (existingFiles && existingFiles.length > 0) {
+    const existingFile = existingFiles.find(file => file.name !== fileName);
+
+    if (existingFile) {
+      const { error: deleteError } = await supabase.storage
+        .from("profile_pictures")
+        .remove([existingFile.name]);
+
+      if (deleteError) {
+        return res.status(500).json({ error: deleteError.message });
+      }
+    }
+  }
+
+  // Upload profile picture
+  const { data, error: uploadError } = await supabase.storage
     .from("profile_pictures")
     .upload(fileName, file.buffer, {
       contentType: file.mimetype,
       upsert: true, // Replace old file
     });
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
+  if (uploadError) {
+    return res.status(500).json({ error: uploadError.message });
   }
 
-  // Get public URL
-  const { publicUrl } = supabase.storage.from("profile_pictures").getPublicUrl(fileName);
+  // Manually generate the public URL
+  const publicUrl = `https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/profile_pictures//${fileName}`;
+
+  // Update the Users table with the profile picture URL
+  const { error: updateError } = await supabase
+    .from("Users")
+    .update({ profile_picture_url: publicUrl })
+    .eq("user_id", user_id);
+
+  if (updateError) {
+    return res.status(500).json({ error: updateError.message });
+  }
 
   return res.json({ url: publicUrl });
 });
 
 // Upload files to a channel or DM
 router.post("/api/upload/chat-file", upload.single("file"), async (req, res) => {
-  const { userId, channelId } = req.body;
-  const file = req.file;
-
-  if (!file || !userId || !channelId) {
-    return res.status(400).json({ error: "Missing file, userId, or channelId" });
-  }
-
-  const fileName = `${channelId}/${Date.now()}_${file.originalname}`; // Unique file name
-
-  const { data, error } = await supabase.storage
-    .from("chat_files")
-    .upload(fileName, file.buffer, {
-      contentType: file.mimetype,
-    });
-
-  if (error) {
-    return res.status(500).json({ error: error.message });
-  }
-
-  // Get public URL
-  const { publicUrl } = supabase.storage.from("chat_files").getPublicUrl(fileName);
-
-  return res.json({ url: publicUrl });
+ 
 });
 
 // Upload art to gallery and update the gallery record with the URL
 router.post("/api/upload/gallery-file", upload.single("file"), async (req, res) => {
-    const { galleryId } = req.body; // Assuming galleryId is passed in the request
-    const file = req.file;
   
-    if (!file || !galleryId) {
-      return res.status(400).json({ error: "Missing file or galleryId" });
-    }
-  
-    const fileExt = file.originalname.split(".").pop();
-    const fileName = `${galleryId}/${Date.now()}_${file.originalname}`; // Unique file name
-  
-    const { data, error } = await supabase.storage
-      .from("gallery_files")
-      .upload(fileName, file.buffer, {
-        contentType: file.mimetype,
-      });
-  
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  
-    // Get public URL
-    const { publicUrl } = supabase.storage.from("gallery_files").getPublicUrl(fileName);
-  
-    // Update the Galleries table with the gallery file URL
-    const { error: updateError } = await supabase
-      .from("Galleries")
-      .update({ gallery_file_url: publicUrl })
-      .eq("GalleryID", galleryId);  // Ensure it updates the right gallery
-  
-    if (updateError) {
-      return res.status(500).json({ error: updateError.message });
-    }
-  
-    return res.json({ url: publicUrl });
-  });  
+});  
 
 export default router;
