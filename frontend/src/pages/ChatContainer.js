@@ -21,11 +21,7 @@ function ChatContainer({barSizes, user, header}) {
       >
         {/* Go Back Button */}
         <div className="back-button flex items-center cursor-pointer mb-2">
-          <img
-            src="images/arrow.png"
-            alt="Go Back"
-            className="w-10 h-10 mr-2"
-          />
+          <ArrowLeft />
           <span className="text-gray-700">Go Back</span>
         </div>
 
