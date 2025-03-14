@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../../frontend')));
 
 // Initialize Supabase client
-const supabaseUrl = "https://syipugxeidvveqpbpnum.supabase.co";
+const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
 //Initializes the cover page (Login page)
