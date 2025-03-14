@@ -38,7 +38,7 @@ Copy API key from database onto file.
 
 E.g. `SUPABASE_KEY="insert api key here"`
 Copy database url from database onto file.
-E.g. `SUPABASE_URL="https://syipugxeidvveqpbpnum.supabase.co"`
+E.g. `SUPABASE_URL="insert url here"`
 
 ### Additional information
 
