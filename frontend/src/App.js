@@ -31,6 +31,7 @@ function App() {
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const [newMessage, setNewMessage] = useState("");
+
   const handleClose = () => setShow(false);
   function handleClick(key) {
     setShow(key);
@@ -47,6 +48,7 @@ function App() {
     }
 
     return 'HelpCircle'; 
+
   };
 
   // ELEMENTS
@@ -158,7 +160,8 @@ function App() {
                     <div className="chat-input d-flex gap-2 align-items-center">
                       <input
                         type="text"
-                        value={newMessage} // Bind the input value to newMessage
+
+                        value={newMessage} 
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type a message..."
                         className="flex-grow-1 p-2 rounded border"
@@ -200,6 +203,7 @@ function App() {
     );
   };
 
+
   const MessageList = ({ messages }) => {
     return (
       <span>
@@ -222,6 +226,7 @@ function App() {
     handleMessages(newMessage); 
     setNewMessage("");
   };
+
 
   // VARIABLES AND DATA
   const [width, setWidth] = React.useState("3.5");
@@ -265,6 +270,7 @@ function App() {
   const [directMessages, setDirectMessages] = useState([
     { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
   ]);
+
 
   const userProfile = {
     // GET items from database
@@ -319,6 +325,7 @@ function App() {
   return (
     <section>
 
+   
       {/* Step 3: Conditionally render Login page or App page */}
       {isLoggedIn ? (
         <section>
@@ -362,6 +369,7 @@ function App() {
                               <Nav.Link><icons.User /> Jane Doe</Nav.Link>
                               <Nav.Link><icons.User /> Julie Doe</Nav.Link>
 
+
                             </Nav>
 
                           </Col>
@@ -375,6 +383,25 @@ function App() {
                           {/* Go Back Button */}
                           <div className="back-button flex items-center cursor-pointer mb-2">
                             < icons.ArrowLeft alt="Go Back" className="w-10 h-10 mr-2" />
+
+
+                            </Nav>
+
+                          </Col>
+
+                        </Tab.Container>
+                      </div>
+                      <div id="mainview-dms">
+                        <div id="top-box">
+                          <Nav.Link><icons.User /> John Doe</Nav.Link>
+                        </div>
+
+
+                        <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
+                          {/* Go Back Button */}
+                          <div className="back-button flex items-center cursor-pointer mb-2">
+                            <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
+
                             <span className="text-gray-700">Go Back</span>
                           </div>
 
@@ -392,7 +419,9 @@ function App() {
                               <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
                               <User className="icon" />
                             </div>
+
                             <MessageList messages={directMessages} />
+
                           </div>
 
                           <Row id="chat-box" className="d-flex align-items-center">
@@ -404,6 +433,7 @@ function App() {
                             </Col>
 
                             {/* Input Box and Send Button */}
+
                             <Col id="chat-input"className="d-flex gap-1">
                               <form onSubmit={handleSubmitMessages}>
                                 <div className="d-flex gap-2">
@@ -417,13 +447,23 @@ function App() {
                                   <button type="submit" className="p-2 bg-[#4facfe] text-gray rounded-md">Send</button>
                                 </div>
                               </form>
+
+                            <Col className="flex-grow-1">
+                              <div className="chat-input d-flex gap-2 align-items-center">
+                                <input
+                                  type="text"
+                                  placeholder="Type a message..."
+                                  className="flex-grow-1 p-2 rounded border"
+                                />
+                                <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
+                              </div>
+
                             </Col>
                           </Row>
 
 
                         </div>
-
-                      </div>
+          </div>
                     </div>
 
                     <Form.Group className="divframe"></Form.Group>
@@ -434,6 +474,7 @@ function App() {
             </Row >
           </Tab.Container>
           <Modal show={showState === 'addGallery-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
+
             <Modal.Dialog >
               <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
               <Modal.Body>
@@ -454,6 +495,28 @@ function App() {
             <Modal.Dialog >
               <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
               <Modal.Body>
+
+            <Modal.Dialog >
+              <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+              <Modal.Body>
+                <h5 className="text-center">Create a Gallery</h5>
+                <form onSubmit={handleSubmitGallery}>
+                  <Col>
+                    <Row><label>Name:</label></Row>
+                    <Row><input type='text' id='newName-gallery' value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      placeholder='Name of your new Gallery' /></Row>
+                    <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
+                  </Col>
+                </form>
+              </Modal.Body>
+            </Modal.Dialog>
+          </Modal>
+          <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
+            <Modal.Dialog >
+              <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+              <Modal.Body>
+
                 <h5 className="text-center">Create a Channel</h5>
                 <form onSubmit={handleSubmitChannel}>
                   <Col>
