@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../style/style.css'
+import "boxicons/css/boxicons.min.css";
 
 function Login({onLogin}){
 
@@ -32,14 +33,14 @@ function Login({onLogin}){
                 <h1>Login</h1>
                 <div class="input-box">
                     <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}required/>
-                    <i class='bx bxs-user'></i>
+                    <i className='bx bxs-user'></i>
                 </div>
                 <div class="input-box">
                     <input type="text" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}required/>
-                    <i class='bx bxs-lock-alt' ></i>
+                    <i className='bx bxs-lock-alt' ></i>
                 </div>
                 <div class="text">
-                    <label><input type="checkbox"/>Remeber Me</label>
+                    <label><input type="checkbox"/>Remember Me</label>
                     <a href="#">Forgot Password</a>
                 </div>
                 <button type="submit" class="button">Login</button>
@@ -57,11 +58,11 @@ function Login({onLogin}){
                     <h1>Sign Up</h1>
                     <div class="input-box">
                         <input type="text" placeholder="Username" required/>
-                        <i class='bx bxs-user'></i>
+                        <i className='bx bxs-user'></i>
                     </div>
                     <div class="input-box">
                         <input type="email" placeholder="Email" required/>
-                        <i class='bx bxs-envelope'></i>
+                        <i className='bx bxs-envelope'></i>
                     </div>
                     <div class="input-box">
                         <input type="password" placeholder="Create password" required/>
@@ -69,10 +70,10 @@ function Login({onLogin}){
                     </div>
                     <div class="input-box">
                         <input type="password" placeholder="Confirm password" required/>
-                        <i class='bx bxs-lock-alt'></i>
+                        <i className='bx bxs-lock-alt'></i>
                     </div>
                     <button type="submit" class="button">Sign Up</button>
-                    <div class="login-link">
+                    <div className="login-link">
                         <p>Already have an account? <a onClick={handleClick} id="backToLogin">Login</a></p>
                     </div>
                 </form>
