@@ -158,6 +158,31 @@ router.post("/dm/upload-file", upload.single("file"), async (req, res) => {
     res.status(200).json({ msg: "File attached successfully", fileUrl });
 });
 
+// Retrieve file URL for a specific DM
+router.get("/dm/file/:DmID", async (req, res) => {
+    const { DmID } = req.params;
+
+    // Validate DmID
+    if (!DmID) {
+        return res.status(400).json({ msg: "Missing DmID" });
+    }
+
+    // Fetch DM record by DmID
+    const { data, error } = await supabase
+        .from("DMs")
+        .select("file_url")
+        .eq("DmID", DmID)
+        .single();
+
+    if (error || !data) {
+        return res.status(404).json({ msg: "DM not found or no file attached", error });
+    }
+
+    // Return the file URL (or any other relevant info)
+    res.status(200).json({ fileUrl: data.file_url });
+});
+
+
 // Upload art to gallery and update the gallery record with the URL
 router.post("/api/upload/gallery-file", upload.single("file"), async (req, res) => {
   
