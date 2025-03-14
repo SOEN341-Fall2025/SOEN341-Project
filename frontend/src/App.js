@@ -9,7 +9,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [galleries, setGalleries] = useState([]);
-  //const [token, setToken] = useState('');
   
   const setCookie = (name, value, days) => {
     const date = new Date();
@@ -18,58 +17,48 @@ function App() {
     document.cookie = `${name}=${value};${expires};path=/`; // Set cookie
   };
   
-  const handleLogin = async (email, password) => {
-    // Here, you can add authentication logic (API call or checking credentials)
-    // For now, just set it to true to simulate successful login
-    console.log("DEBUG: handleLogin called with:", email, password);
-    //setIsLoggedIn(true);
-        try {
-          // Step 1: Login and get token
-          const loginResponse = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({ email, password }),
-          });
-          
-          if (!loginResponse.ok) throw new Error('Login failed');
-          const { token } = await loginResponse.json();
-          
-          console.log("Login Success:", JSON.stringify({ email, password }));   
+  const handleLogin = async (email, password) => { console.log("DEBUG: handleLogin called with:", email, password);
+    // Here, you can add authentication logic (API call or checking credentials). For now, just set it to true to simulate successful login //setIsLoggedIn(true);
+    try {
+      // Step 1: Login and get token
+      const loginResponse = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });          
+      if (!loginResponse.ok) throw new Error('Login failed');
+      const { token } = await loginResponse.json();          
+      console.log("Login Success:", JSON.stringify({ email, password }));             
+      
+      // Step 2: Get user info using token
+      const userResponse = await fetch('/api/auth/me', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` }, // Pass token in Authorization header
+      });
+      if (!userResponse.ok) throw new Error('Failed to fetch user info');
+      const userInfo = await userResponse.json();
+      setUserData(userInfo); // Save user info
+      console.log("userResponse Success:", userInfo);   
 
-          
-          // Step 2: Get user info using token
-          const userResponse = await fetch('/api/auth/me', {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }, // Pass token in Authorization header
-          });
-          if (!userResponse.ok) throw new Error('Failed to fetch user info');
-          const userInfo = await userResponse.json();
-          setUserData(userInfo); // Save user info
-          //console.log("userResponse Success:", userInfo);   
-
-          // Step 3: Fetch galleries using user ID
-          const galleriesResponse = await fetch(`/api/user/galleries`, {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }, // Pass token in Authorization header
-          });
-          if (!galleriesResponse.ok) throw new Error('Failed to fetch galleries');
-          const galleryData = await galleriesResponse.json();
-          //console.log("galleriesResponse Success:", galleryData);   
-          
-          setGalleries(galleryData); // Save galleries
-          setIsLoggedIn(true); // Mark as logged in 
-          // Example usage after login
-          setCookie('authToken', token, 1); // Cookie valid for 7 days
-          
-          
-        } catch (error) {
-          console.error("Error during login:", error);
-          setIsLoggedIn(false);
-        }      
+      // Step 3: Fetch galleries using user ID
+      const galleriesResponse = await fetch('/api/gallery/all', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` }, // Pass token in Authorization header
+      });
+      if (!galleriesResponse.ok) throw new Error('Failed to fetch galleries');
+      const galleryData = await galleriesResponse.json();
+      console.log("galleriesResponse Success:", galleryData);   
+      
+      setGalleries(galleryData); // Save galleries
+      setIsLoggedIn(true); // Mark as logged in 
+      setCookie('authToken', token, 1); // Cookie valid for 7 days        
+    } catch (error) {
+      console.error("Error during login:", error);
+      setIsLoggedIn(false);
+    }      
   };
   return (
-    <section>
-    
+    <section>    
       {/* Step 3: Conditionally render Login page or App page */}
       {isLoggedIn ? (
         <Main userData={userData} galleries={galleries}/>
