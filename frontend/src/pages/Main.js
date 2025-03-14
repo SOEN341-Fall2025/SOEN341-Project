@@ -61,7 +61,15 @@ function Main({ userData, galleries}) {
     event.preventDefault();  // Prevents page reload on submit
     handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
-  
+  const handleMessages = (newMessage) => {
+    setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
+  };
+
+  const handleSubmitMessages = (event) => {
+    event.preventDefault();  // Prevents page reload on submit
+    handleMessages(newMessage); 
+    setNewMessage("");
+  };
   
   /*SECTION - ELEMENTS */
 
@@ -118,6 +126,19 @@ function Main({ userData, galleries}) {
       ))
     
     );
+  }; 
+  
+  const MessageList = ({ messages }) => {
+    return (
+      <span>
+        {messages.map((item, index) =>
+          <div className="message recipient flex items-center justify-end my-2">
+            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">{item.message}</div>
+            <User className="icon" />
+          </div>
+        )}
+      </span>
+    )
   };
   
   const ModalAddGallery = () => {

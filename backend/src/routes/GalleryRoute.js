@@ -3,7 +3,7 @@ const router = express.Router();
 import { supabase } from "../server.js";
 
 //Deletion of a gallery
-router.delete("/gal/delete", async (req, res) => {
+router.delete("/api/gal/delete", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
@@ -13,7 +13,7 @@ router.delete("/gal/delete", async (req, res) => {
     const { galleryName } = req.body;
 
     //Convert gallery name to gallery ID
-    const galleryID = await fetch(`http://localhost:4000/gal/getID/${galleryName}`);
+    const galleryID = await fetch(`/api/gal/getID/${galleryName}`);
     const galleryIDres = await galleryID.json();
     const gallId = galleryIDres.data.GalleryID;
     if(gallId == null){
@@ -21,7 +21,7 @@ router.delete("/gal/delete", async (req, res) => {
     }
 
     //Helper call
-    const verifyUser = await fetch('http://localhost:4000/gal/verifyCreator', {
+    const verifyUser = await fetch('/api/gal/verifyCreator', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,14 +53,14 @@ router.delete("/gal/delete", async (req, res) => {
 });
 
 //Creation of a gallery
-router.post("/gal/create", async (req, res) => {
+router.post("/api/gal/create", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
     if (error || !user) {
         return res.status(401).json(error);
     }
-
+    
     const { galleryName } = req.body;
 
     const { data, error: databaseError } = await supabase
@@ -82,7 +82,7 @@ router.post("/gal/create", async (req, res) => {
     const gallId = data.GalleryID;
 
     //Helper call
-    const addUser = await fetch('http://localhost:4000/gal/addCreator', {
+    const addUser = await fetch('/api/gal/addCreator', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ router.post("/gal/create", async (req, res) => {
 
 
 //Helper call to add the creator of the gallery inside the GalleryMembers table
-router.post("/gal/addCreator", async (req, res) => {
+router.post("/api/gal/addCreator", async (req, res) => {
 
     const { UserID, GalleryID } = req.body;
 
@@ -124,7 +124,7 @@ router.post("/gal/addCreator", async (req, res) => {
 });
 
 //Helper method to verify is user can delete gallery
-router.post("/gal/verifyCreator", async (req, res) => {
+router.post("/api/gal/verifyCreator", async (req, res) => {
 
     const { UserID, GalleryID } = req.body;
 
@@ -147,7 +147,7 @@ router.post("/gal/verifyCreator", async (req, res) => {
 });
 
 //Helper method to get gallery ID from gallery name
-router.get("/gal/getID/:galleryName", async (req, res) => {
+router.get("/api/gal/getID/:galleryName", async (req, res) => {
 
     const { galleryName } = req.params;
 
