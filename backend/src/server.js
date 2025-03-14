@@ -14,10 +14,12 @@ const app = express();
 //Importing routes
 import ProtectedRoute from "./routes/ProtectedRoute.js";
 import MessagingRoute from "./routes/MessagingRoute.js";
+import GalleryRoute from "./routes/GalleryRoute.js";
 import User from "./user.js";
 import Admin from "./admin.js";
 app.use(ProtectedRoute);
 app.use(MessagingRoute);
+app.use(GalleryRoute);
 app.use(User);
 app.use(Admin);
 
