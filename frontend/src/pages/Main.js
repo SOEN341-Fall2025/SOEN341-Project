@@ -40,6 +40,43 @@ function Main({ userData, galleries}) {
     userGalleries: JSON.stringify(galleries)
   };
 
+  // Push the gallery to database
+  const createGallery = async (galleryName) => {
+    // Get the auth token, for example from localStorage or a cookie
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+  
+    try {
+      // Send POST request to backend to create gallery
+      const response = await fetch('/gal/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ galleryName }), // Pass the gallery name in the body
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        // Handle server error
+        console.error('Error:', result);
+        alert('Failed to create gallery: ' + result.msg || 'Unknown error');
+        return;
+      }
+  
+      // Successfully created the gallery
+      console.log('Gallery created:', result);
+      alert('Gallery created successfully!');
+  
+      // Optionally, you can update the UI here with the new gallery or trigger a re-fetch of galleries
+  
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while creating the gallery.');
+    }
+  };
+
 
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
@@ -56,6 +93,7 @@ function Main({ userData, galleries}) {
 
   const handleGalleries = (newname, newicon) => {
     setUserGalleries(Object.values([...userGalleries, { GalleryName: newname, icon: newicon }]));
+    console.log(userGalleries)
   };
   
   const handleSubmitGallery = (event) => {
@@ -65,6 +103,7 @@ function Main({ userData, galleries}) {
       return;
     }
     handleGalleries(newName, '');  // Proceed with gallery creation
+    //createGallery(newName); //calls function to create gallery in the database
   };
   
   
@@ -169,42 +208,6 @@ function Main({ userData, galleries}) {
     Username: "@John_Doe77",
     Displayname: "Johnny Dough",
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
-  };
-
-  const createGallery = async (galleryName) => {
-    // Get the auth token, for example from localStorage or a cookie
-    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
-  
-    try {
-      // Send POST request to backend to create gallery
-      const response = await fetch('/gal/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
-        },
-        body: JSON.stringify({ galleryName }), // Pass the gallery name in the body
-      });
-  
-      const result = await response.json();
-  
-      if (!response.ok) {
-        // Handle server error
-        console.error('Error:', result);
-        alert('Failed to create gallery: ' + result.msg || 'Unknown error');
-        return;
-      }
-  
-      // Successfully created the gallery
-      console.log('Gallery created:', result);
-      alert('Gallery created successfully!');
-  
-      // Optionally, you can update the UI here with the new gallery or trigger a re-fetch of galleries
-  
-    } catch (error) {
-      console.error('An error occurred:', error);
-      alert('An error occurred while creating the gallery.');
-    }
   };
   
   return(
