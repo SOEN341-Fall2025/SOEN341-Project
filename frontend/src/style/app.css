@@ -1,3 +1,4 @@
+
 :root{
   --color-accent: #c9ffed;
   --color-bar: #76bea6;
@@ -82,6 +83,7 @@ body{
   padding: 0 !important;
   margin: 0 !important;
 }
+
 .tab-content{  
   position: absolute;
   z-index: 1;
@@ -93,6 +95,7 @@ body{
   background-size: cover !important;*/
   width: 100vw;
 }
+
 #pages{
  /* backdrop-filter: brightness(90%) sepia(20%);*/
   height: 100vh;
@@ -175,18 +178,33 @@ body{
   z-index: 5;
   left: var(--user-sidebar-length);*/
 }
-/*
+
+#mainview-dms {
+display: grid;
+grid-template-columns: auto auto; grid-column-gap: 30px;
+
+justify-content: center;
+align-items: center;
+
+}
 .chat-container {
   
-  height: 80vh;
-  bottom: 8vh; 
-  max-width: 90vw;
-  background: var(--color-accent);  Light blue 
-  position: absolute;
+  height: 704px;
+
+  bottom: 20px; /* Distance from bottom */
+  right: 20px;  /* Distance from right */
+  width: 928px;
+  left: 20px;
+  background: #c3e7ed; /* Light blue */
+
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}*/
+
+  flex-grow: 1; /* Allow the chat box to take up remaining space */
+
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
 
 /* Back Button */
 .back-button {
@@ -255,7 +273,7 @@ body{
 /* Recipient message (green) */
 .message.recipient {
   
-  flex-direction: row-reverse; /* Moves the image to the right */
+  flex-direction: row; 
 }
 
 .message.recipient .text {
@@ -273,6 +291,7 @@ body{
   border-radius: 50%; /* Circular icons */
   background-color: #e0e0e0; /* Light gray background */
   transition: background-color 0.3s ease; /* Smooth hover effect */
+  flex-direction: row-reverse;
 }
 
 #plus:hover, #camera:hover, #mic:hover {
@@ -282,6 +301,8 @@ body{
 .chat-input input {
   border: 1px solid #ccc; /* Light border for input */
   outline: none; /* Remove default outline */
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 
 .chat-input input:focus {
@@ -297,6 +318,23 @@ body{
 .chat-input button:hover {
   background-color: #3a8fd9; /* Darker blue on hover */
 }
+
+
+@media (max-width: 768px) {
+  .chat-input {
+    flex-direction: column; /* Stack input and button vertically on small screens */
+    gap: 8px; /* Add spacing between stacked elements */
+  }
+
+  .chat-input input {
+    width: 100%; /* Make input take full width */
+  }
+
+  .chat-input button {
+    width: 100%; /* Make button take full width */
+  }
+}
+
 
 #dm-list Nav.Link{
   border-color: #282c34 ;
@@ -336,4 +374,22 @@ body{
   border-radius: 30px 30px 30px 30px;
 }
 
+@media (max-width: 768px) {
+  .chat-container {
+    height: 90vh; /* Adjust height for smaller screens */
+    max-width: 95vw; /* Adjust max-width for smaller screens */
+  }
+
+  .chat-input {
+    flex-direction: column; /* Stack input and button vertically on small screens */
+  }
+
+  .chat-input input {
+    width: 100%; /* Make input take full width */
+  }
+
+  .chat-input button {
+    width: 100%; /* Make button take full width */
+  }
+}
 
