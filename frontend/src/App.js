@@ -4,7 +4,6 @@ import React, { useState, createContext } from 'react';
 import AppContext from './AppContext';
 import Settings from './pages/Settings.js';
 import './style/style.css';
-import React, { useState } from 'react';
 import Login from './pages/Login.js';
 
 
@@ -341,15 +340,6 @@ const [newAboutme, setNewAboutme] = useState("Initial about me text");
           setIsLoggedIn(false);
         }      
 
-      if (!data.token) {
-        console.log("Login was unsuccessful.", data);
-        setIsLoggedIn(false);
-        return;
-      }
-
-      console.log("Login was successful.", data);
-      setIsLoggedIn(true);
-      setUserId(data.user_id);
 
    
   };
