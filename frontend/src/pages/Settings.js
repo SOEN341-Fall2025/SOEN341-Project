@@ -1,8 +1,9 @@
 import '../style/settings.css';
 import React from 'react';
-import AppContext from '../AppContext';
+import {AppContext} from '../AppContext.js';
 import { useContext } from 'react';
 import { useState } from 'react';
+
 
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
@@ -13,17 +14,17 @@ function Settings() {
       const [newUsername, setNewUsername] = useState("Enter new username");
       const [newPassword, setNewPassword] = useState( "Enter new Password");
 
-
+      const getCookie = (name) => {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+      };
       const handleClose = () => setModalState(false);
       function handleClick(key) {
           setModalState(key);
       }
       const changeAboutMe = async ( newAboutMe) => {
-
-
         try {
-
-        const token = localStorage.getItem("authToken");
+        const token = getCookie("authToken");
          console.log("Sending data:", { token, newAboutMe }); 
           const response = await fetch("/api/newaboutme", {
             method: "POST",
@@ -44,18 +45,14 @@ function Settings() {
           }
       
           console.log("Update was successful.", data);
-
          handleClose();
         } catch (error) {
           console.error("There was an error in updating about me.", error);
         }
       };
       const changeusername = async ( newUsername) => {
-
-
         try {
-
-        const token = localStorage.getItem("authToken");
+        const token = getCookie("authToken");
          console.log("Sending data:", { token, newUsername }); 
           const response = await fetch("/api/newusername", {
             method: "PUT",
@@ -79,35 +76,35 @@ function Settings() {
 
          handleClose();
         } catch (error) {
-          console.error("There was an error in updating username.", error);
+      console.error("There was an error in updating username.", error);
         }
       };
-
-      const changePassword = async ( newPassword) => {
+ const changePassword = async ( newPassword) => {
 
 
         try {
 
-        const token = localStorage.getItem("authToken");
+        const token = getCookie("authToken");
          console.log("Sending data:", { token, newPassword }); 
           const response = await fetch("/api/newpassword", {
             method: "POST",
             headers: {
                'Authorization': `Bearer ${token}`,
               "Content-Type": "application/json"
-             
+
             },
             body: JSON.stringify({ newPassword}), 
           });
-      
-          const data = await response.json();
+        
+          const data = await response.json();  
+          console.log("reaponse:", response); 
           console.log("Response from backend:", data); 
-      
+
           if (!response.ok) {
             console.log("Update was unsuccessful.", data);
             return;
           }
-      
+
           console.log("Update was successful.", data);
 
          handleClose();
@@ -117,7 +114,7 @@ function Settings() {
       };
 
       const { ProfilePic } = useContext(AppContext);
-    return (      
+return (      
       <section>
         <div className="settings">
           <Tab.Container className="tab-content settings-page col-6 col-md-7 ps-5 pe-10 pt-10 text-start" defaultActiveKey="settings-profile">            
@@ -138,11 +135,10 @@ function Settings() {
                   <Tab.Pane eventKey="settings-profile">
                     <h3>Profile</h3>       
                     <Form.Group className="divframe">
-                      <Form.Label className="label px-1">Password</Form.Label>
+                <Form.Label className="label px-1">Password</Form.Label>
                       <div className="justify-between">
+<input type="password" row={1} placeholder={"Enter new password"} disabled />      
 
-                            <input type="password" row={1} placeholder={"Enter new password"} disabled />      
-                       
                         <Button variant="secondary" id="modal-profile-1" onClick={() => handleClick('modal-profile-1')}>🖊</Button>
                       </div>                    
                       <Form.Label className="label px-1">User Name</Form.Label>
@@ -166,17 +162,16 @@ function Settings() {
                     <Modal show={modalState === 'modal-profile-1'} onHide={handleClose} id="modal-profile-1" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
                           <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
-                          <Modal.Body>                      
-                            <h5 className="text-center">Change Your Password</h5>
+                          <Modal.Body>            
+ <h5 className="text-center">Change Your Password</h5>
                             <h6 className="label text-center">Enter new Password</h6>
                             <Form>
-                              <Form.Group>
-                            
+                              <Form.Group>      
+
                                 <small id="emailHelp" className="form-text text-muted">Please only use numbers, letter, underscores, or periods.</small>
                               </Form.Group>
                               <Form.Group>
-                               
-                                <input type="password" rows={1} cols={40} onChange={(e) => setNewPassword(e.target.value)}/> 
+ <input type="password" rows={1} cols={40} onChange={(e) => setNewPassword(e.target.value)}/> 
                               <Button onClick={() => changePassword(newPassword)}>Submit</Button> 
                              </Form.Group>                        
                              </Form>
@@ -346,5 +341,4 @@ function Settings() {
       </section>
     );
   }
-
-  export default Settings;
+  export default Settings;    
