@@ -4,18 +4,14 @@
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
-body:has(#loginWrapper){
+body{
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url('../assets/img1.jpg') no-repeat !important;
+    background: url('../assets/img1.jpg') no-repeat;
     background-size: cover;
     background-position: center;
-}
-div#loginWrapper{
-    background-color: rgba(240, 255, 253, 0.6);
-    box-shadow: 10px rgba(0,0,0, .5);
 }
 .wrapper{
     width: 420px;

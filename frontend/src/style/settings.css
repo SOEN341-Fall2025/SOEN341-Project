@@ -4,12 +4,12 @@
 * {
     border-width: 0 !important;
 }
-/*body{
+body{
     height: 100vh;
     width: 100vw;
     background-color: var(--color-bkg);
     overflow: hidden;
-}*/
+}
 img.form-control{
     border-width: 5px !important;
     border-color: var(--color-accent);
@@ -41,7 +41,7 @@ input.form-control-color{
 #settings-nav{
     background-color: var(--color-accent) !important;
     height: 100vh !important;
-    width: 40vw;
+    width: 30vw;
 }#settings-nav *{
     text-align: right !important;
 }
@@ -50,8 +50,8 @@ input.form-control-color{
     height: 100vh;
     position: absolute;
     top: 0;
-    left: 40vw;
-    /*width: auto !important;*/
+    left: 30vw;
+    width: auto !important;
     padding-left: 3%;
 }
 .divframe button{
@@ -89,7 +89,7 @@ input.form-control-color{
     justify-content: space-between !important;
 }
 .justify-between *{
-    /*max-width: 30% !important;*/
+    max-width: 30% !important;
 }
 .justify-end, .justify-end *{
     display: flex !important;
@@ -105,5 +105,5 @@ input.form-control-color{
     z-index: 999;
 }
 .divframe{
-    padding: 10% 10% 0 0;
+    padding: 10% 10% 10% 0;
 }
