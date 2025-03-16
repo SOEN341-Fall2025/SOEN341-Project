@@ -36,27 +36,43 @@ function Main({ userData, galleries}) {
   const logout = () => {    
     localStorage.removeItem('auth-token');
   }
-  const settings = userData.settings;
-  const uservar = {
+  const [userVar, setUserVar] = useState({
     sizeGallerySidebar: "3.5vw",
     sizeInnerSidebar: "17vw",
     clrAccent: '#d2a292',
     clrChat: '#f0ffff',
     clrNavbar: '#f0ffff',
+    clrNavbarGradient: '#d2a292',
     userGalleries: JSON.stringify(galleries),
-    username: userData.username,
-    profilepic: userData.profile_picture_url,
-    aboutme: userData.aboutme,
-    userID: userData.user_id,
-    settings: settings
-  };
-  function SetStyles(){    
-    uservar.clrAccent = settings.clrAccent;
-    uservar.clrChat = settings.clrAccent;
-    uservar.clrNavbar = settings.clrNavbar;
-    UpdateStyle("--color-accent", uservar.clrAccent);
-    UpdateStyle("--color-bar", uservar.clrSidebar);
-  }  
+    username: userData.user[0].username,
+    profilepic: userData.user[0].profile_picture_url,
+    aboutme: userData.user[0].aboutme,
+    userID: userData.user[0].user_id,
+    settings: userData.user[0].settings
+  });
+  
+  useEffect(() => {
+    console.log(userVar.settings);
+    console.log(userData);
+    function setStyles() {
+      const newUserVar = { ...userVar };
+      newUserVar.clrAccent = userVar.settings.clrAccent;
+      newUserVar.clrChat = userVar.settings.clrChat;
+      newUserVar.clrNavbar = userVar.settings.clrNavbar;
+      newUserVar.clrNavbarGradient = userVar.settings.clrNavbarGradient;
+      
+      setUserVar(newUserVar);
+  
+      UpdateStyle('--color-accent', newUserVar.clrAccent);
+      UpdateStyle('--color-bar', newUserVar.clrNavbar);
+      UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
+      UpdateStyle('--color-chat', newUserVar.clrChat);
+      
+      console.log(userVar);
+    }
+  
+    setStyles();
+  }, [userVar.settings]);
   
   
       
@@ -94,8 +110,8 @@ function Main({ userData, galleries}) {
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
-    let picUrl = null;//uservar.profilepic;
-    let name = null;//uservar.username;
+    let picUrl = null;//userVar.profilepic;
+    let name = null;//userVar.username;
     if (picUrl == null && name != null) {
       let words = name.split(' ');
       let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
@@ -168,7 +184,7 @@ function Main({ userData, galleries}) {
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={uservar}/>
+        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar}/>
       ))
     
     );
@@ -235,7 +251,7 @@ function Main({ userData, galleries}) {
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
   return(
-    <section onLoad={() => SetStyles()}>
+    <section>
       <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
         <Row className='justify-content-start' id="main-container">
           <Resizable id="gallery-sidebar-resizable" maxWidth={"15vw"} minWidth={"3vw"} enable={{ right: true }} size={{ width: ToPX(galleryNavWidth) }}
@@ -272,7 +288,7 @@ function Main({ userData, galleries}) {
                         <Nav.Link><icons.User /> Julie Doe</Nav.Link>
                     </Nav>                      
                     </Col>
-                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={uservar}/>
+                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={userVar}/>
                 </Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
             </Tab.Content>
@@ -305,7 +321,7 @@ function Main({ userData, galleries}) {
           <Modal.Header><div id="settings-close-button"><Button className="btn-close" onClick={handleClose}></Button></div></Modal.Header>
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
-              <Settings userVars={uservar}/>
+              <Settings userVars={userVar}/>
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>

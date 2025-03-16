@@ -1,6 +1,6 @@
 import '../style/settings.css';
 import React from 'react';
-import { AppContext } from '../AppContext';
+import { AppContext, RGB_A } from '../AppContext';
 import { useContext } from 'react';
 import { useState } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
@@ -12,29 +12,45 @@ function Settings({userVars}) {
       function handleClick(key) {
           setModalState(key);
       }              
-          
+      const [alphas, setAlphas] = useState({});
     const updateUser = async (userId, columnName, newValue) => {
         const token = localStorage.getItem('auth-token');    
-        try {      
+        try {       
           const updateResponse = await fetch('/api/auth/updateUser', {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ userId, columnName, newValue })
           });
-          const updateData = await updateResponse.json();
-          if(updateData){
-            console.log("Channels response ", updateData);    
+          if (!updateResponse.ok) {
+            throw new Error(`HTTP error! status: ${updateResponse.status}`);
           }
+          const updateData = await updateResponse.json();
+          console.log("Channels response ", updateData);       
+          return updateData;
       } catch (error) {
         console.error('Request failed:', error);
       } 
     };
+    const handleDone = () => {
+      window.location.reload();
+    
+    }
+    const handleAlphaChange = (event) => {
+      setAlphas[event.target.id] = parseFloat(event.target.value)
+      console.log(alphas);
+    };
       const handleColorChange = (event) => {
           const color = event.target.value; // Get the selected color
           const id = event.target.id;      // Get the ID of the input
+          const a = alphas[id];
+          if(a){color = RGB_A(color, a)}
           console.log(`Color: ${color}, ID: ${id}`);
+          console.log(userVars.settings);
           userVars.settings[id] = color;
-          //console.log(userVars.settings);
+          console.log(userVars.settings);
           const userId = userVars.userID;    
           updateUser(userId, "settings", userVars.settings);
       }
@@ -44,7 +60,7 @@ function Settings({userVars}) {
         <div className="settings">
           <Tab.Container className="tab-content settings-page col-6 col-md-7 ps-5 pe-10 pt-10 text-start" defaultActiveKey="settings-profile">            
           <Row>
-              <Col sm={3} id="settings-nav" className="d-flex flex-column justify-content-center">
+              <Col sm={4} id="settings-nav" className="d-flex flex-column justify-content-center">
               <Nav variant="pills" className="flex-column ps-30">
                   <Form.Label className="label labelnav px-3">User Settings</Form.Label>
                   <Nav.Item><Nav.Link eventKey="settings-profile">My Profile</Nav.Link></Nav.Item>
@@ -55,8 +71,8 @@ function Settings({userVars}) {
                   <Nav.Item><Nav.Link eventKey="settings-notif">Notifications</Nav.Link></Nav.Item>
                 </Nav>
               </Col>              
-              <Col sm={9} id="settings-pages">
-                <Tab.Content>                  
+              <Col sm={5} id="settings-pages">
+                <Tab.Content style={{width:'50%'}}>                  
                   <Tab.Pane eventKey="settings-profile">
                     <h3>Profile</h3>       
                     <Form.Group className="divframe">
@@ -72,7 +88,8 @@ function Settings({userVars}) {
                       </div>                    
                       <Form.Label className="label px-1">About Me</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control as="textarea" rows={5} placeholder={Aboutme} disabled />
+                      <div className="flex-grow">
+                        <Form.Control as="textarea" rows={5} style={{width:'10vw!important'}} placeholder={Aboutme} disabled /> </div>
                         <Button variant="secondary" id="modal-profile-3" onClick={() => handleClick('modal-profile-3')}>🖊</Button>
                       </div>      
                       <Form.Label className="label px-1">Avatar</Form.Label>   
@@ -181,48 +198,52 @@ function Settings({userVars}) {
                     <Form.Group className="divframe"> 
                       <Form.Label htmlFor="colorForm.Control" className="form-label">Accent Color</Form.Label>
                       <div className="d-flex flex-column">   
-                        <div className="justify-between"> 
-                          <Form.Control type="color" id="colorForm.Control1" defaultValue={userVars.clrAccent} title="Choose your color" disabled/>                   
-                          <Button type="submit" className="btn btn-secondary" id="colorEdit-accent" onClick={() => handleClick('settings-view-modal-1')}>Change 🖊</Button>
-                        </div>
-                        <Form.Label className="form-control form-control-color" id="prevColor1"></Form.Label>
-                      </div>
-                    </Form.Group>
-                    <Form.Group className="divframe"> 
-                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Color</Form.Label>
-                      <div className="d-flex flex-column">   
-                        <div className="justify-between"> 
-                          <Form.Control type="color" id="colorForm.Control2" defaultValue={userVars.clrNavbar} title="Choose your color" disabled />                   
-                          <Button type="submit" className="btn btn-secondary" id="colorEdit-bkg" onClick={() => handleClick('settings-view-modal-2')}>Change 🖊</Button>
-                        </div>
-                        <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
-                      </div>
-                    </Form.Group>
-                    <Modal show={modalState === "settings-view-modal-1"} onHide={handleClose} eventKey="settings-view-modal-1" >
-                      <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header closeButton>
-                          <Modal.Title>Choose your Accent</Modal.Title></Modal.Header>
-                          <Modal.Body>                      
-                            <h6 className="label text-center">Enter Modified Hex Value</h6>                            
-                            <Form.Control 
+                        <Form.Control 
                               type="color" 
                               id="clrAccent" 
                               defaultValue={userVars.clrAccent} 
                               onChange={handleColorChange} 
                               title="Choose your color"/> 
-                            <Row><input type='submit' value="Submit" onClick={handleClose}/></Row>
-                          </Modal.Body>
-                      </Modal.Dialog>
-                    </Modal>
-                    <Modal show={modalState === "settings-view-modal-2"} onHide={handleClose} eventKey="settings-view-modal-2" >
-                      <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header closeButton>
-                          <Modal.Title>Choose your Nav Color</Modal.Title></Modal.Header>
-                          <Modal.Body>                      
-                            <h6 className="label text-center">Enter Modified Hex Value</h6>
-                          </Modal.Body>
-                      </Modal.Dialog>
-                    </Modal>
+                        </div>
+                    </Form.Group>
+                    <Form.Group className="divframe"> 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrNavBar" 
+                              defaultValue={userVars.clrNavBar} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> </div>
+                    </Form.Group>
+                    <Form.Group className="divframe"> 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Gradient Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrNavBarGradient" 
+                              defaultValue={userVars.clrNavBarGradient} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> </div>
+                    </Form.Group>
+                    <Form.Group className="divframe"> 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Chatbox Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrChat" 
+                              defaultValue={userVars.clrChat} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> 
+                        </div>
+                    </Form.Group>
+                    <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
+                    <Row>
+                      <div class="hover-text" style={{ width:'fit-content'}}>
+                        <input className='btn btn-primary' type='submit' value="Done" onClick={handleDone}/>
+                        <span class="hover-text-content">Warning: This will reload the page!</span>
+                      </div>
+                    </Row>                    
                   </Tab.Pane>
                   
                   <Tab.Pane className="tab-pane" eventKey="settings-chats" role="tabpanel">

@@ -106,7 +106,7 @@ router.post("/api/auth/logout", async (req, res) => {
     res.json({ msg: "Logged out successfully" });
 });
 
-router.put("/api/auth/updateUser", async (req, res) => {
+router.post("/api/auth/updateUser", async (req, res) => {
     const { userId, columnName, newValue } = req.body;
     const token = req.header("Authorization")?.split(" ")[1];
     console.log(req.body);
