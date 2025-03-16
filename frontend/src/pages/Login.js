@@ -14,7 +14,14 @@ function Login({ onLogin }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onLogin(email, password);
+        if (showLogin) {
+            onLogin(email, password);
+        } else {
+            if (!passwordMatch || passwordStrength !== "Strong") {
+                alert("Passwords must match and be strong.");
+                return;
+            }
+        }
     };
 
     // Toggle between login and register views
@@ -92,7 +99,7 @@ function Login({ onLogin }) {
                             <i className={`bx ${showPassword ? 'bx bxs-lock-open-alt' : 'bx bxs-lock-alt'}`} onClick={togglePasswordVisibility}></i>
                         </div>
                         {!passwordMatch && <p style={{ color: '#0052A5' }}> Passwords do not match</p>}
-                        <button type="submit" className="button">Sign Up</button>
+                        <button type="submit" className="button" disabled={!passwordMatch}>Sign Up</button>
                         <div className="login-link">
                             <p>Already have an account? <a onClick={handleToggleView}>Login</a></p>
                         </div>
