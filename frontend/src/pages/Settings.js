@@ -1,6 +1,6 @@
 import '../style/settings.css';
 import React from 'react';
-import AppContext from '../AppContext';
+import { AppContext } from '../AppContext';
 import { useContext } from 'react';
 import { useState } from 'react';
 
