@@ -47,6 +47,11 @@ function App() {
 
         // Check if the response is ok (status 200-299)
         if (!response.ok) {
+          if (response.status === 404) {
+            console.warn('No galleries found.');
+            setGalleries([]);  // Set an empty array instead of letting the site crash
+            return;
+          }
           const result = await response.json();
           setError(result.msg || 'Failed to retrieve galleries');
           return;
@@ -120,7 +125,7 @@ function App() {
   return (
     <section>
     {isLoggedIn ? (
-      galleries.length > 0 ? (  // Only render Main if galleries are not empty
+      galleries.length >= 0 ? (  // Rendering main with 0 or more galleries
         <Main userData={userData} galleries={galleries} />
       ) : (
         <p>Loading galleries...</p>  // Optional: show a loading message while galleries are being fetched
