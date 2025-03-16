@@ -1,11 +1,9 @@
-
 :root{
   --color-accent: #c9ffed;
-  --color-bar: #76bea6;
   --color-bkg: azure;
   --user-sidebar-length: 3.5vw;
-  --user-dm-length: 2.5vw;
 }
+
 .App {
   text-align: center;
 }
@@ -39,30 +37,19 @@ hr{
   padding: 0 !important;
   border-width: 2px !important;
 }
-html, section{
-  width: 100%;
-}
-body{
-  background-image: url("../assets/background.png") !important;
-  backdrop-filter: brightness(90%) sepia(20%) !important;
-  background-repeat: no-repeat !important;
-  width: 100% !important;
-  overflow-x: hidden;
-}
 .carousel-caption{
   width: 100% !important;
   height: auto;
 }
 
-#gallery-sidebar-resizable{
-  height: 100vh !important;
-  background-color: var(--color-accent) !important;
-  background: linear-gradient(to right, var(--color-accent), var(--color-bar)) !important;
-  overflow: hidden !important;
-  /*position: absolute !important;
+#sidebar-resizable{
+  position: absolute;
   left: 0;
   top: 0;
-  z-index: 15;*/
+  height: 100vh !important;
+  background-color: var(--color-accent) !important;
+  width: var(--user-sidebar-length);
+  overflow: hidden !important;
 }
 #sidebar-list{
   width: 100%;
@@ -79,46 +66,35 @@ body{
   width: 19vw !important;
   height: fit-content !important;
 }
-#settings-modal, #gallery-sidebar-resizable, #status-modal{
+#settings-modal, #sidebar-resizable, #status-modal{
   padding: 0 !important;
   margin: 0 !important;
 }
 
-.tab-content{  
-  position: absolute;
-  z-index: 1;
-  top: 0;
-}
-#main-container{
-  /*background-image: url("../assets/background.png");
-  background-repeat: no-repeat !important;
-  background-size: cover !important;*/
-  width: 100vw;
-}
+
+
+
+
+
+
 
 #pages{
- /* backdrop-filter: brightness(90%) sepia(20%);*/
+  backdrop-filter: brightness(80%) sepia(50%);
   height: 100vh;
-  width: 100% !important;
+  width: 100vw;
   /*z-index: 2;
   position: absolute;
   top: 0;
   left: var(--user-sidebar-length);*/
-  padding: 0;
+  padding: 1%;
 }
 #pages-content{
-  /*background-color: var(--color-accent);
-  background-image: url("../assets/background.png");
-  background-repeat: no-repeat !important;
-  background-size: cover !important;*/
-  opacity: 100%;
+  background-color: var(--color-accent);
+  opacity: 80%;
   height: 100%;
-  width: auto;
-  position: relative;
+  width: 100%;
 }
-.gallery-pane{
-  width: 100% !important;
-}
+
 #settings-close-button{
   position: absolute !important;
   right: 50px !important;
@@ -139,46 +115,38 @@ body{
   }
 }
 #sidebar-dm{
-  /*background-color: white;*/
-  background: linear-gradient(to right, var(--color-bar), white);
+  background-color: white;
   padding-left: 12px;
   max-height: 100% !important;
-  height: 100vh !important;
-  width: 17vw !important;
+  height: 100px;
+  width: 300px;
 }
 #sidebar-dm-options{
   font-weight: bolder;
-  /*background-color: white;
-  background: linear-gradient(to right, var(--color-bar), white);*/
+  background-color: white;
   text-align: center;
   width: 300px;
-  height: fit-content;
+  height: 100%;
   padding-top: 5%;
+  padding-bottom: 5%;
 
 }
 
 *:has(.no-parent-padding.active){
-  /*background-image: url("../assets/img1.jpg");
-  backdrop-filter: brightness(80%) sepia(50%) !important;*/
+  background-image: url("../assets/img1.jpg");
+  backdrop-filter: brightness(80%) sepia(50%) !important;
   padding: 0 !important;
   opacity: 100% !important;
   max-height: 100%;
   position: relative !important;
 }
-#sidebar-channels {
-  /*background-color: white;*/
-  background: linear-gradient(to right, var(--color-bar), rgba(154, 218, 197, 0.95), rgba(154, 218, 197, 0.80), rgba(255, 255, 255, 0.65));
-  /*float: left;
-  margin-left: 20px;*/
-  height: 100vh !important;
-  width: var(--user-dm-length);
-  overflow: hidden;  
-  /*position: absolute !important;
-  top: 0;
-  z-index: 5;
-  left: var(--user-sidebar-length);*/
-}
 
+#sidebar-dms {
+  background-color: white;
+  float: left;
+  width: 300px;
+  height: 1000px;
+}
 #mainview-dms {
 display: grid;
 grid-template-columns: auto auto; grid-column-gap: 30px;
@@ -196,15 +164,16 @@ align-items: center;
   width: 928px;
   left: 20px;
   background: #c3e7ed; /* Light blue */
-
   border-radius: 10px;
+  padding: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
   flex-grow: 1; /* Allow the chat box to take up remaining space */
 
   overflow-y: auto; /* Enable vertical scrolling */
-}
 
+
+}
 
 /* Back Button */
 .back-button {
@@ -319,7 +288,6 @@ align-items: center;
   background-color: #3a8fd9; /* Darker blue on hover */
 }
 
-
 @media (max-width: 768px) {
   .chat-input {
     flex-direction: column; /* Stack input and button vertically on small screens */
@@ -335,22 +303,20 @@ align-items: center;
   }
 }
 
-
 #dm-list Nav.Link{
   border-color: #282c34 ;
   border-style: dashed;
 }
-#dm-list a{
-  width: 28vw;
-}
 #top-box{
-  height: 5vh;  
+  background-color: white;
+  height: 50px;
   position: absolute;
-  top: 3vh;
-  right: 5vw;
-  width: 50%;
-  margin: auto;
-  text-align: center;
+  top: 0;
+  left: 312px;
+  padding: 0.5%;
+  padding-left: 1%;
+  width: 100%;
+  text-align: left;
 }
 
 #messages-view{
@@ -392,4 +358,3 @@ align-items: center;
     width: 100%; /* Make button take full width */
   }
 }
-

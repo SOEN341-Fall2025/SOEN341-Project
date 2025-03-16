@@ -1,18 +1,36 @@
 import './style/app.css';
 import './style/settings.css';
-import './style/style.css';
 import React, { useState } from 'react';
+import {AppContext} from './AppContext';
+import Settings from './pages/Settings.js';
+import './style/style.css';
 import Login from './pages/Login.js';
-import Main from './pages/Main.js';
-function App() {
 
+
+import $ from 'jquery';
+import { Resizable } from 're-resizable';
+
+import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
+
+
+
+import * as icons from 'lucide-react';
+import { LoaderPinwheel } from 'lucide-react';
+import { CircleUser } from 'lucide-react';
+import { MessageCircleDashed } from 'lucide-react';
+import { Camera } from 'lucide-react';
+import { Mic } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { User } from 'lucide-react';
+import { Plus } from 'lucide-react';
+
+function App() {
 
   const [showState, setShow] = useState("close");
   const [newName, setNewName] = useState("");
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const [newMessage, setNewMessage] = useState("");
-
   const handleClose = () => setShow(false);
   function handleClick(key) {
     setShow(key);
@@ -29,7 +47,6 @@ function App() {
     }
 
     return 'HelpCircle'; 
-
   };
 
   // ELEMENTS
@@ -141,8 +158,7 @@ function App() {
                     <div className="chat-input d-flex gap-2 align-items-center">
                       <input
                         type="text"
-
-                        value={newMessage} 
+                        value={newMessage} // Bind the input value to newMessage
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type a message..."
                         className="flex-grow-1 p-2 rounded border"
@@ -184,7 +200,6 @@ function App() {
     );
   };
 
-
   const MessageList = ({ messages }) => {
     return (
       <span>
@@ -207,7 +222,6 @@ function App() {
     handleMessages(newMessage); 
     setNewMessage("");
   };
-
 
   // VARIABLES AND DATA
   const [width, setWidth] = React.useState("3.5");
@@ -252,7 +266,6 @@ function App() {
     { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
   ]);
 
-
   const userProfile = {
     // GET items from database
     username: "@John",
@@ -267,65 +280,47 @@ function App() {
     Displayname: "Johnny Dough",
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const [galleries, setGalleries] = useState([]);
-  //const [token, setToken] = useState('');
-  
-  const setCookie = (name, value, days) => {
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Expiration in days
-    const expires = `expires=${date.toUTCString()}`;
-    document.cookie = `${name}=${value};${expires};path=/`; // Set cookie
-  };
-  
+
   const handleLogin = async (email, password) => {
     // Here, you can add authentication logic (API call or checking credentials)
     // For now, just set it to true to simulate successful login
+
     console.log("DEBUG: handleLogin called with:", email, password);
 
+    try{
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!data.token) {
+        console.log("Login was unsuccessful.", data);
+        setIsLoggedIn(false);
+        return;
+      }
+
+      console.log("Login was successful.", data);
+      setIsLoggedIn(true);
+
+    }catch(error){
+      console.error("There was an error during login.");
+    }
+      
     //setIsLoggedIn(true);
-        try {
-          // Step 1: Login and get token
-          const loginResponse = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify({ email, password }),
-          });
-          
-          if (!loginResponse.ok) throw new Error('Login failed');
-          const { token } = await loginResponse.json();
-          
-          console.log("Login Success:", JSON.stringify({ email, password }));   
-
-          
-          // Step 2: Get user info using token
-          const userResponse = await fetch('/api/auth/me', {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${token}` }, // Pass token in Authorization header
-          });
-          if (!userResponse.ok) throw new Error('Failed to fetch user info');
-          const userInfo = await userResponse.json();
-          setUserData(userInfo); // Save user info
-          //console.log("userResponse Success:", userInfo);   
-          
-          setIsLoggedIn(true); // Mark as logged in 
-          // Example usage after login
-          setCookie('authToken', token, 1); // Cookie valid for 7 days          
-          
-        } catch (error) {
-          console.error("Error during login:", error);
-          setIsLoggedIn(false);
-        }      
-
   };
+
   return (
     <section>
 
-   
       {/* Step 3: Conditionally render Login page or App page */}
       {isLoggedIn ? (
-
         <section>
           <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
             <Row className='justify-content-start' id="main-container">
@@ -367,7 +362,6 @@ function App() {
                               <Nav.Link><icons.User /> Jane Doe</Nav.Link>
                               <Nav.Link><icons.User /> Julie Doe</Nav.Link>
 
-
                             </Nav>
 
                           </Col>
@@ -381,25 +375,6 @@ function App() {
                           {/* Go Back Button */}
                           <div className="back-button flex items-center cursor-pointer mb-2">
                             < icons.ArrowLeft alt="Go Back" className="w-10 h-10 mr-2" />
-
-
-                            </Nav>
-
-                          </Col>
-
-                        </Tab.Container>
-                      </div>
-                      <div id="mainview-dms">
-                        <div id="top-box">
-                          <Nav.Link><icons.User /> John Doe</Nav.Link>
-                        </div>
-
-
-                        <div className="chat-container w-[1000px] h-[400px] bg-[#c3e7ed] rounded-lg p-4 shadow-lg text-center absolute right-[10px]">
-                          {/* Go Back Button */}
-                          <div className="back-button flex items-center cursor-pointer mb-2">
-                            <img src="images/arrow.png" alt="Go Back" className="w-10 h-10 mr-2" />
-
                             <span className="text-gray-700">Go Back</span>
                           </div>
 
@@ -417,9 +392,7 @@ function App() {
                               <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">I'm good, thanks!</div>
                               <User className="icon" />
                             </div>
-
                             <MessageList messages={directMessages} />
-
                           </div>
 
                           <Row id="chat-box" className="d-flex align-items-center">
@@ -431,7 +404,6 @@ function App() {
                             </Col>
 
                             {/* Input Box and Send Button */}
-
                             <Col id="chat-input"className="d-flex gap-1">
                               <form onSubmit={handleSubmitMessages}>
                                 <div className="d-flex gap-2">
@@ -445,23 +417,13 @@ function App() {
                                   <button type="submit" className="p-2 bg-[#4facfe] text-gray rounded-md">Send</button>
                                 </div>
                               </form>
-
-                            <Col className="flex-grow-1">
-                              <div className="chat-input d-flex gap-2 align-items-center">
-                                <input
-                                  type="text"
-                                  placeholder="Type a message..."
-                                  className="flex-grow-1 p-2 rounded border"
-                                />
-                                <button className="p-2 bg-[#4facfe] text-white rounded-md">Send</button>
-                              </div>
-
                             </Col>
                           </Row>
 
 
                         </div>
-          </div>
+
+                      </div>
                     </div>
 
                     <Form.Group className="divframe"></Form.Group>
@@ -472,7 +434,6 @@ function App() {
             </Row >
           </Tab.Container>
           <Modal show={showState === 'addGallery-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
-
             <Modal.Dialog >
               <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
               <Modal.Body>
@@ -493,28 +454,6 @@ function App() {
             <Modal.Dialog >
               <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
               <Modal.Body>
-
-            <Modal.Dialog >
-              <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-              <Modal.Body>
-                <h5 className="text-center">Create a Gallery</h5>
-                <form onSubmit={handleSubmitGallery}>
-                  <Col>
-                    <Row><label>Name:</label></Row>
-                    <Row><input type='text' id='newName-gallery' value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      placeholder='Name of your new Gallery' /></Row>
-                    <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
-                  </Col>
-                </form>
-              </Modal.Body>
-            </Modal.Dialog>
-          </Modal>
-          <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered" fullscreen="false">
-            <Modal.Dialog >
-              <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-              <Modal.Body>
-
                 <h5 className="text-center">Create a Channel</h5>
                 <form onSubmit={handleSubmitChannel}>
                   <Col>
@@ -553,9 +492,6 @@ function App() {
           </Modal>
 
         </section>
-
-        <Main userData={userData} galleries={galleries}/>
-
       ) : (
         <Login onLogin={handleLogin} />
       )}
