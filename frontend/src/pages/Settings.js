@@ -94,6 +94,7 @@ function Settings() {
 
             },
             body: JSON.stringify({ newPassword}), 
+            
           });
         
           const data = await response.json();  
@@ -247,7 +248,7 @@ return (
                     <Form.Group className="divframe">
                       <Form.Label className="label px-1">Password</Form.Label>   
                       <div className="justify-between">   
-                        <Form.Control plaintext type="password" defaultValue="********" id="email" aria-label="********" disabled />
+                        <Form.Control plaintext type="password" value="********" id="email" aria-label="********" disabled />
                         <Button  className="btn edit btn-primary" data-bs-toggle="modal" data-bs-target="#modal-profile-4">🖊</Button>
                       </div>      
                       <Form.Label className="label px-1">Email</Form.Label>   
@@ -340,5 +341,6 @@ return (
         </div>
       </section>
     );
+   
   }
   export default Settings;    
