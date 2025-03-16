@@ -2,8 +2,8 @@
 import '../style/app.css';
 import '../style/settings.css';
 import '../style/style.css';
-import React, { useState, useEffect } from 'react';
-import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToPX } from '../AppContext.js';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToPX } from '../AppContext';
 import Settings from './Settings.js';
 import Gallery from './Gallery.js';
 import ChatContainer from './ChatContainer.js';
@@ -14,8 +14,10 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 
+
 function Main({ userData, galleries}) {    
-      
+  
+  
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
@@ -23,31 +25,65 @@ function Main({ userData, galleries}) {
   const [newGalleryName, setNewGalleryName] = useState("");
   const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
   const [dmNavWidth, setDmNavWidth] = useState(17);  
-  const [userGalleries, setUserGalleries] = useState(Object.values(galleries)); 
+  const [userGalleries, setUserGalleries] = useState(Object.values(galleries));   
+  const [newMessage, setNewMessage] = useState("");
+  const [directMessages, setDirectMessages] = useState([
+    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
+  ]);  
+  const [userChannels, setUserChannels] = useState([]); 
+  const [galleryChannels, setGalleryChannels] = useState([]); 
   
-  const [userChannels, setUserChannels] = useState([
-    { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
-    { galleryName: 'Work Server', channelName: 'Cook', icon: '' }
-]);   
-  const [galleryChannels, setGalleryChannels] = useState([
-    { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
-  );
-  
- const uservar = {
+  const logout = () => {    
+    localStorage.removeItem('auth-token');
+  }
+  const [userVar, setUserVar] = useState({
     sizeGallerySidebar: "3.5vw",
     sizeInnerSidebar: "17vw",
-    clrAccent: '#c9ffed',
-    userGalleries: JSON.stringify(galleries)
-  };
-
-
+    clrAccent: '#d2a292',
+    clrChat: '#f0ffff',
+    clrNavbar: '#f0ffff',
+    clrNavbarGradient: '#d2a292',
+    userGalleries: JSON.stringify(galleries),
+    username: userData.user[0].username,
+    profilepic: userData.user[0].profile_picture_url,
+    aboutme: userData.user[0].aboutme,
+    userID: userData.user[0].user_id,
+    settings: userData.user[0].settings
+  });
+  
+  useEffect(() => {
+    console.log(userVar.settings);
+    console.log(userData);
+    function setStyles() {
+      const newUserVar = { ...userVar };
+      newUserVar.clrAccent = userVar.settings.clrAccent;
+      newUserVar.clrChat = userVar.settings.clrChat;
+      newUserVar.clrNavbar = userVar.settings.clrNavbar;
+      newUserVar.clrNavbarGradient = userVar.settings.clrNavbarGradient;
+      
+      setUserVar(newUserVar);
+  
+      UpdateStyle('--color-accent', newUserVar.clrAccent);
+      UpdateStyle('--color-bar', newUserVar.clrNavbar);
+      UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
+      UpdateStyle('--color-chat', newUserVar.clrChat);
+      
+      console.log(userVar);
+    }
+  
+    setStyles();
+  }, [userVar.settings]);
+  
+  
+      
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
    function handleClick(key) { setShowState(key); }
+  
   const handleChannels = (newGalleryName, newChannelName, newIcon) => {
     setUserChannels([...userChannels, { galleryName: newGalleryName, channelName: newChannelName, icon: newIcon }]);
   };
-
+  
   const handleSubmitChannel = (event) => {
     event.preventDefault();
     handleChannels(newGalleryName, newChannelName, '');
@@ -61,16 +97,24 @@ function Main({ userData, galleries}) {
     event.preventDefault();  // Prevents page reload on submit
     handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
-  
+  const handleMessages = (newMessage) => {
+    setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
+  };
+
+  const handleSubmitMessages = (event) => {
+    event.preventDefault();  // Prevents page reload on submit
+    handleMessages(newMessage); 
+    setNewMessage("");
+  };
   
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
-    let picUrl = userProfile.profilepic;
-    let name = userProfile.displayname;
-    let words = name.split(' ');
-    let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
-    if (picUrl.length === 0) {
+    let picUrl = null;//userVar.profilepic;
+    let name = null;//userVar.username;
+    if (picUrl == null && name != null) {
+      let words = name.split(' ');
+      let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
       return (
         <span style={{ width: '50%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Image src='bublii_bubble.png' id="avatar" style={{ height: '100%', width: '100%' }} />
@@ -85,57 +129,80 @@ function Main({ userData, galleries}) {
       );
     }
   };
-  const GalleryList = () => {
+  const getChannels = useCallback(async (name) => {
+    try {      
+        const token = localStorage.getItem('auth-token');        
+        
+        // Fetch gallery channels
+        const channelsResponse = await fetch(`/api/gallery/getChannels?galleryName=${encodeURIComponent(name)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(channelsResponse){
+          const channelsData = await channelsResponse.json();
+          //console.log("Channels response ", channelsData);    
+          const galleryName = Object.keys(channelsData)[0];
+          const channels = channelsData[galleryName];
+          if(!Array.isArray(channels)) {channels = [];}
+          //console.log("Channels ", channels); 
+          setGalleryChannels(prevChannels => {
+            //console.log('Setting galleryChannels:', JSON.stringify(channels));
+            return channels;
+          });        
+        }
+    } catch (error) {
+      //console.error('Login failed:', error);
+      setGalleryChannels([]);
+    }
+  }, []);
+  
+  const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
-    //console.log("Gallery Names:", galleryNames);
+    const handleGalleryClick = useCallback((galleryName) => {
+      console.log("Getting Channels for " + galleryName);
+      getChannels(galleryName);
+    }, [getChannels]);
+  
+    useEffect(() => {
+      //console.log("galleryChannels updated:", galleryChannels);
+    }, [galleryChannels]);
+  
     return (        
-        userGalleries.map((item, index) => (
-          <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
-            <span className="channel-icon">
-              <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
-            </span>
-            {item.GalleryName}
-          </Nav.Link>
-        ))
+      userGalleries.map((item, index) => (
+        <Nav.Link 
+          eventKey={item.GalleryName} 
+          key={index} 
+          onClick={() => handleGalleryClick(item.GalleryName)}
+        >
+          <span className="channel-icon">
+            <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
+          </span>
+          {item.GalleryName}
+        </Nav.Link>
+      ))
     );
-  };
-  const GalleryChannelList = ({ g }) => {
-    return (
-        g.map((item, index) => (
-          <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
-            <span className="channel-icon">
-              <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
-            </span>
-            {item.name}
-          </Nav.Link>
-        ))
-    );
-  };
+  });
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} userChannels={userChannels} gallerySize={galleryNavWidth} user={uservar}/>
+        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar}/>
       ))
     
     );
+  }; 
+  
+  const MessageList = ({ messages }) => {
+    return (
+      <span>
+        {messages.map((item, index) =>
+          <div className="message recipient flex items-center justify-end my-2">
+            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">{item.message}</div>
+            <User className="icon" />
+          </div>
+        )}
+      </span>
+    )
   };
   
-  const ModalAddGallery = () => {
-    return(
-        <Modal.Body> 
-            <h5 className="text-center">Create a Gallery</h5>
-            <form onSubmit={handleSubmitGallery}>
-            <Col>
-                <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-gallery' value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder='Name of your new Gallery' /></Row>
-                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
-            </Col>
-            </form>
-        </Modal.Body>
-    );
-  };
   const ModalAddChannel = () => {
     return(
         <Modal.Body> 
@@ -152,13 +219,29 @@ function Main({ userData, galleries}) {
         </Modal.Body>
     );
   };
-
+  const ModalAddGallery = () => {
+    return(
+        <Modal.Body> 
+            <h5 className="text-center">Create a Gallery</h5>
+            <form onSubmit={handleSubmitGallery}>
+            <Col>
+                <Row><label>Name:</label></Row>
+                <Row><input type='text' id='newName-gallery' value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder='Name of your new Gallery' autoFocus/></Row>
+                <Row><input type='submit' value="Submit" onClick={handleClose}/></Row>
+            </Col>
+            </form>
+        </Modal.Body>
+    );
+  };
+  /*
   const userProfile = {
     // GET items from database
     username: "@John",
     displayname: "Johnny Sanders",
     profilepic: "bublii_bubble.png",
-  };
+  };*/
 
   // SHARED ELEMENT LIST
   const contextValue = {
@@ -167,7 +250,6 @@ function Main({ userData, galleries}) {
     Displayname: "Johnny Dough",
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
-  
   return(
     <section>
       <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
@@ -206,7 +288,7 @@ function Main({ userData, galleries}) {
                         <Nav.Link><icons.User /> Julie Doe</Nav.Link>
                     </Nav>                      
                     </Col>
-                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={uservar}/>
+                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={userVar}/>
                 </Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
             </Tab.Content>
@@ -214,17 +296,12 @@ function Main({ userData, galleries}) {
         </Row >
       </Tab.Container>
       <Modal show={showState === 'addGallery-modal'} onHide={handleClose} id="addGallery-modal" className="modal-dialog-centered">
-        <Modal.Dialog >
-          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-          <ModalAddGallery />
-        </Modal.Dialog>
+        <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header> <ModalAddGallery /> </Modal.Dialog>
       </Modal>
       <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
-        <Modal.Dialog >
-          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-          <ModalAddChannel />
-        </Modal.Dialog>
+        <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalAddChannel /></Modal.Dialog>
       </Modal>
+
       <Modal show={showState === 'status-modal'} onHide={handleClose} id="status-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
@@ -233,6 +310,7 @@ function Main({ userData, galleries}) {
             <Form>
               <Col xs={6} md={4}>
                 <ProfilePic />
+                <Row><input type="submit" value="Logout" onClick={logout}></input></Row>
               </Col >
             </Form>
           </Modal.Body>
@@ -243,7 +321,7 @@ function Main({ userData, galleries}) {
           <Modal.Header><div id="settings-close-button"><Button className="btn-close" onClick={handleClose}></Button></div></Modal.Header>
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
-              <Settings />
+              <Settings userVars={userVar}/>
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>
