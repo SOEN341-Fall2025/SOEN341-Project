@@ -49,7 +49,7 @@ function App() {
         .then(([userData, galleriesData]) => {
           //console.log("User data received:", userData);
           //console.log("Galleries data received:", galleriesData);
-          setUserData(userData);
+          setUserData(userData.user[0]);
           setGalleries(galleriesData);
           setAuthStatus('authenticated');
           //setIsLoggedIn(true);
@@ -146,7 +146,6 @@ function App() {
         });
         const userData = await userResponse.json();
         setUserData(userData.user[0]);
-        console.log(userData.user[0].settings);
         // Fetch user galleries
         const galleriesResponse = await fetch('/api/gallery/all', {
           headers: { 'Authorization': `Bearer ${data.token}` }
@@ -203,7 +202,6 @@ function App() {
       setIsLoggedIn(false);
     }  
   };*/
-  
   return (
     <section>   
     {authStatus === 'checking' ? (

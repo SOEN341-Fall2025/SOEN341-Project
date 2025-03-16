@@ -44,31 +44,29 @@ function Main({ userData, galleries}) {
     clrNavbar: '#f0ffff',
     clrNavbarGradient: '#d2a292',
     userGalleries: JSON.stringify(galleries),
-    username: userData.user[0].username,
-    profilepic: userData.user[0].profile_picture_url,
-    aboutme: userData.user[0].aboutme,
-    userID: userData.user[0].user_id,
-    settings: userData.user[0].settings
+    username: userData.username,
+    profilepic: userData.profile_picture_url,
+    aboutme: userData.aboutme,
+    userID: userData.user_id,
+    settings: userData.settings
   });
   
   useEffect(() => {
-    console.log(userVar.settings);
-    console.log(userData);
+    console.log(JSON.stringify(userData.settings));
     function setStyles() {
       const newUserVar = { ...userVar };
-      newUserVar.clrAccent = userVar.settings.clrAccent;
-      newUserVar.clrChat = userVar.settings.clrChat;
-      newUserVar.clrNavbar = userVar.settings.clrNavbar;
-      newUserVar.clrNavbarGradient = userVar.settings.clrNavbarGradient;
+      newUserVar.clrAccent = userData.settings.clrAccent || userVar.clrNavbar;
+      newUserVar.clrChat = userData.settings.clrChat || userVar.clrNavbar;
+      newUserVar.clrNavbar = userData.settings.clrNavbar || userVar.clrNavbar;
+      newUserVar.clrNavbarGradient = userData.settings.clrNavbarGradient || userVar.clrNavbarGradient;
       
       setUserVar(newUserVar);
   
       UpdateStyle('--color-accent', newUserVar.clrAccent);
       UpdateStyle('--color-bar', newUserVar.clrNavbar);
       UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
-      UpdateStyle('--color-chat', newUserVar.clrChat);
+      //console.log(newUserVar.clrNavbarGradient);
       
-      console.log(userVar);
     }
   
     setStyles();
@@ -110,8 +108,8 @@ function Main({ userData, galleries}) {
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
-    let picUrl = null;//userVar.profilepic;
-    let name = null;//userVar.username;
+    let picUrl = userVar.profilepic;
+    let name = userVar.username;
     if (picUrl == null && name != null) {
       let words = name.split(' ');
       let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
@@ -161,10 +159,6 @@ function Main({ userData, galleries}) {
       console.log("Getting Channels for " + galleryName);
       getChannels(galleryName);
     }, [getChannels]);
-  
-    useEffect(() => {
-      //console.log("galleryChannels updated:", galleryChannels);
-    }, [galleryChannels]);
   
     return (        
       userGalleries.map((item, index) => (
@@ -308,10 +302,10 @@ function Main({ userData, galleries}) {
           <Modal.Body>
             <h5 className="text-center">Your Status</h5>
             <Form>
-              <Col xs={6} md={4}>
                 <ProfilePic />
+                <Row><Form.Label id="placeholder"></Form.Label></Row>
+                <Row><Form.Label id="placeholder"></Form.Label></Row>
                 <Row><input type="submit" value="Logout" onClick={logout}></input></Row>
-              </Col >
             </Form>
           </Modal.Body>
         </Modal.Dialog>

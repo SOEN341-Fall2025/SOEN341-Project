@@ -35,8 +35,8 @@ function Settings({userVars}) {
       } 
     };
     const handleDone = () => {
-      window.location.reload();
-    
+      console.log(JSON.stringify(userVars.settings));
+      window.location.reload();      
     }
     const handleAlphaChange = (event) => {
       setAlphas[event.target.id] = parseFloat(event.target.value)
@@ -45,12 +45,14 @@ function Settings({userVars}) {
       const handleColorChange = (event) => {
           const color = event.target.value; // Get the selected color
           const id = event.target.id;      // Get the ID of the input
-          const a = alphas[id];
-          if(a){color = RGB_A(color, a)}
-          console.log(`Color: ${color}, ID: ${id}`);
-          console.log(userVars.settings);
+          console.log(`Before ${id} change: ${userVars.settings[id]}`);
+          /*const a = alphas[id];
+          if(a){color = RGB_A(color, a)}*/
+          /*console.log(`Seetings: ${id}, ${userVars.settings[id]}`);
+          console.log(`Seetings: ${id}, new: ${userVars.settings[id]}`);
+          console.log(userVars.settings);*/
           userVars.settings[id] = color;
-          console.log(userVars.settings);
+          console.log(`After ${id} change: ${userVars.settings[id]}`);
           const userId = userVars.userID;    
           updateUser(userId, "settings", userVars.settings);
       }
@@ -211,8 +213,8 @@ function Settings({userVars}) {
                       <div className="d-flex flex-column">   
                         <Form.Control 
                               type="color" 
-                              id="clrNavBar" 
-                              defaultValue={userVars.clrNavBar} 
+                              id="clrNavbar" 
+                              defaultValue={userVars.clrNavbar} 
                               onChange={handleColorChange} 
                               title="Choose your color"/> </div>
                     </Form.Group>
@@ -221,8 +223,8 @@ function Settings({userVars}) {
                       <div className="d-flex flex-column">   
                         <Form.Control 
                               type="color" 
-                              id="clrNavBarGradient" 
-                              defaultValue={userVars.clrNavBarGradient} 
+                              id="clrNavbarGradient" 
+                              defaultValue={userVars.clrNavbarGradient} 
                               onChange={handleColorChange} 
                               title="Choose your color"/> </div>
                     </Form.Group>
@@ -239,9 +241,9 @@ function Settings({userVars}) {
                     </Form.Group>
                     <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
                     <Row>
-                      <div class="hover-text" style={{ width:'fit-content'}}>
+                      <div className="hover-text" style={{ width:'fit-content'}}>
                         <input className='btn btn-primary' type='submit' value="Done" onClick={handleDone}/>
-                        <span class="hover-text-content">Warning: This will reload the page!</span>
+                        <span className="hover-text-content">Warning: This will reload the page!</span>
                       </div>
                     </Row>                    
                   </Tab.Pane>
