@@ -1,7 +1,6 @@
 import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
-import React, { useState } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
 function App() {
@@ -68,5 +67,4 @@ function App() {
     </section>
   );
 }
-
 export default App;
