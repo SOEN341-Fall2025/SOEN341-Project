@@ -2,8 +2,10 @@ import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
+import { Loader } from 'lucide-react';
 import { Loader } from 'lucide-react';
 function App() {
   
@@ -76,6 +78,15 @@ function App() {
   
   
   return (
+    <section>   
+    {authStatus === 'checking' ? (
+      <Loader />
+    ) : authStatus === 'authenticated' && userData && galleries ? (
+      <Main userData={userData} galleries={galleries} />
+    ) : (
+      <Login onLogin={login} />
+    )}    
+  </section>
     <section>   
     {authStatus === 'checking' ? (
       <Loader />

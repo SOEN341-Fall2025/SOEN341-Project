@@ -1,16 +1,58 @@
 import '../style/settings.css';
 import React from 'react';
-import { AppContext } from '../AppContext';
+import { AppContext, RGB_A } from '../AppContext';
 import { useContext } from 'react';
 import { useState } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
-function Settings() {
+function Settings({userVars}) {
     
       const [modalState, setModalState] = useState("close");
       const handleClose = () => setModalState(false);
       function handleClick(key) {
           setModalState(key);
+      }              
+      const [alphas, setAlphas] = useState({});
+    const updateUser = async (userId, columnName, newValue) => {
+        const token = localStorage.getItem('auth-token');    
+        try {       
+          const updateResponse = await fetch('/api/auth/updateUser', {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId, columnName, newValue })
+          });
+          if (!updateResponse.ok) {
+            throw new Error(`HTTP error! status: ${updateResponse.status}`);
+          }
+          const updateData = await updateResponse.json();
+          console.log("Channels response ", updateData);       
+          return updateData;
+      } catch (error) {
+        console.error('Request failed:', error);
+      } 
+    };
+    const handleDone = () => {
+      window.location.reload();
+    
+    }
+    const handleAlphaChange = (event) => {
+      setAlphas[event.target.id] = parseFloat(event.target.value)
+      console.log(alphas);
+    };
+      const handleColorChange = (event) => {
+          const color = event.target.value; // Get the selected color
+          const id = event.target.id;      // Get the ID of the input
+          const a = alphas[id];
+          if(a){color = RGB_A(color, a)}
+          console.log(`Color: ${color}, ID: ${id}`);
+          console.log(userVars.settings);
+          userVars.settings[id] = color;
+          console.log(userVars.settings);
+          const userId = userVars.userID;    
+          updateUser(userId, "settings", userVars.settings);
       }
       const { ProfilePic, Username, Displayname, Aboutme } = useContext(AppContext);
     return (      
@@ -18,19 +60,19 @@ function Settings() {
         <div className="settings">
           <Tab.Container className="tab-content settings-page col-6 col-md-7 ps-5 pe-10 pt-10 text-start" defaultActiveKey="settings-profile">            
           <Row>
-              <Col sm={3} id="settings-nav" className="d-flex flex-column justify-content-center">
+              <Col sm={4} id="settings-nav" className="d-flex flex-column justify-content-center">
               <Nav variant="pills" className="flex-column ps-30">
                   <Form.Label className="label labelnav px-3">User Settings</Form.Label>
                   <Nav.Item><Nav.Link eventKey="settings-profile">My Profile</Nav.Link></Nav.Item>
-                  <Nav.Item><Nav.Link eventKey="settings-account">My Accounts</Nav.Link></Nav.Item>
+                  <Nav.Item><Nav.Link eventKey="settings-account">My Account</Nav.Link></Nav.Item>
                   <Form.Label className="label labelnav px-3">App Settings</Form.Label>
                   <Nav.Item><Nav.Link eventKey="settings-view">Appearance</Nav.Link></Nav.Item>
                   <Nav.Item><Nav.Link eventKey="settings-chats">Chat & Channels</Nav.Link></Nav.Item>
                   <Nav.Item><Nav.Link eventKey="settings-notif">Notifications</Nav.Link></Nav.Item>
                 </Nav>
               </Col>              
-              <Col sm={9} id="settings-pages">
-                <Tab.Content>                  
+              <Col sm={5} id="settings-pages">
+                <Tab.Content style={{width:'50%'}}>                  
                   <Tab.Pane eventKey="settings-profile">
                     <h3>Profile</h3>       
                     <Form.Group className="divframe">
@@ -46,7 +88,8 @@ function Settings() {
                       </div>                    
                       <Form.Label className="label px-1">About Me</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control as="textarea" rows={5} placeholder={Aboutme} disabled />
+                      <div className="flex-grow">
+                        <Form.Control as="textarea" rows={5} style={{width:'10vw!important'}} placeholder={Aboutme} disabled /> </div>
                         <Button variant="secondary" id="modal-profile-3" onClick={() => handleClick('modal-profile-3')}>🖊</Button>
                       </div>      
                       <Form.Label className="label px-1">Avatar</Form.Label>   
@@ -65,12 +108,12 @@ function Settings() {
                             <h6 className="label text-center">Enter Modified Name and Password</h6>
                             <Form>
                               <Form.Group>
-                                <Form.Label for="modEmail">Display Name</Form.Label>
+                                <Form.Label htmlFor="modEmail">Display Name</Form.Label>
                                 <Form.Control type="email" id="modEmail" aria-describedby="modEmail" placeholder="Enter email" />
                                 <small id="emailHelp" className="form-text text-muted">Please only use numbers, letter, underscores, or periods.</small>
                               </Form.Group>
                               <Form.Group>
-                                <Form.Label for="exampleForm.ControlPassword1">Password</Form.Label>
+                                <Form.Label htmlFor="exampleForm.ControlPassword1">Password</Form.Label>
                                 <Form.Control type="password" id="exampleForm.ControlPassword1" placeholder="Password" />
                               </Form.Group>
                               <Button type="submit" className="btn btn-primary">Submit</Button>
@@ -104,7 +147,7 @@ function Settings() {
                             <Form>
                               <Form.Group>
                                 <div className="d-flex align-items-start flex-column">
-                                  <Form.Label for="avatarFile">Upload new avatar</Form.Label>
+                                  <Form.Label htmlFor="avatarFile">Upload new avatar</Form.Label>
                                   <Form.Control type="file" id="avatarFile" />
                                 </div>
                               </Form.Group>
@@ -153,32 +196,54 @@ function Settings() {
                   <Tab.Pane className="tab-pane" eventKey="settings-view" role="tabpanel">
                     <h3>Appearance</h3>         
                     <Form.Group className="divframe"> 
-                      <Form.Label for="colorForm.Control" className="form-label">Accent Color</Form.Label>
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Accent Color</Form.Label>
                       <div className="d-flex flex-column">   
-                        <div className="justify-between"> 
-                          <Form.Control type="color" id="colorForm.Control1" defaultValue="#c9ffed" title="Choose your color" />                   
-                          <Button type="submit" className="btn btn-secondary" id="colorEdit-accent">Change 🖊</Button>
+                        <Form.Control 
+                              type="color" 
+                              id="clrAccent" 
+                              defaultValue={userVars.clrAccent} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> 
                         </div>
-                        <Form.Label className="form-control form-control-color" id="prevColor1"></Form.Label>
-                      </div>
                     </Form.Group>
                     <Form.Group className="divframe"> 
-                      <Form.Label for="colorForm.Control" className="form-label">Background Color</Form.Label>
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Color</Form.Label>
                       <div className="d-flex flex-column">   
-                        <div className="justify-between"> 
-                          <Form.Control type="color" id="colorForm.Control2" defaultValue="#f0ffff" title="Choose your color" />                   
-                          <Button type="submit" className="btn btn-secondary" id="colorEdit-bkg">Change 🖊</Button>
-                        </div>
-                        <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
-                      </div>
+                        <Form.Control 
+                              type="color" 
+                              id="clrNavBar" 
+                              defaultValue={userVars.clrNavBar} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> </div>
                     </Form.Group>
-                    <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-modal" >
-                      <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                        <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
-                          <Modal.Body>                      
-                          </Modal.Body>
-                      </Modal.Dialog>
-                    </Modal>
+                    <Form.Group className="divframe"> 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Gradient Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrNavBarGradient" 
+                              defaultValue={userVars.clrNavBarGradient} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> </div>
+                    </Form.Group>
+                    <Form.Group className="divframe"> 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Chatbox Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrChat" 
+                              defaultValue={userVars.clrChat} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> 
+                        </div>
+                    </Form.Group>
+                    <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
+                    <Row>
+                      <div class="hover-text" style={{ width:'fit-content'}}>
+                        <input className='btn btn-primary' type='submit' value="Done" onClick={handleDone}/>
+                        <span class="hover-text-content">Warning: This will reload the page!</span>
+                      </div>
+                    </Row>                    
                   </Tab.Pane>
                   
                   <Tab.Pane className="tab-pane" eventKey="settings-chats" role="tabpanel">
