@@ -148,9 +148,9 @@ router.post("/api/gal/verifyCreator", async (req, res) => {
 
 //Helper method to get gallery ID from gallery name
 router.get("/api/gal/getID/:galleryName", async (req, res) => {
-
+    
     const { galleryName } = req.params;
-
+    
     if (!galleryName) {
         return res.status(400).json({ error: "Gallery name was not received." });
     }
@@ -202,4 +202,110 @@ router.get("/api/gallery/all", async (req, res) => {
     }
   });
   
+router.get("/api/gallery/channels", async (req, res) => {
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token provided" });
+    }
+    try {
+      // Step 1: Get all gallery IDs from GalleryMembers for this user
+      const { data: memberships, error: membershipError } = await supabase
+      .from('GalleryMembers')
+      .select('*');
+      //console.log(memberships);
+      if (membershipError) throw membershipError;
+      // Extract gallery IDs into an array
+      const galleryIds = memberships.map(m => m.GalleryID);
+      
+      //console.log(galleryIds);
+      if (galleryIds.length === 0) {
+        return res.status(200).json([]);
+      }
+      // Step 2: Get channels in each gallery details for these IDs
+      const { data: channels } = await supabase
+      .from('Channels')
+      .select('*')
+      .in('GalleryID', galleryIds);
+    
+      if (channels.length === 0) {
+        return res.status(200).json([]);
+      }
+    // 3. Structure response, respecting the composite key
+    const response = galleryIds.map(gid => ({
+      id: gid,
+      channels: channels
+        .filter(c => c.GalleryID === gid)
+        .map(c => ({
+            GalleryID: c.GalleryID,
+            ChannelName: c.ChannelName, // Assuming 'name' is the channel name
+          // Include other channel properties as needed
+        }))
+    }));
+      
+    console.log("All Channels" + channels);
+    res.json(response);
+    } catch (err) {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+router.get("/api/gallery/getChannels", async (req, res) => {
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token provided" });
+    }
+    try {
+        const { galleryName } = req.query;
+        console.log("DEBUG: " + galleryName)
+        if (!galleryName) {
+            return res.status(400).json({ error: "Gallery name was not received." });
+        }
+        const { data, error } = await supabase
+        .from('Galleries')
+        .select('GalleryID') 
+        .eq('GalleryName', galleryName).single();
+        if (error) {
+            return res.status(400).json({ msg: error.message, data: {"GalleryID": null} });
+        }
+        
+        if (!data) {
+            return res.status(404).json({ msg: "Gallery not found", data: {"GalleryID": null} });
+        }
+        
+        const galleryId = data.GalleryID;
+        console.log("DEBUG: " + galleryId);
+        // Step 2: Get channels in each gallery details for these IDs
+        const { data: channels, error: channelsError } = await supabase
+        .from('Channels')
+        .select('ChannelName')
+        .eq('GalleryID', galleryId);
+    
+        if (channelsError) {
+        console.error('Error fetching channels:', channelsError);
+        return res.status(500).json({ error: channelsError.message });
+        }
+        
+        if (!channels || channels.length === 0) {
+            console.log('No channels found for galleryId:', galleryId);// Format the response
+            const formattedResponse = {
+                [galleryName]: []
+            };
+            return res.status(200).json(formattedResponse);
+        }
+        
+        // Format the response
+        const formattedResponse = {
+            [galleryName]: channels.map((channel, index) => ({
+                  ChannelName: channel.ChannelName,
+                  Icon: channel.icon || null
+              }))
+        };
+    
+        console.log('DEBUG RES:', formattedResponse);
+        res.status(200).json(formattedResponse);
+        
+    } catch (err) {
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 export default router;

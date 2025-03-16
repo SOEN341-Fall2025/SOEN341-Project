@@ -1,7 +1,7 @@
 :root{
-  --color-accent: #c9ffed;
-  --color-bar: #76bea6;
-  --color-bkg: azure;
+  --color-accent: #e6d08e;
+  --color-bar: #d2a292;
+  --color-bkg: #f0ffffa1;
   --user-sidebar-length: 3.5vw;
   --user-dm-length: 2.5vw;
 }
@@ -43,10 +43,16 @@ html, section{
 }
 body{
   background-image: url("../assets/background.png") !important;
-  backdrop-filter: brightness(90%) sepia(20%) !important;
+  backdrop-filter: brightness(90%) contrast(110%) !important;
   background-repeat: no-repeat !important;
   width: 100% !important;
   overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
 }
 .carousel-caption{
   width: 100% !important;
@@ -164,7 +170,7 @@ body{
 }
 #sidebar-channels {
   /*background-color: white;*/
-  background: linear-gradient(to right, var(--color-bar), rgba(154, 218, 197, 0.95), rgba(154, 218, 197, 0.80), rgba(255, 255, 255, 0.65));
+  background: linear-gradient(to right, var(--color-bar), var(--color-accent), var(--color-accent));
   /*float: left;
   margin-left: 20px;*/
   height: 100vh !important;
@@ -207,7 +213,7 @@ body{
   font-size: 18px;
   font-weight: bold;
   padding: 10px;
-  background: linear-gradient(to right, #cdffd8, #94b9ff);
+  background: linear-gradient(to right, var(--color-accent), var(--color-bar));
   color: rgb(15, 12, 12);
   border-radius: 5px;
 }

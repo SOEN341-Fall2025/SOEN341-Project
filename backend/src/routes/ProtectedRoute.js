@@ -62,18 +62,41 @@ router.post("/api/auth/login", async (req, res) => {
 });
 
 // Get user info 
+router.get("/api/get/me", async (req, res) => {
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) return res.status(401).json({ msg: "Unauthorized" });
+    // Directly call the logic of /api/auth/me
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error) return res.status(401).json({ msg: "Invalid token" });
+
+    const userId = data.user.id;
+    //console.log(userId);
+    const { data: userData, error: userError } = await supabase
+        .from('Users')
+        .select('*')
+        .eq('user_id', userId);
+
+    if (userError) return res.status(500).json({ msg: "Error fetching user data" });
+
+    res.json({ user: userData });
+});
+// Get user auth 
 router.get("/api/auth/me", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
-
+    
     if (!token) return res.status(401).json({ msg: "Unauthorized" });
 
     const { data, error } = await supabase.auth.getUser(token);
 
     if (error) return res.status(401).json({ msg: "Invalid token" });
-
-    res.json({ user: data.user });
+    const response = { 
+        valid: true, 
+        user: data.user
+    };
+    console.log('Sending response:', response);  // Log the response
+    res.json(response);
 });
-
 // Logout route
 router.post("/api/auth/logout", async (req, res) => {
     const { error } = await supabase.auth.signOut();
@@ -83,5 +106,26 @@ router.post("/api/auth/logout", async (req, res) => {
     res.json({ msg: "Logged out successfully" });
 });
 
-
+router.put("/api/auth/updateUser", async (req, res) => {
+    const { userId, columnName, newValue } = req.body;
+    const token = req.header("Authorization")?.split(" ")[1];
+    console.log(req.body);
+    if (!token) return res.status(401).json({ msg: "Unauthorized" });
+  
+    try {
+  
+      // Update the user's information
+      const { data, error } = await supabase
+        .from('Users')
+        .update({ [columnName]: newValue })
+        .eq('user_id', userId);
+  
+      if (error) throw error;
+  
+      res.json({ message: "User updated successfully", data });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+  
 export default router;

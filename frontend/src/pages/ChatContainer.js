@@ -8,6 +8,7 @@ import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, Arr
 function ChatContainer({barSizes, user, header}) {
     var bars = Math.abs(barSizes);
     var bg = HexToRGBA(user.clrAccent, 0.7);
+    var chatbg = HexToRGBA(user.clrChat, 0.4);
   return (
     <div className="mainview no-parent-padding">
       <div id="top-box" style={{ backgroundColor: bg, left: `calc(${user.sizeInnerSidebar} + 5vw)` }}>
@@ -16,7 +17,7 @@ function ChatContainer({barSizes, user, header}) {
         </Nav.Link>
       </div>
       
-      <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{ position: 'absolute', right: '2vw', backgroundColor: bg,
+      <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{ position: 'absolute', right: '2vw', backgroundColor: chatbg,
        height: '80vh', bottom: '8vh', maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)` }}
       >
         {/* Go Back Button */}
@@ -27,7 +28,7 @@ function ChatContainer({barSizes, user, header}) {
 
         {/* Chat Box */}
         <div className="chat-box border rounded-lg p-4 bg-gray-100">
-          <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">
+          <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[{chatbg}] to-[#94b9ff] text-black rounded-md">
             *Chat Name*
           </div>
 
