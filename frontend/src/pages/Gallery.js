@@ -7,11 +7,19 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
+
 function Gallery({ item, index, userChannels, gallerySize, user }) {  
   
-    const [showState, setShow] = useState("close"); 
+    const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
-    function handleClick(key) { setShow(key); }
+    const handleClose = () => setShowState(false);
+    function handleClick(key) { setShowState(key); }
+
+    const [newChannelName, setNewChannelName] = useState("");
+    const [newGalleryName, setNewGalleryName] = useState(item.GalleryName);
+
+    const [userChannelsList, setUserChannelsList] = useState(userChannels);   
+
     const GalleryChannelsList = ({ galleryName, channels }) => {
         return (
             <span>
@@ -19,11 +27,11 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
                 // Check if the galleryName matches the item's galleryName
                 if (galleryName === item.GalleryName) {
                 return (
-                    <Nav.Link key={index} eventKey={item.channelName}>
+                    <Nav.Link key={index} eventKey={item.ChannelName}>
                     <span className="channel-icon">
-                        <Icon name={item.icon || FindClosestIcon(item.channelName)} size={24} />
+                        <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
                     </span>
-                    {item.channelName}
+                    {item.ChannelName}
                     </Nav.Link>
                 );
                 }
@@ -32,6 +40,33 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
             </span>
         );
     };
+
+    const handleChannels = (newGalleryName, newChannelName, newIcon) => {
+      setUserChannelsList([...userChannelsList, { GalleryName: newGalleryName, ChannelName: newChannelName, icon: newIcon }]);
+    };
+  
+    const handleSubmitChannel = (event) => {
+      event.preventDefault();
+      handleChannels(newGalleryName, newChannelName, '');
+    };
+
+    const ModalAddChannel = () => {
+        return(
+            <Modal.Body> 
+                <h5 className="text-center">Create a Channel</h5>
+                <form onSubmit={handleSubmitChannel}>
+                  <Col>
+                    <Row><label>Name:</label></Row>
+                    <Row><input type='text' id='newName-channel' value={newChannelName}
+                      onChange={(e) => setNewChannelName(e.target.value)}
+                      placeholder='Name of your new Channel' /></Row>
+                    <Row><input type='submit' value="Submit" /></Row>
+                  </Col>
+                </form>
+            </Modal.Body>
+        );
+    };
+  
       
 
   return (
@@ -56,7 +91,7 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
                 </Nav.Link>
                 <GalleryChannelsList
                   galleryName={item.GalleryName}
-                  channels={userChannels}
+                  channels={userChannelsList}
                 />
                 <Nav.Link
                   onClick={() => handleClick("addChannel-modal")}
@@ -71,7 +106,14 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
             </Col>
           </Tab.Container>
         <ChatContainer barSizes={(Number(gallerySize) + Number(channelNavWidth))} header={item.channelName} user={user}/>
+        <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
+                <Modal.Dialog >
+                  <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+                  <ModalAddChannel />
+                </Modal.Dialog>
+              </Modal>
     </Tab.Pane>
+    
   );
 }
 

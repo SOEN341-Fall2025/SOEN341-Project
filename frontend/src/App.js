@@ -1,15 +1,18 @@
 import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
+
 function App() {
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [galleries, setGalleries] = useState([]);
   //const [token, setToken] = useState('');
+
+  
   
   const setCookie = (name, value, days) => {
     const date = new Date();
@@ -17,6 +20,68 @@ function App() {
     const expires = `expires=${date.toUTCString()}`;
     document.cookie = `${name}=${value};${expires};path=/`; // Set cookie
   };
+
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  
+    const fetchUserGalleries = async () => {
+      const token = localStorage.getItem('authToken');  // Get token from localStorage (ensure it's stored when the user logs in)
+
+      console.log('Authorization token:', token);
+      
+      if (!token) {
+        setError('Authentication token is missing.');
+        return;
+      }
+
+      try {
+        // Make GET request to the backend with the Authorization header
+        const response = await fetch('/gal/retrieve', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,  // Add token to Authorization header
+          },
+        });
+
+        // Check if the response is ok (status 200-299)
+        if (!response.ok) {
+          if (response.status === 404) {
+            console.warn('No galleries found.');
+            setGalleries([]);  // Set an empty array instead of letting the site crash
+            return;
+          }
+          const result = await response.json();
+          setError(result.msg || 'Failed to retrieve galleries');
+          return;
+        }
+
+        // Parse and set the galleries data
+        const result = await response.json();
+        const modifiedGalleries = result.galleries.map(gallery => ({
+          ...gallery,
+          icon: ''  // Add the 'icon' property with an empty string as the default value
+        }));
+        console.log(modifiedGalleries);
+        setGalleries(prevGalleries => [...prevGalleries, ...modifiedGalleries]);
+        setError(null);  // Clear any previous errors
+
+      } catch (error) {
+        setError('An error occurred while fetching galleries: ' + error.message);
+      }
+    };
+  
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchUserGalleries(); // Fetch galleries after successful login
+    }
+  }, [isLoggedIn]);
+  useEffect(() => {
+    console.log('Updated galleries:', galleries);
+    
+  }, [galleries]);
   
   const handleLogin = async (email, password) => {
     // Here, you can add authentication logic (API call or checking credentials)
@@ -33,6 +98,7 @@ function App() {
           
           if (!loginResponse.ok) throw new Error('Login failed');
           const { token } = await loginResponse.json();
+          localStorage.setItem('authToken', token);
           
           console.log("Login Success:", JSON.stringify({ email, password }));   
 
@@ -58,14 +124,16 @@ function App() {
   };
   return (
     <section>
-    
-      {/* Step 3: Conditionally render Login page or App page */}
-      {isLoggedIn ? (
-        <Main userData={userData} galleries={galleries}/>
+    {isLoggedIn ? (
+      galleries.length >= 0 ? (  // Rendering main with 0 or more galleries
+        <Main userData={userData} galleries={galleries} />
       ) : (
-        <Login onLogin={handleLogin} />
-      )}
-    </section>
+        <p>Loading galleries...</p>  // Optional: show a loading message while galleries are being fetched
+      )
+    ) : (
+      <Login onLogin={handleLogin} />
+    )}
+  </section>
   );
 }
 
