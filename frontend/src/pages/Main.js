@@ -103,7 +103,7 @@ function Main({ userData, galleries}) {
       return;
     }
     handleGalleries(newName, '');  // Proceed with gallery creation
-    //createGallery(newName); //calls function to create gallery in the database
+    createGallery(newName); //calls function to create gallery in the database
   };
   
   

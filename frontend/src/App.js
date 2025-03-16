@@ -75,6 +75,7 @@ function App() {
   }, [isLoggedIn]);
   useEffect(() => {
     console.log('Updated galleries:', galleries);
+    
   }, [galleries]);
   
   const handleLogin = async (email, password) => {
