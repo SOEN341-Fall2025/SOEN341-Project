@@ -1,11 +1,6 @@
 import './style/app.css';
 import './style/settings.css';
-import React, { useState, createContext } from 'react';
-import AppContext from './AppContext';
-import Settings from './pages/Settings.js';
 import './style/style.css';
-import './style/style.css';
-import React, { useState } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
 function App() {

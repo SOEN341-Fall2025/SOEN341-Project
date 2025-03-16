@@ -14,25 +14,25 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 
-function Main({ userData, galleries}) {    
-      
-  // VARIABLES AND DATA  
+function Main({ userData, galleries}) {
+
+  // VARIABLES AND DATA
   const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
-  const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
-  const [dmNavWidth, setDmNavWidth] = useState(17);  
-  const [userGalleries, setUserGalleries] = useState(Object.values(galleries)); 
-  
+  const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);
+  const [dmNavWidth, setDmNavWidth] = useState(17);
+  const [userGalleries, setUserGalleries] = useState(Object.values(galleries));
+
   const [userChannels, setUserChannels] = useState([
     { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
     { galleryName: 'Work Server', channelName: 'Cook', icon: '' }
-]);   
+]);
   const [galleryChannels, setGalleryChannels] = useState([
     { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
   );
-  
+
  const uservar = {
     sizeGallerySidebar: "3.5vw",
     sizeInnerSidebar: "17vw",
@@ -56,13 +56,13 @@ function Main({ userData, galleries}) {
   const handleGalleries = (newname, newicon) => {
     setUserGalleries([...userGalleries, { name: newname, icon: newicon }]);
   };
-  
+
   const handleSubmitGallery = (event) => {
     event.preventDefault();  // Prevents page reload on submit
     handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
-  
-  
+
+
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
@@ -88,7 +88,7 @@ function Main({ userData, galleries}) {
   const GalleryList = () => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
     //console.log("Gallery Names:", galleryNames);
-    return (        
+    return (
         userGalleries.map((item, index) => (
           <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
             <span className="channel-icon">
@@ -112,17 +112,17 @@ function Main({ userData, galleries}) {
     );
   };
   const GalleryPageList = ({ galleries }) => {
-    return (        
+    return (
         galleries.map((item, index) => (
         <Gallery item={item} key={index} userChannels={userChannels} gallerySize={galleryNavWidth} user={uservar}/>
       ))
-    
+
     );
   };
-  
+
   const ModalAddGallery = () => {
     return(
-        <Modal.Body> 
+        <Modal.Body>
             <h5 className="text-center">Create a Gallery</h5>
             <form onSubmit={handleSubmitGallery}>
             <Col>
@@ -138,7 +138,7 @@ function Main({ userData, galleries}) {
   };
   const ModalAddChannel = () => {
     return(
-        <Modal.Body> 
+        <Modal.Body>
             <h5 className="text-center">Create a Channel</h5>
             <form onSubmit={handleSubmitChannel}>
               <Col>
@@ -163,21 +163,21 @@ function Main({ userData, galleries}) {
   // SHARED ELEMENT LIST
   const contextValue = {
     ProfilePic: ProfilePic,
-    Username: "@John_Doe77",
-    Displayname: "Johnny Dough",
-    Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
+    // Username: "@John_Doe77",
+    // Displayname: "Johnny Dough",
+    // Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
-  
+
   return(
     <section>
       <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
         <Row className='justify-content-start' id="main-container">
           <Resizable id="gallery-sidebar-resizable" maxWidth={"15vw"} minWidth={"3vw"} enable={{ right: true }} size={{ width: ToPX(galleryNavWidth) }}
-            onResizeStop={(e, direction, ref, d) => {  
-                if(d.width != 0){      
+            onResizeStop={(e, direction, ref, d) => {
+                if(d.width != 0){
                     let ratio = Number((100 * (d.width) / window.innerWidth).toFixed(2));
                     let prev = Number(parseFloat(galleryNavWidth));
-                    let newWidth = (prev + ratio).toFixed(2);           
+                    let newWidth = (prev + ratio).toFixed(2);
                     setGalleryNavWidth(newWidth);
                 }
             }}>
@@ -193,7 +193,7 @@ function Main({ userData, galleries}) {
             </Col>
           </Resizable>
           <Col id="pages">
-            <Tab.Content id="pages-content">                  
+            <Tab.Content id="pages-content">
                 <Tab.Pane eventKey="page-dm" className="no-parent-padding">
                     <Col id="sidebar-dm">
                     <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
@@ -204,7 +204,7 @@ function Main({ userData, galleries}) {
                         <Nav.Link><icons.User /> John Doe</Nav.Link>
                         <Nav.Link><icons.User /> Jane Doe</Nav.Link>
                         <Nav.Link><icons.User /> Julie Doe</Nav.Link>
-                    </Nav>                      
+                    </Nav>
                     </Col>
                     <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={uservar}/>
                 </Tab.Pane>
