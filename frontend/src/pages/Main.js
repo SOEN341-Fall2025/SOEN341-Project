@@ -32,6 +32,10 @@ function Main({ userData, galleries}) {
   const [galleryChannels, setGalleryChannels] = useState([
     { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
   );
+  const [newMessage, setNewMessage] = useState("");
+  const [directMessages, setDirectMessages] = useState([
+    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
+  ]);
   
  const uservar = {
     sizeGallerySidebar: "3.5vw",
@@ -62,6 +66,15 @@ function Main({ userData, galleries}) {
     handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
   
+  const handleMessages = (newMessage) => {
+    setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
+  };
+
+  const handleSubmitMessages = (event) => {
+    event.preventDefault(); // Prevents page reload on submit
+    handleMessages(newMessage);
+    setNewMessage("");
+  };
   
   /*SECTION - ELEMENTS */
 
