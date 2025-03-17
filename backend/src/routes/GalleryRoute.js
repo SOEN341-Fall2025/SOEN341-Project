@@ -99,56 +99,6 @@ router.post("/gal/create", async (req, res) => {
 
 });
 
-router.get("/gal/retrieve", async (req, res) => {
-  // Get the token from the Authorization header
-  const token = req.headers.authorization?.split(" ")[1];
-  
-  if (!token) {
-    console.log('Authorization token is missing.');
-    return res.status(400).json({ msg: "Authorization token is missing." });
-  }
-
-  // Get the user based on the token
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-  
-  if (authError || !user) {
-    console.error('Authentication Error:', authError); // Log error for debugging
-    return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
-  }
-
-  // Fetch gallery members for the authenticated user
-  const { data: galleryMembers, error: galleryMembersError } = await supabase
-    .from("GalleryMembers")
-    .select("GalleryID")
-    .eq("UserID", user.id);
-
-  if (galleryMembersError) {
-    console.error('Gallery Members Error:', galleryMembersError); // Log error for debugging
-    return res.status(500).json({ msg: "Error retrieving galleries.", error: galleryMembersError });
-  }
-
-  // Extract the gallery names
-  const galleryIDs = galleryMembers.map(member => member.GalleryID);
-
-  if (galleryIDs.length === 0) {
-    return res.status(404).json({ msg: "No galleries found for this user." });
-  }
-
-  // Fetch the actual galleries from the Galleries table
-  const { data, error: databaseError } = await supabase
-    .from("Galleries")
-    .select("GalleryName")
-    .in("GalleryID", galleryIDs);
-
-  if (databaseError) {
-    console.error('Database Error:', databaseError); // Log error for debugging
-    return res.status(500).json({ msg: "Error retrieving galleries.", error: databaseError });
-  }
-
-  // Successfully retrieve the galleries and send response
-  res.status(200).json({ galleries: data });
-});
-
 
 //Helper call to add the creator of the gallery inside the GalleryMembers table
 router.post("/gal/addCreator", async (req, res) => {
@@ -172,7 +122,6 @@ router.post("/gal/addCreator", async (req, res) => {
     res.status(200).json({msg:"Gallery member has been recorded as creator.", data});
 
 });
-
 
 //Helper method to verify is user can delete gallery
 router.post("/gal/verifyCreator", async (req, res) => {

@@ -124,7 +124,6 @@ function Main({ userData, galleries, users}) {
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
    function handleClick(key) { setShowState(key); }
-   
   const handleChannels = (newGalleryName, newChannelName, newIcon) => {
     setUserChannels([...userChannels, { galleryName: newGalleryName, channelName: newChannelName, icon: newIcon }]);
   };
@@ -135,18 +134,12 @@ function Main({ userData, galleries, users}) {
   }
 
   const handleGalleries = (newname, newicon) => {
-    setUserGalleries(Object.values([...userGalleries, { GalleryName: newname, icon: newicon }]));
-    console.log(userGalleries)
+    setUserGalleries([...userGalleries, { name: newname, icon: newicon }]);
   };
   
   const handleSubmitGallery = (event) => {
-    event.preventDefault();
-    if (!newName.trim()) {
-      alert("Gallery name cannot be empty!");
-      return;
-    }
-    handleGalleries(newName, '');  // Proceed with gallery creation
-    createGallery(newName); //calls function to create gallery in the database
+    event.preventDefault();  // Prevents page reload on submit
+    handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
   
   
@@ -173,6 +166,8 @@ function Main({ userData, galleries, users}) {
     }
   };
   const GalleryList = () => {
+    const galleryNames = userGalleries.map((membership) => membership.GalleryName);
+    //console.log("Gallery Names:", galleryNames);
     return (        
         userGalleries.map((item, index) => (
           <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
@@ -228,7 +223,7 @@ function Main({ userData, galleries, users}) {
                 <Row><input type='text' id='newName-gallery' value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder='Name of your new Gallery' /></Row>
-                <Row><input type='submit' value="Submit" /></Row>
+                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
             </Col>
             </form>
         </Modal.Body>
@@ -283,9 +278,8 @@ function Main({ userData, galleries, users}) {
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
                 <Nav.Link eventKey="page-dm"><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
                 <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                <GalleryList/>
+                <GalleryList />
                 <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
-                
                 <Nav.Link onClick={() => handleClick('status-modal')} className="mt-auto user-status"><span className="channel-icon"><CircleUser /></span> Me</Nav.Link>
                 <Nav.Link onClick={() => handleClick('settings-modal')} className=""><span className="channel-icon"><LoaderPinwheel /></span> Settings</Nav.Link>
               </Nav>

@@ -1,10 +1,9 @@
 import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
-
 function App() {
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,8 +12,6 @@ function App() {
   const [users, setUsers] = useState([]);
 
   //const [token, setToken] = useState('');
-
-  
   
   const setCookie = (name, value, days) => {
     const date = new Date();
@@ -138,7 +135,6 @@ function App() {
           
           if (!loginResponse.ok) throw new Error('Login failed');
           const { token } = await loginResponse.json();
-          localStorage.setItem('authToken', token);
           
           console.log("Login Success:", JSON.stringify({ email, password }));   
 
@@ -168,12 +164,9 @@ function App() {
       (galleries.length > 0) ? (  // Only render Main if galleries are not empty
         <Main userData={userData} galleries={galleries} users={users}/>
       ) : (
-        <p>Loading galleries...</p>  // Optional: show a loading message while galleries are being fetched
-      )
-    ) : (
-      <Login onLogin={handleLogin} />
-    )}
-  </section>
+        <Login onLogin={handleLogin} />
+      )}
+    </section>
   );
 }
 
