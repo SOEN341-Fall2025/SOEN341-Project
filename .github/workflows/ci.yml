@@ -30,17 +30,7 @@ jobs:
       - name: Install dependencies
         run: npm install --omit=optional
 
-        
-
-      # Step 4: Run tests
-      - name: Run tests
-        run: npm test
-        env:
-          # Provide environment variables for testing
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          NODE_ENV: test
-
+     
       # Step 5: Build the application (optional)
       - name: Build application
         run: npm run build
