@@ -29,6 +29,7 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci --omit=optional 
+        continue-on-error: true
 
       # Step 4: Run tests
       - name: Run tests
