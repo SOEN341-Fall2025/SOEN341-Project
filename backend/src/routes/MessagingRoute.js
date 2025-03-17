@@ -3,6 +3,29 @@ const router = express.Router();
 import { supabase } from "../server.js";
 
 
+router.get("/dm/fetch-users", async (req, res) => {
+
+    const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+    if (error || !user) {
+        return res.status(401).json({ msg: "Unauthorized", error });
+    }
+
+    // Fetch messages involving the user
+    const { data, error: databaseError } = await supabase
+        .from("Users")
+        .select("username").neq("user_id", user.id);
+
+
+    if (databaseError) {
+        return res.status(500).json({ msg: "Users could not be fetched.", error: databaseError });
+    }
+
+    res.status(200).json({ data });
+
+});
+
+
 //Retrieve private DM (When user is receiving message)
 router.get("/dm/retrieve", async (req, res) => {
 

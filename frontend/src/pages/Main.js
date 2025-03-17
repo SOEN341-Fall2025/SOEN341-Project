@@ -14,7 +14,7 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 
-function Main({ userData, galleries}) {    
+function Main({ userData, galleries, users}) {    
       
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
@@ -24,6 +24,8 @@ function Main({ userData, galleries}) {
   const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
   const [dmNavWidth, setDmNavWidth] = useState(17);
   const [userGalleries, setUserGalleries] = useState(galleries); 
+  const[error, setError] = useState(false);
+  const[newUsers, setNewUsers] = useState(users);
   
   const [userChannels, setUserChannels] = useState([
     { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
@@ -76,6 +78,47 @@ function Main({ userData, galleries}) {
       alert('An error occurred while creating the gallery.');
     }
   };
+
+  const fetchUsers = async () => {
+    const token = localStorage.getItem('authToken');  // Get token from localStorage (ensure it's stored when the user logs in)
+
+    console.log('Authorization token:', token);
+    
+    if (!token) {
+      setError('Authentication token is missing.');
+      return;
+    }
+
+    try {
+      // Make GET request to the backend with the Authorization header
+      const response = await fetch('/dm/fetch-users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Add token to Authorization header
+        },
+      });
+
+      // Check if the response is ok (status 200-299)
+      if (!response.ok) {
+        const result = await response.json();
+        setError(result.msg || 'Failed to retrieve galleries');
+        return;
+      }
+
+      // Parse and set the galleries data
+      const result = await response.json();
+      setNewUsers(result);
+      console.log(newUsers)
+      
+      setError(null);  // Clear any previous errors
+
+    } catch (error) {
+      setError('An error occurred while fetching galleries: ' + error.message);
+    }
+  };
+
+
 
 
   /*SECTION - FUNCTIONS */
@@ -161,6 +204,19 @@ function Main({ userData, galleries}) {
     
     );
   };
+
+  const UserList = () => {
+    return (        
+        newUsers.map((item, index) => (
+          <Nav.Link eventKey={item.username} key={index}>
+            <span className="user-icon">
+              <Icon name={icons.User2} size={24} />
+            </span>
+            {item.username}
+          </Nav.Link>
+        ))
+    );
+  };
   
   const ModalAddGallery = () => {
     return(
@@ -244,9 +300,8 @@ function Main({ userData, galleries}) {
                         <Col>Private</Col>
                         </Row>
                         <Nav.Link className="separator" disabled><hr /><hr /></Nav.Link>
-                        <Nav.Link><icons.User /> John Doe</Nav.Link>
-                        <Nav.Link><icons.User /> Jane Doe</Nav.Link>
-                        <Nav.Link><icons.User /> Julie Doe</Nav.Link>
+                        <UserList/>
+                        
                     </Nav>                      
                     </Col>
                     <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={uservar}/>

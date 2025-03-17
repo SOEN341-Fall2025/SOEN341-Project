@@ -10,6 +10,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [galleries, setGalleries] = useState([]);
+  const [users, setUsers] = useState([]);
+
   //const [token, setToken] = useState('');
 
   
@@ -24,6 +26,43 @@ function App() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const fetchUsers = async () => {
+    const token = localStorage.getItem('authToken');  // Get token from localStorage (ensure it's stored when the user logs in)
+
+    console.log('Authorization token:', token);
+    
+    if (!token) {
+      setError('Authentication token is missing.');
+      return;
+    }
+
+    try {
+      // Make GET request to the backend with the Authorization header
+      const response = await fetch('/dm/fetch-users', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Add token to Authorization header
+        },
+      });
+
+      // Check if the response is ok (status 200-299)
+      if (!response.ok) {
+        const result = await response.json();
+        setError(result.msg || 'Failed to retrieve galleries');
+        return;
+      }
+
+      // Parse and set the galleries data
+      const result = await response.json();
+      setUsers(result);
+      
+      setError(null);  // Clear any previous errors
+
+    } catch (error) {
+      setError('An error occurred while fetching galleries: ' + error.message);
+    }
+  };
   
     const fetchUserGalleries = async () => {
       const token = localStorage.getItem('authToken');  // Get token from localStorage (ensure it's stored when the user logs in)
@@ -71,12 +110,18 @@ function App() {
   useEffect(() => {
     if (isLoggedIn) {
       fetchUserGalleries(); // Fetch galleries after successful login
+      fetchUsers();
     }
   }, [isLoggedIn]);
   useEffect(() => {
     console.log('Updated galleries:', galleries);
     
   }, [galleries]);
+
+  useEffect(() => {
+    console.log('Updated Users:', users);
+    
+  }, [users]);
   
   const handleLogin = async (email, password) => {
     // Here, you can add authentication logic (API call or checking credentials)
@@ -120,8 +165,8 @@ function App() {
   return (
     <section>
     {isLoggedIn ? (
-      galleries.length > 0 ? (  // Only render Main if galleries are not empty
-        <Main userData={userData} galleries={galleries} />
+      (galleries.length > 0) ? (  // Only render Main if galleries are not empty
+        <Main userData={userData} galleries={galleries} users={users}/>
       ) : (
         <p>Loading galleries...</p>  // Optional: show a loading message while galleries are being fetched
       )
