@@ -1,11 +1,11 @@
 import '../style/settings.css';
 import React from 'react';
-import { AppContext } from '../AppContext';
+import { AppContext, RGB_A } from '../AppContext';
 import { useContext } from 'react';
 import { useState } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
-function Settings() {
+function Settings({userVars}) {
     
       const [modalState, setModalState] = useState("close");
       const handleClose = () => setModalState(false);
@@ -214,7 +214,8 @@ function Settings() {
                               id="clrNavbar" 
                               defaultValue={userVars.clrNavbar} 
                               onChange={handleColorChange} 
-                              title="Choose your color"/> </div>
+                              title="Choose your color"/> 
+                      </div>
                     </Form.Group>
                     <Form.Group className="divframe"> 
                       <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Gradient Color</Form.Label>
@@ -229,11 +230,14 @@ function Settings() {
                     <Form.Group className="divframe"> 
                       <Form.Label htmlFor="colorForm.Control" className="form-label">Chatbox Color</Form.Label>
                     </Form.Group>
+                    <Form.Group className="divframe"> 
                     <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
                     <Row>
                       <div className="hover-text" style={{ width:'fit-content'}}>
                         <input className='btn btn-primary' type='submit' value="Done" onClick={handleDone}/>
                         <span className="hover-text-content">Warning: This will reload the page!</span>
+                      </div>
+                    </Row>
                     </Form.Group>
                     <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-modal" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
