@@ -31,7 +31,6 @@ const __dirname = dirname(__filename);
 app.use(
     cors()
   );
-  
 app.use(express.json());
 //Gives access to the JS and CSS
 app.use(express.static(path.join(__dirname, '../../frontend')));
