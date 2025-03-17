@@ -3,9 +3,9 @@ name: Continuous Integration
 # Trigger the workflow on push or pull request to the main or develop branch
 on:
   push:
-    branches: [ main ]
+    branches: [ main, feature/ci-setup ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, feature/ci-setup ]
 
 # Define the jobs to run
 jobs:
