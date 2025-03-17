@@ -99,7 +99,6 @@ router.post("/gal/create", async (req, res) => {
 
 });
 
-
 //Helper call to add the creator of the gallery inside the GalleryMembers table
 router.post("/gal/addCreator", async (req, res) => {
 

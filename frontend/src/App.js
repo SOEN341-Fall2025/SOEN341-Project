@@ -1,7 +1,7 @@
 import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
 function App() {
@@ -160,11 +160,14 @@ function App() {
   };
   return (
     <section>
-    {isLoggedIn ? (
-      (galleries.length > 0) ? (  // Only render Main if galleries are not empty
-        <Main userData={userData} galleries={galleries} users={users}/>
+      {isLoggedIn ? (
+        galleries.length > 0 ? (  // Only render Main if galleries are not empty
+          <Main userData={userData} galleries={galleries} users={users} />
+        ) : (
+          <p>Loading galleries...</p>  // Show loading message if galleries are still being fetched
+        )
       ) : (
-        <Login onLogin={handleLogin} />
+        <Login onLogin={handleLogin} />  // Show Login if the user is not logged in
       )}
     </section>
   );
