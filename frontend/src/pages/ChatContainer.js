@@ -6,8 +6,10 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 function ChatContainer({barSizes, user, header}) {
+  
     var bars = Math.abs(barSizes);
     var bg = HexToRGBA(user.clrAccent, 0.7);
+
   return (
     <div className="mainview no-parent-padding">
       <div id="top-box" style={{ backgroundColor: bg, left: `calc(${user.sizeInnerSidebar} + 5vw)` }}>
