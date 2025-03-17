@@ -184,18 +184,18 @@ body{
   z-index: 5;
   left: var(--user-sidebar-length);*/
 }
-/*
+
 .chat-container {
-  
-  height: 80vh;
-  bottom: 8vh; 
-  max-width: 90vw;
-  background: var(--color-accent);  Light blue 
-  position: absolute;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}*/
+  position: relative; /* Ensure the container is the reference for absolute positioning */
+  height: 80vh; /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-box {
+  flex-grow: 1; /* Allow the chat box to take up remaining space */
+  overflow-y: auto; /* Enable scrolling for messages */
+}
 
 /* Back Button */
 .back-button {
