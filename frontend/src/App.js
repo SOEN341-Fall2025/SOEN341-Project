@@ -10,6 +10,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [galleries, setGalleries] = useState([]);
+  const [currentUsers, setCurrentUsers] = useState([]);
   //const [token, setToken] = useState('');
 
   
@@ -65,6 +66,49 @@ function App() {
       } catch (error) {
         setError('An error occurred while fetching galleries: ' + error.message);
       }
+    };
+
+    const fetchUsers = async () => {
+
+      const token = localStorage.getItem('authToken');  // Get token from localStorage (ensure it's stored when the user logs in)
+
+      console.log('Authorization token:', token);
+      
+      if (!token) {
+        setError('Authentication token is missing.');
+        return;
+      }
+
+      try {
+        // Make GET request to the backend with the Authorization header
+        const response = await fetch('/dm/fetch-users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,  // Add token to Authorization header
+          },
+        });
+
+        // Check if the response is ok (status 200-299)
+        if (!response.ok) {
+          const result = await response.json();
+          setError(result.msg || 'Failed to retrieve users');
+          return;
+        }
+
+        // Parse and set the galleries data
+        const result = await response.json();
+
+        const modifiedUsers = result.users.map(user => ({
+          ...user
+        }));
+
+        setCurrentUsers()
+
+      } catch (error) {
+        setError('An error occurred while fetching galleries: ' + error.message);
+      }
+
     };
   
 
