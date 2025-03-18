@@ -54,7 +54,31 @@ router.get("/dm/retrieve", async (req, res) => {
         return res.status(500).json({msg:"Messages could not be fetched.", databaseError});
     }
 
-    res.json({ msg: "DMs were fetched.", data });
+    const updatedData = [];
+
+    for (let msg of data) {
+        // Fetch the Popper's username
+        const popperResponse = await fetch(`http://localhost:4000/api/get/username-id/${msg.PopperID}`);
+        const popperData = await popperResponse.json();
+        const popperUsername = popperData.data.username;
+
+        // Fetch the Bubbler's username
+        const bubblerResponse = await fetch(`http://localhost:4000/api/get/username-id/${msg.BubblerID}`);
+        const bubblerData = await bubblerResponse.json();
+        const bubblerUsername = bubblerData.data.username;
+
+        // Add the converted usernames to the DM object
+        updatedData.push({
+            ...msg,
+            PopperUsername: popperUsername,
+            BubblerUsername: bubblerUsername
+        });
+    }
+
+    console.log(updatedData);
+
+
+    res.json({ msg: "DMs were fetched.", updatedData });
 
 });
 

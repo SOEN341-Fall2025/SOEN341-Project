@@ -40,9 +40,7 @@ function Main({ userData, galleries}) {
     { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
   );
   const [newMessage, setNewMessage] = useState("");
-  const [directMessages, setDirectMessages] = useState([
-    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
-  ]);
+  const [directMessages, setDirectMessages] = useState([]);
   
  const uservar = {
     sizeGallerySidebar: "3.5vw",
@@ -193,6 +191,7 @@ function Main({ userData, galleries}) {
                 barSizes={galleryNavWidth + dmNavWidth}
                 user={uservar}
                 header={item.username}
+                messages={directMessages}
               />
             );
           }
@@ -321,7 +320,7 @@ function Main({ userData, galleries}) {
 
     try {
         // Send GET request to backend to retrieve DMs
-        const response = await fetch(`http://localhost:4000/dm/retrieve?username=${username}`, {
+        const response = await fetch(`/dm/retrieve?username=${username}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -337,9 +336,23 @@ function Main({ userData, galleries}) {
         // Parse the JSON response
         const result = await response.json();
 
+        if (result?.updatedData) {
+          // Map the relevant fields (Message, PopperID, BubblerID)
+          const messageDetails = result.updatedData.map(item => ({
+              PopperUsername: item.PopperUsername,
+              BubblerUsername: item.BubblerUsername,
+              Message: item.Message
+          }));
+
+          // Log the message details to see the output
+          setDirectMessages(messageDetails);
+      } else {
+          console.log('No messages found');
+      }
+
         // Handle the result (you can process or display it)
         if (result.msg === "DMs were fetched.") {
-            console.log('Fetched DMs:', result.data);
+            console.log('Fetched DMs:', result.updatedData);
             // Do something with the data, e.g., display messages
         } else {
             console.error('Error fetching DMs:', result);

@@ -1,44 +1,61 @@
 
-import React, { useState } from 'react';
-import { Icon, FindClosestIcon, AppContext, UpdateStyle, HexToRGBA } from '../AppContext';
-import { Resizable } from 're-resizable';
-import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
-import * as icons from 'lucide-react';
-import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, ArrowLeft, Camera, Mic, Plus } from 'lucide-react';  // Assuming you're using lucide-react
+import { Row, Col, Nav } from 'react-bootstrap';
+import { HexToRGBA } from '../AppContext';
 
+function ChatContainer({ barSizes, user, header, messages= [] }) {
+  const [popperUser, setPopperUser] = useState("");  // For storing the other user's name
+  const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
+  const [newMessage, setNewMessage] = useState(""); // Input for new messages
+  const [directMessages, setDirectMessages] = useState(messages);  // Messages list
 
+  // Update popper user based on the header and messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      const popperUsername = messages[0].PopperUsername;
+      const bubblerUsername = messages[0].BubblerUsername;
 
+      if (bubblerUsername === bubblerUser) {
+        setPopperUser(popperUsername);
+      } else {
+        setPopperUser(bubblerUsername);
+      }
+    }
+  }, [bubblerUser, messages]);  // Only run this effect when messages or header change
 
-
-function ChatContainer({barSizes, user, header}) {
-   const [newMessage, setNewMessage] = useState("");
-  const [directMessages, setDirectMessages] = useState([
-    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
-  ]);
-   const handleMessages = (newMessage) => {
-    setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
+  // Handle adding a new message
+  const handleMessages = (newMessage) => {
+    setDirectMessages([
+      ...directMessages,
+      { PopperUsername: bubblerUser, BubblerUsername: popperUser, Message: newMessage }
+    ]);
   };
 
   const handleSubmitMessages = (event) => {
-    event.preventDefault(); // Prevents page reload on submit
-    handleMessages(newMessage);
-    setNewMessage("");
+    event.preventDefault();  // Prevent page reload on submit
+    handleMessages(newMessage);  // Add the new message
+    setNewMessage("");  // Clear input field
   };
 
+  // Message List Component
   const MessageList = ({ messages }) => {
     return (
       <span>
-        {messages.map((item, index) =>
-          <div className="message recipient flex items-center justify-end my-2">
-            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">{item.message}</div>
+        {messages.map((item, index) => (
+          <div key={index} className={`message ${item.PopperUsername === popperUser ? "user" : "recipient"} flex items-center my-2`}>
+            <div className={`text ${item.PopperUsername === popperUser ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.PopperUsername === popperUser ? "ml-2" : "mr-2"} max-w-[60%]`}>
+              {item.Message}
+            </div>
             <User className="icon" />
           </div>
-        )}
+        ))}
       </span>
-    )
+    );
   };
-    var bars = Math.abs(barSizes);
-    var bg = HexToRGBA(user.clrAccent, 0.7);
+
+  const bars = Math.abs(barSizes);  // Absolute value of bar sizes
+  const bg = HexToRGBA(user.clrAccent, 0.7);  // Background color with transparency
 
   return (
     <div className="mainview no-parent-padding">
@@ -47,16 +64,14 @@ function ChatContainer({barSizes, user, header}) {
           <span></span> {header}
         </Nav.Link>
       </div>
-      
-      <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{ position: 'absolute', right: '2vw', backgroundColor: bg,
-       height: '80vh', bottom: '8vh', maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)` }}
-      >
+
+      <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{
+        position: 'absolute', right: '2vw', backgroundColor: bg, height: '80vh', bottom: '8vh',
+        maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)`
+      }}>
         {/* Go Back Button */}
         <div className="back-button flex items-center cursor-pointer mb-2">
-          <ArrowLeft
-            alt="Go Back"
-            className="w-10 h-10 mr-2"
-          />
+          <ArrowLeft alt="Go Back" className="w-10 h-10 mr-2" />
           <span className="text-gray-700">Go Back</span>
         </div>
 
@@ -66,30 +81,15 @@ function ChatContainer({barSizes, user, header}) {
             {header}
           </div>
 
-          {/* Messages */}
-          <div className="message user flex items-center my-2">
-            <User className="icon" />
-            <div className="text bg-[#5592ed] text-white p-2 rounded-lg ml-2 max-w-[60%]">
-              Hello! How are you?
-            </div>
-          </div>
-
-          <div className="message recipient flex items-center justify-end my-2">
-            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">
-              I'm good, thanks!
-            </div>
-            <User className="icon" />
-          </div>
+          {/* Display Messages */}
           <MessageList messages={directMessages} />
         </div>
 
-
-
+        {/* Input Section */}
         <Row id="chat-box" className="d-flex align-items-center">
-          {/* Icons (Plus, Camera, Mic) */}
           <Col className="d-flex gap-2">
             <div id="plus">
-              <icons.Plus />
+              <Plus />
             </div>
             <div id="camera">
               <Camera />
@@ -100,20 +100,20 @@ function ChatContainer({barSizes, user, header}) {
           </Col>
 
           {/* Input Box and Send Button */}
-          <Col id="chat-input"className="">
-                              <form onSubmit={handleSubmitMessages}>
-                                <div className="d-flex gap-2">
-                                  <input
-                                    type="text"
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder="Type a message..."
-                                    className="flex-grow-1 p-2 rounded border"
-                                  />
-                                  <button type="submit" className="p-2 bg-[#4facfe] text-gray rounded-md">Send</button>
-                                </div>
-                              </form>
-                            </Col>
+          <Col id="chat-input" className="">
+            <form onSubmit={handleSubmitMessages}>
+              <div className="d-flex gap-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-grow-1 p-2 rounded border"
+                />
+                <button type="submit" className="p-2 bg-[#4facfe] text-gray rounded-md">Send</button>
+              </div>
+            </form>
+          </Col>
         </Row>
       </div>
     </div>
