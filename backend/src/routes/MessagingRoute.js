@@ -37,7 +37,7 @@ router.get("/dm/retrieve", async (req, res) => {
         return res.status(401).json(error);
     }
 
-    const { username } = req.body;
+    const { username } = req.query;
 
     const receiverInfo = await fetch(`http://localhost:4000/api/get/userid-username/${username}`);
     const receiverData = await receiverInfo.json();

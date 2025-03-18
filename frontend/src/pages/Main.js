@@ -172,6 +172,14 @@ function Main({ userData, galleries}) {
     );
   };
 
+  useEffect(() => {
+    console.log("currentUser:",currentUser);
+    if(currentUser !== ""){
+    fetchDMs(currentUser);
+    }
+      
+    }, [currentUser]);
+
   const UserChatList = ({usernames}) => {
     return (
       <>
@@ -302,11 +310,45 @@ function Main({ userData, galleries}) {
 
     } catch (error) {
       console.error('An error occurred:', error);
-      alert('An error occurred while creating the gallery.');
+      alert('An error occurred while fetching contacts.');
     }
   
 
-  }
+  };
+
+  const fetchDMs = async (username) => {
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+
+    try {
+        // Send GET request to backend to retrieve DMs
+        const response = await fetch(`http://localhost:4000/dm/retrieve?username=${username}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,  // Pass the token in Authorization header
+            },
+        });
+
+        // Check if the response is OK (status code 200)
+        if (!response.ok) {
+            throw new Error('Failed to fetch DMs');
+        }
+
+        // Parse the JSON response
+        const result = await response.json();
+
+        // Handle the result (you can process or display it)
+        if (result.msg === "DMs were fetched.") {
+            console.log('Fetched DMs:', result.data);
+            // Do something with the data, e.g., display messages
+        } else {
+            console.error('Error fetching DMs:', result);
+        }
+    } catch (error) {
+        console.error('An error occurred:', error);
+        alert('An error occurred while fetching DMs.');
+    }
+};
 
   // Push the gallery to database
   const createGallery = async (galleryName) => {
