@@ -63,7 +63,7 @@ function ChatContainer({barSizes, user, header}) {
         {/* Chat Box */}
         <div className="chat-box border rounded-lg p-4 bg-gray-100">
           <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">
-            *Chat Name*
+            {header}
           </div>
 
           {/* Messages */}

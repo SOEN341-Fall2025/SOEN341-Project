@@ -2,26 +2,29 @@ import express from "express";
 const router = express.Router();
 import { supabase } from "../server.js";
 
-router.get("/dm/fetch-users", async (req, res) => {
+router.get("/dm/fetch-user", async (req, res) => {
 
-    const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+    const { username } = req.query;  // Use req.query for GET parameters
 
-    if (error || !user) {
-        return res.status(401).json({ msg: "Unauthorized", error });
+    if (!username) {
+        return res.status(400).json({ msg: "Username is required" });
     }
 
-    // Fetch messages involving the user
+    // Fetch user data from Supabase
     const { data, error: databaseError } = await supabase
         .from("Users")
-        .select("username").neq("user_id", user.id);
-
+        .select("username")
+        .eq("username", username).single();
 
     if (databaseError) {
         return res.status(500).json({ msg: "Users could not be fetched.", error: databaseError });
     }
 
-    res.status(200).json({ users: data });
+    if (!data || data.length === 0) {
+        return res.status(404).json({ msg: "User not found." });
+    }
 
+    res.status(200).json({ msg: "Username is fetched", user: data });
 });
 
 

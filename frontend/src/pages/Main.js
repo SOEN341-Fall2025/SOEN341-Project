@@ -19,11 +19,18 @@ function Main({ userData, galleries}) {
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
+
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
+  const [newUserName, setNewUserName] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+
   const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
   const [dmNavWidth, setDmNavWidth] = useState(17);  
   const [userGalleries, setUserGalleries] = useState(galleries); 
+  const [error, setError] = useState(false);
+
+  const[userNames, setUserNames] = useState([]);
   
   const [userChannels, setUserChannels] = useState([
     { galleryName: 'Gift Ideas', channelName: 'General', icon: '' },
@@ -58,13 +65,31 @@ function Main({ userData, galleries}) {
   }
 
   const handleGalleries = (newname, newicon) => {
-    setUserGalleries([...userGalleries, { name: newname, icon: newicon }]);
+    setUserGalleries([...userGalleries, { GalleryName: newname, icon: newicon }]);
+    createGallery(newname);
   };
   
   const handleSubmitGallery = (event) => {
     event.preventDefault();  // Prevents page reload on submit
     handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
+
+  const handleUsers = (newUserName) => {
+    setUserNames([...userNames, {username: newUserName}]);
+  };
+
+  const handleSubmitUser = async (event) => {
+    event.preventDefault();  // Prevents page reload on submit
+    console.log("handleSubmitUser is accessed");
+    const verifyUser = await fetchUser(newUserName);  // Pass the new name and any other parameters
+    console.log("Verify User", verifyUser);
+    if(verifyUser){
+      handleUsers(newUserName);
+    }else{
+      console.log("Unsuccessful");
+    }
+  };
+
   
   const handleMessages = (newMessage) => {
     setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
@@ -101,7 +126,6 @@ function Main({ userData, galleries}) {
 
   const GalleryList = () => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
-    //console.log("Gallery Names:", galleryNames);
     return (        
         userGalleries.map((item, index) => (
           <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
@@ -134,6 +158,41 @@ function Main({ userData, galleries}) {
     
     );
   };
+
+  const UserList = () => {
+    return (
+      userNames.map((item, index) =>
+        <Nav.Link eventKey={item.username} onClick={() => setCurrentUser(item.username)}>
+      <span className="user-icon">
+        <Icon name={icons.User2} size={24} />
+      </span>
+      {item.username}
+    </Nav.Link>
+      )
+    );
+  };
+
+  const UserChatList = ({usernames}) => {
+    return (
+      <>
+        {usernames.map((item, index) => {
+          // Check if the username matches the currentUser
+          if (item.username === currentUser) {
+            return (
+              <ChatContainer
+                key={index}  // Add a key to help React identify each item in the list
+                eventKey={item.username}
+                barSizes={galleryNavWidth + dmNavWidth}
+                user={uservar}
+                header={item.username}
+              />
+            );
+          }
+          return null; // Return null if the username doesn't match currentUser
+        })}
+      </>
+    );
+  };
   
   const ModalAddGallery = () => {
     return(
@@ -145,7 +204,7 @@ function Main({ userData, galleries}) {
                 <Row><input type='text' id='newName-gallery' value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder='Name of your new Gallery' /></Row>
-                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
+                <Row><input type='submit' value="Submit" /></Row>
             </Col>
             </form>
         </Modal.Body>
@@ -161,8 +220,25 @@ function Main({ userData, galleries}) {
                 <Row><input type='text' id='newName-channel' value={newChannelName}
                   onChange={(e) => setNewChannelName(e.target.value)}
                   placeholder='Name of your new Channel' /></Row>
-                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
+                <Row><input type='submit' value="Submit" /></Row>
               </Col>
+            </form>
+        </Modal.Body>
+    );
+  };
+
+  const ModalAddUser = () => {
+    return(
+        <Modal.Body> 
+            <h5 className="text-center">Add a User</h5>
+            <form onSubmit={handleSubmitUser}>
+            <Col>
+                <Row><label>Name:</label></Row>
+                <Row><input type='text' id='newName-user' value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+                placeholder='Name of your new User' /></Row>
+                <Row><input type='submit' value="Submit" /></Row>
+            </Col>
             </form>
         </Modal.Body>
     );
@@ -182,6 +258,92 @@ function Main({ userData, galleries}) {
     Displayname: "Johnny Dough",
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
+
+  const fetchUser = async (username) => {
+    let verifyUser = false;
+    try {
+      // Make GET request to the backend with the Authorization header
+      const response = await fetch(`/dm/fetch-user?username=${username}`);
+      if (!response.ok) {
+        return verifyUser;
+      } 
+
+      const result = await response.json();
+      console.log(result.user.username,username);
+      
+      verifyUser = (username === result.user.username) && !userNames.some(user => user.username === username);
+
+      
+    } catch (error) {
+      setError('An error occurred while fetching galleries: ' + error.message);
+    }
+    return verifyUser;
+
+  };
+
+  //fetch the users' name if they have ever contacted with the logged in user
+  const fetchDmUsers = async () => {
+
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+  
+    try {
+      // Send POST request to backend to create gallery
+      const response = await fetch('/dm/contacts', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+        },
+      });
+
+      const result = await response.json();
+
+      setUserNames(result.data.map(contact => ({...contact})));
+
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while creating the gallery.');
+    }
+  
+
+  }
+
+  // Push the gallery to database
+  const createGallery = async (galleryName) => {
+    // Get the auth token, for example from localStorage or a cookie
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+  
+    try {
+      // Send POST request to backend to create gallery
+      const response = await fetch('/gal/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ galleryName }), // Pass the gallery name in the body
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        // Handle server error
+        console.error('Error:', result);
+        alert('Failed to create gallery: ' + result.msg || 'Unknown error');
+        return;
+      }
+  
+      // Successfully created the gallery
+      console.log('Gallery created:', result);
+      alert('Gallery created successfully!');
+  
+      // Optionally, you can update the UI here with the new gallery or trigger a re-fetch of galleries
+  
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while creating the gallery.');
+    }
+  };
   
   return(
     <section>
@@ -198,7 +360,7 @@ function Main({ userData, galleries}) {
             }}>
             <Col id="sidebar-list">
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
-                <Nav.Link eventKey="page-dm"><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
+                <Nav.Link eventKey="page-dm" onClick={fetchDmUsers}><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
                 <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
                 <GalleryList />
                 <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
@@ -216,12 +378,12 @@ function Main({ userData, galleries}) {
                         <Col>Private</Col>
                         </Row>
                         <Nav.Link className="separator" disabled><hr /><hr /></Nav.Link>
-                        <Nav.Link><icons.User /> John Doe</Nav.Link>
-                        <Nav.Link><icons.User /> Jane Doe</Nav.Link>
-                        <Nav.Link><icons.User /> Julie Doe</Nav.Link>
+                        <UserList/>
+                        <Nav.Link onClick={() => handleClick('addUser-modal')} className="add-user"><span className="channel-icon"><Plus /></span> Add a User</Nav.Link>
+
                     </Nav>                      
                     </Col>
-                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={uservar}/>
+                    <UserChatList usernames={userNames}/>
                 </Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
             </Tab.Content>
@@ -234,6 +396,14 @@ function Main({ userData, galleries}) {
           <ModalAddGallery />
         </Modal.Dialog>
       </Modal>
+
+      <Modal show={showState === 'addUser-modal'} onHide={handleClose} id="addUser-modal" className="modal-dialog-centered">
+        <Modal.Dialog >
+          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          <ModalAddUser />
+        </Modal.Dialog>
+      </Modal>
+
       <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
