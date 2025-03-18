@@ -6,6 +6,7 @@
   --color-bkg: #f0ffff;
   --user-sidebar-length: 3.5vw;
   --user-dm-length: 2.5vw;
+  --user-inner-length: 17vw;
 }
 .App {
   text-align: center;
@@ -61,6 +62,25 @@ body{
   height: auto;
 }
 
+#sidebar-dm{
+  /*background-color: white;*/
+  background: linear-gradient(to right, var(--color-bar), white);
+  padding-left: 12px;
+  max-height: 100% !important;
+  height: 100vh !important;
+  width: var(--user-dm-length);
+}
+#sidebar-dm-options{
+  font-weight: bolder;
+  /*background-color: white;
+  background: linear-gradient(to right, var(--color-bar), white);*/
+  text-align: center;
+  width: 300px;
+  height: fit-content;
+  padding-top: 5%;
+
+}
+
 #gallery-sidebar-resizable{
   height: 100vh !important;
   background-color: var(--color-accent) !important;
@@ -82,7 +102,7 @@ body{
   padding-right: 20px !important;
   text-align: center !important;
 }
-#sidebar-list .nav-pills a{
+#sidebar-list .nav-pills a:not(.separator){
   width: 19vw !important;
   height: fit-content !important;
 }
@@ -121,6 +141,13 @@ body{
   width: auto;
   position: relative;
 }
+.separator{
+  overflow: hidden !important;
+  background-color: black;
+  width: 100% !important;
+  height: 2px !important;
+  padding: 0 !important;
+}
 .gallery-pane{
   width: 100% !important;
 }
@@ -147,25 +174,6 @@ body{
     transform: rotate(360deg);
   }
 }
-#sidebar-dm{
-  /*background-color: white;*/
-  background: linear-gradient(to right, var(--color-bar), white);
-  padding-left: 12px;
-  max-height: 100% !important;
-  height: 100vh !important;
-  width: 17vw !important;
-}
-#sidebar-dm-options{
-  font-weight: bolder;
-  /*background-color: white;
-  background: linear-gradient(to right, var(--color-bar), white);*/
-  text-align: center;
-  width: 300px;
-  height: fit-content;
-  padding-top: 5%;
-
-}
-
 *:has(.no-parent-padding.active){
   /*background-image: url("../assets/img1.jpg");
   backdrop-filter: brightness(80%) sepia(50%) !important;*/
@@ -180,12 +188,34 @@ body{
   /*float: left;
   margin-left: 20px;*/
   height: 100vh !important;
-  width: var(--user-dm-length);
+  width: var(--user-inner-length);
   overflow: hidden;  
   /*position: absolute !important;
   top: 0;
   z-index: 5;
   left: var(--user-sidebar-length);*/
+}
+
+#sidebar-channels a,  #sidebar-channels div{  
+  width: var(--user-inner-length) !important;
+}
+/*
+.tab-pane.active{  
+  animation-delay: 30ms !important;
+  animation: fade-in 1s;
+}*/
+.fade, .show{
+  transition: unset !important;
+}
+
+
+@keyframes fade-in {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@-webkit-keyframes fade-in {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 
 .chat-container {
