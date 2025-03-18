@@ -30,6 +30,8 @@ function ChatContainer({ barSizes, user, header, messages= [] }) {
       ...directMessages,
       { PopperUsername: bubblerUser, BubblerUsername: popperUser, Message: newMessage }
     ]);
+
+    saveMessage(bubblerUser,newMessage);
   };
 
   const handleSubmitMessages = (event) => {
@@ -53,6 +55,45 @@ function ChatContainer({ barSizes, user, header, messages= [] }) {
       </span>
     );
   };
+
+  const saveMessage = async (username, newMessage) => {
+    // Retrieve the auth token from localStorage
+    const token = localStorage.getItem('authToken');
+    
+    try {
+        // Send POST request to the backend to save the message
+        const response = await fetch('/dm/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+            },
+            body: JSON.stringify({
+                username, // The recipient's username
+                message: newMessage, // The message to be sent
+            }),
+        });
+
+        // Parse the response as JSON
+        const result = await response.json();
+  
+        // Handle the case where the response status is not OK (non-2xx status codes)
+        if (!response.ok) {
+            console.error('Error:', result);
+            alert('Failed to save message: ' + (result.msg || 'Unknown error'));
+            return;
+        }
+  
+        // If successful, log the result and alert the user
+        console.log('Message saved:', result);
+        alert('Message saved successfully!');
+  
+    } catch (error) {
+        // Handle any unexpected errors
+        console.error('An error occurred:', error);
+        alert('An error occurred while saving the message.');
+    }
+};
 
   const bars = Math.abs(barSizes);  // Absolute value of bar sizes
   const bg = HexToRGBA(user.clrAccent, 0.7);  // Background color with transparency

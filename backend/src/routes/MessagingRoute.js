@@ -92,9 +92,9 @@ router.post("/dm/save", async (req, res) => {
         return res.status(401).json(error);
     }
 
-    const { email, message } = req.body;
+    const { username, message } = req.body;
 
-    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid/${email}`);
+    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid-username/${username}`);
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
