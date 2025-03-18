@@ -37,9 +37,9 @@ router.get("/dm/retrieve", async (req, res) => {
         return res.status(401).json(error);
     }
 
-    const { email } = req.body;
+    const { username } = req.body;
 
-    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid/${email}`);
+    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid-username/${username}`);
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
@@ -183,6 +183,29 @@ router.get("/api/get/userid/:email", async (req, res) => {
 
 });
 
+
+//Retrieve User uuid using a user's username
+router.get("/api/get/userid-username/:username", async (req, res) => {
+
+    const { username } = req.params;
+
+    if (!username) {
+        return res.status(400).json({ error: "Username was not received." });
+    }
+    
+    const { data, error } = await supabase
+    .from('Users')
+    .select('user_id') 
+    .eq('username', username)
+    .single();
+
+    if (error) {
+        return res.status(400).json({ msg: error.message });
+    }
+
+    res.status(200).json({ msg: "Uuid was retrieved.", data });
+
+});
 
 //Retrieve username using a user's email
 router.get("/api/get/username-email/:email", async (req, res) => {
