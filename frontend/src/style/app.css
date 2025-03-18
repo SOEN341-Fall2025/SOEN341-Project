@@ -5,6 +5,7 @@
   --color-bkg: #f0ffff;
   --user-sidebar-length: 3.5vw;
   --user-dm-length: 2.5vw;
+  --user-inner-length: 17vw;
 }
 .App {
   text-align: center;
@@ -81,7 +82,7 @@ body{
   padding-right: 20px !important;
   text-align: center !important;
 }
-#sidebar-list .nav-pills a{
+#sidebar-list .nav-pills a:not(.separator){
   width: 19vw !important;
   height: fit-content !important;
 }
@@ -120,6 +121,13 @@ body{
   width: auto;
   position: relative;
 }
+.separator{
+  overflow: hidden !important;
+  background-color: black;
+  width: 100% !important;
+  height: 2px !important;
+  padding: 0 !important;
+}
 .gallery-pane{
   width: 100% !important;
 }
@@ -152,7 +160,7 @@ body{
   padding-left: 12px;
   max-height: 100% !important;
   height: 100vh !important;
-  width: 17vw !important;
+  width: var(--user-dm-length);
 }
 #sidebar-dm-options{
   font-weight: bolder;
@@ -179,12 +187,33 @@ body{
   /*float: left;
   margin-left: 20px;*/
   height: 100vh !important;
-  width: var(--user-dm-length);
+  width: var(--user-inner-length);
   overflow: hidden;  
   /*position: absolute !important;
   top: 0;
   z-index: 5;
   left: var(--user-sidebar-length);*/
+}
+#sidebar-channels a,  #sidebar-channels div{  
+  width: var(--user-inner-length) !important;
+}
+/*
+.tab-pane.active{  
+  animation-delay: 30ms !important;
+  animation: fade-in 1s;
+}*/
+.fade, .show{
+  transition: unset !important;
+}
+
+
+@keyframes fade-in {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@-webkit-keyframes fade-in {
+  from {opacity: 0;}
+  to {opacity: 1;}
 }
 /*
 .chat-container {

@@ -8,11 +8,13 @@ import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
 function Gallery({ item, index, galleryChannels, gallerySize, user }) {  
-    const [showState, setShow] = useState("close"); 
+    const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
     const [newChannelName, setNewChannelName] = useState("");
-    function handleClick(key) { setShow(key); }
+    const [newTitle, setNewTitle] = useState("");
+    const handleClose = () => setShowState(false);
+    function handleClick(key) { setShowState(key); }
     const GalleryChannelsList = () => {
       thisChannels.map((item, index) => {
           return (
@@ -25,6 +27,41 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
           );
           return null; // Ensure the map function returns something in all cases
       });
+    };
+    
+  const handleChannels = (newname, galleryid) => {
+    setTheseChannels(Object.values([...galleryChannels, { GalleryID: galleryid, ChannelName: newname }]));
+    console.log(galleryChannels);
+  };
+    const handleSubmitChannel = (event) => {
+      event.preventDefault();
+      if (!newTitle.trim()) {
+        alert("Channel name cannot be empty!");
+        return;
+      }
+      handleChannels(newTitle, ''); 
+      createChannel(newTitle, item.GalleryID); 
+      handleClose();  //Close the modal *after* form is submitted.
+    };
+    const ModalAddChannel = () => {
+        return(
+          <Modal.Body> 
+              <h5 className="text-center">Create a Channel</h5>
+              <form onSubmit={handleSubmitChannel}>
+                <Col>
+                  <Row><label>Name:</label></Row>
+                  <Row>
+                    <input type='textarea' id='newName-channel' value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder='Name of your new Channel' 
+                    autoFocus
+                    />
+                    </Row>
+                  <Row><input type='submit' value="Submit" /></Row>
+                </Col>
+              </form>
+          </Modal.Body>
+        );
     };
     const GalleryChannelList = ({ channels }) => {
       if(channels.length > 0){
@@ -40,6 +77,37 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
         );
       }
     };
+  const createChannel = async (channelName, galleryID) => {
+    // Get the auth token, for example from localStorage or a cookie
+    const token = localStorage.getItem('auth-token');  // Adjust according to where you store your token
+  
+    try {
+      const response = await fetch('/gal/createChannel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ channelName, galleryID }), 
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.error('Error:', result);
+        alert('Failed to create channel: ' + result.msg || 'Unknown error');
+        return;
+      }
+  
+      console.log('Channel created:', result);
+      alert('Channel created successfully!');
+  
+  
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while creating the gallery.');
+    }
+  };
   return (
     <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
           <Tab.Container id="">
@@ -70,6 +138,9 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
             </Col>
           </Tab.Container>
         <ChatContainer barSizes={(Number(gallerySize) + Number(channelNavWidth))} header={item.channelName} user={user}/>
+        <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
+          <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalAddChannel /></Modal.Dialog>
+        </Modal>
     </Tab.Pane>
   );
 }

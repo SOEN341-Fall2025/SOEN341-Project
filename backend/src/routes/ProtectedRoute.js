@@ -53,7 +53,7 @@ router.post("/api/auth/login", async (req, res) => {
         email,
         password,
     });
-
+    
     if (error) {
         return res.status(400).json({ msg: error.message });
     }
@@ -77,16 +77,16 @@ router.get("/api/get/me", async (req, res) => {
         .select('*')
         .eq('user_id', userId);
 
-    if (userError) return res.status(500).json({ msg: "Error fetching user data" });
+    if (userError) return res.status(505).json({ msg: "Error fetching user data" });
 
     res.json({ user: userData });
 });
 // Get user auth 
 router.get("/api/auth/me", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
-    
-    if (!token) return res.status(401).json({ msg: "Unauthorized" });
 
+    if (!token) return res.status(401).json({ msg: "Unauthorized" });
+    
     const { data, error } = await supabase.auth.getUser(token);
 
     if (error) return res.status(401).json({ msg: "Invalid token" });
@@ -94,7 +94,7 @@ router.get("/api/auth/me", async (req, res) => {
         valid: true, 
         user: data.user
     };
-    console.log('Sending response:', response);  // Log the response
+    //console.log('Sending response:', response);  // Log the response
     res.json(response);
 });
 // Logout route
