@@ -1,12 +1,15 @@
+
+
+
 * {
     border-width: 0 !important;
 }
-body{
+/*body{
     height: 100vh;
     width: 100vw;
     background-color: var(--color-bkg);
     overflow: hidden;
-}
+}*/
 img.form-control{
     border-width: 5px !important;
     border-color: var(--color-accent);
@@ -23,7 +26,7 @@ label.labelnav{
 label.form-control-color{
     width: fit-content !important;
     background-color: transparent;
-    color: var(--color-bkg) !important;
+    /*color: var(--color-bkg) !important;*/
 }
 input.form-control-color{
     padding: 0 !important;
@@ -31,21 +34,33 @@ input.form-control-color{
     border-radius: 10px !important;
     border-color: black;
 }
-.close-button{
-    position: absolute;
-    right: 50;
-    top: 50;
+.modal{
+    --bs-modal-zindex: 1050 !important;
 }
-.settings-nav{
-    background-color: var(--color-accent);
-    height: 100vh;
-}.settings-nav .list-group-item.active{ background-color: #7fffd46c !important;
-}.settings-nav .list-group-item:not(.active){ background-color: transparent !important;
-}.settings-nav button{border-radius: 10px !important;}
-.tab-content{    
+.settings .row{margin-left: 0 !important; background-color: var(--color-bkg);}
+#settings-nav{
+    background-color: var(--color-accent) !important;
+    height: 100vh !important;
+    width: 40vw;
+}#settings-nav *{
+    text-align: right !important;
+}
+#settings-pages{    
     background-color: var(--color-bkg);
     height: 100vh;
-}.tab-pane{height: 100vh;}
+    position: absolute;
+    top: 0;
+    left: 40vw;
+    /*width: auto !important;*/
+    padding-left: 3%;
+}
+.divframe button{
+    height: fit-content !important;
+    width: fit-content !important;
+    padding: 1% !important
+}#settings-pages h3{
+    padding-top: 10%;
+}
 .settings-nav-list{
     background-color: transparent;
 }
@@ -53,8 +68,14 @@ input.form-control-color{
 .ps-30{
     padding-left: 30% !important;
 }
+.ps-10{
+    padding-left: 10% !important;
+}
 .pe-10{
     padding-right: 10% !important;
+}
+.pt-20{
+    padding-top: 20% !important;
 }
 .pt-10{
     padding-top: 5% !important;
@@ -68,7 +89,7 @@ input.form-control-color{
     justify-content: space-between !important;
 }
 .justify-between *{
-    max-width: 30% !important;
+    /*max-width: 30% !important;*/
 }
 .justify-end, .justify-end *{
     display: flex !important;
@@ -79,10 +100,10 @@ input.form-control-color{
 }
 .btn-close{
     position: absolute !important;
-    top: 25%;
-    right: 5%;
-    z-index: 999;
+    top: 0;
+    right: 0;
+    z-index: 999;    
 }
 .divframe{
-    padding: 10%;
+    padding: 10% 10% 0 0;
 }

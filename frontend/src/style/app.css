@@ -3,8 +3,7 @@
   --color-accent: #e6d08e;
   --color-bar: #d2a292;
   --color-bar-gradient: #d1d292;
-  --color-bkg: #f0ffffa1;
-  --color-chat: #f0ffffa1;
+  --color-bkg: #f0ffff;
   --user-sidebar-length: 3.5vw;
   --user-dm-length: 2.5vw;
 }
@@ -87,7 +86,7 @@ body{
   width: 19vw !important;
   height: fit-content !important;
 }
-#settings-modal, #gallery-sidebar-resizable, #status-modal{
+#settings-modal, #gallery-sidebar-resizable{
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -130,11 +129,15 @@ body{
   right: 50px !important;
   top: 50px !important;
 }
-#settings-modal .modal-header, #settings-modal .modal-body, #status-modal .modal-header, #status-modal .modal-body{
+#settings-modal .modal-body, #settings-modal .modal-header{
   margin: 0 !important;
   padding: 0 !important;
-}#status-modal{
+}
+#status-modal{
   width: 30% !important;
+}
+.modal-dialog-centered{
+  display: flex !important;
 }
 @keyframes App-logo-spin {
   from {
@@ -173,7 +176,7 @@ body{
 }
 #sidebar-channels {
   /*background-color: white;*/
-  background: linear-gradient(to right, var(--color-bar), var(--color-accent), var(--color-accent));
+  background: linear-gradient(to right, var(--color-bar), var(--color-accent));
   /*float: left;
   margin-left: 20px;*/
   height: 100vh !important;
