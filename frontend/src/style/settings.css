@@ -51,14 +51,16 @@ input.form-control-color{
     position: absolute;
     top: 0;
     left: 30vw;
-    width: auto !important;
+    /* width: auto !important; */
     padding-left: 3%;
 }
-.divframe button{
+/* .divframe button{
     height: fit-content !important;
     width: fit-content !important;
     padding: 1% !important
-}#settings-pages h3{
+} */
+
+#settings-pages h3{
     padding-top: 10%;
 }
 .settings-nav-list{

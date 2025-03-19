@@ -58,7 +58,7 @@ router.post("/api/auth/login", async (req, res) => {
         return res.status(400).json({ msg: error.message });
     }
 
-    res.json({ msg: "Login successful", token: data.session.access_token });
+    res.json({ msg: "Login successful", token: data.session.access_token, user_id :data.user.id });
 });
 
 // Get user info 
