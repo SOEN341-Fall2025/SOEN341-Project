@@ -76,7 +76,29 @@ function Main({ userData, galleries}) {
   
     setStyles();
   }, [userVar.settings]);*/
-
+  useEffect(() => {
+    if (userData && userData.settings) {
+      console.log(JSON.stringify(userData.settings));
+  
+      function setStyles() {
+        const newUserVar = { ...userVar };
+        newUserVar.clrAccent = userData.settings.clrAccent || userVar.clrNavbar;
+        newUserVar.clrChat = userData.settings.clrChat || userVar.clrNavbar;
+        newUserVar.clrNavbar = userData.settings.clrNavbar || userVar.clrNavbar;
+        newUserVar.clrNavbarGradient = userData.settings.clrNavbarGradient || userVar.clrNavbarGradient;
+  
+        setUserVar(newUserVar);
+  
+        UpdateStyle('--color-accent', newUserVar.clrAccent);
+        UpdateStyle('--color-bar', newUserVar.clrNavbar);
+        UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
+      }
+  
+      setStyles();
+    } else {
+      console.warn('userData.settings is undefined or null');
+    }
+  }, [userVar.settings]);
 
     
   /*SECTION - FUNCTIONS */
