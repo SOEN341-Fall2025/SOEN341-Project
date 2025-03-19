@@ -2,7 +2,7 @@
 import '../style/app.css';
 import '../style/settings.css';
 import '../style/style.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToPX } from '../AppContext.js';
 import Settings from './Settings.js';
 import Gallery from './Gallery.js';
@@ -41,15 +41,50 @@ function Main({ userData, galleries}) {
   );
   const [newMessage, setNewMessage] = useState("");
   const [directMessages, setDirectMessages] = useState([]);
+
+  const logout = () => {    
+    localStorage.removeItem('auth-token');
+  }
   
- const uservar = {
+  const [userVar, setUserVar] = useState({
     sizeGallerySidebar: "3.5vw",
     sizeInnerSidebar: "17vw",
-    clrAccent: '#c9ffed',
-    userGalleries: JSON.stringify(galleries)
-  };
-
-
+    clrAccent: '#d2a292',
+    clrChat: '#f0ffff',
+    clrNavbar: '#f0ffff',
+    clrNavbarGradient: '#d2a292',
+    userGalleries: JSON.stringify(galleries),
+    username: userData.username,
+    profilepic: userData.profile_picture_url,
+    aboutme: userData.aboutme,
+    userID: userData.user_id,
+    settings: userData.settings
+  });
+  
+  useEffect(() => {
+    console.log(JSON.stringify(userData.settings));
+    function setStyles() {
+      if (!userData?.settings) {
+        console.warn("userData.settings is undefined, skipping setStyles.");
+        return; // Exit the function early if settings are not available
+      }
+  
+      const newUserVar = { ...userVar };
+      newUserVar.clrAccent = userData.settings?.clrAccent || userVar.clrNavbar;
+      newUserVar.clrChat = userData.settings?.clrChat || userVar.clrNavbar;
+      newUserVar.clrNavbar = userData.settings?.clrNavbar || userVar.clrNavbar;
+      newUserVar.clrNavbarGradient = userData.settings?.clrNavbarGradient || userVar.clrNavbarGradient;
+  
+      setUserVar(newUserVar);
+  
+      UpdateStyle("--color-accent", newUserVar.clrAccent);
+      UpdateStyle("--color-bar", newUserVar.clrNavbar);
+      UpdateStyle("--color-bar-gradient", newUserVar.clrNavbarGradient);
+    }
+  
+    setStyles();
+  }, [userVar.settings]);
+    
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
    function handleClick(key) { setShowState(key); }
@@ -102,11 +137,11 @@ function Main({ userData, galleries}) {
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
-    let picUrl = userProfile.profilepic;
-    let name = userProfile.displayname;
-    let words = name.split(' ');
-    let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
-    if (picUrl.length === 0) {
+    let picUrl = userVar.profilepic;
+    let name = userVar.username;
+    if (picUrl == null && name != null) {
+      let words = name.split(' ');
+      let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
       return (
         <span style={{ width: '50%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Image src='bublii_bubble.png' id="avatar" style={{ height: '100%', width: '100%' }} />
@@ -122,19 +157,53 @@ function Main({ userData, galleries}) {
     }
   };
 
-  const GalleryList = () => {
+  const getChannels = useCallback(async (name) => {
+    try {      
+        const token = localStorage.getItem('auth-token');        
+        
+        // Fetch gallery channels
+        const channelsResponse = await fetch(`/api/gallery/getChannels?galleryName=${encodeURIComponent(name)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(channelsResponse){
+          const channelsData = await channelsResponse.json();
+          //console.log("Channels response ", channelsData);    
+          const galleryName = Object.keys(channelsData)[0];
+          const channels = channelsData[galleryName];
+          if(!Array.isArray(channels)) {channels = [];}
+          //console.log("Channels ", channels); 
+          setGalleryChannels(prevChannels => {
+            //console.log('Setting galleryChannels:', JSON.stringify(channels));
+            return channels;
+          });        
+        }
+    } catch (error) {
+      //console.error('Login failed:', error);
+      setGalleryChannels([]);
+    }
+  }, []);
+
+  const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
+    const handleGalleryClick = useCallback((galleryName) => {
+      console.log("Getting Channels for " + galleryName);
+      getChannels(galleryName);
+    }, [getChannels]);
     return (        
-        userGalleries.map((item, index) => (
-          <Nav.Link eventKey={item.GalleryName} key={index} onClick={() => setNewGalleryName(item.GalleryName)}>
-            <span className="channel-icon">
-              <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
-            </span>
-            {item.GalleryName}
-          </Nav.Link>
-        ))
+      userGalleries.map((item, index) => (
+        <Nav.Link 
+          eventKey={item.GalleryName} 
+          key={index} 
+          onClick={() => handleGalleryClick(item.GalleryName)}
+        >
+          <span className="channel-icon">
+            <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
+          </span>
+          {item.GalleryName}
+        </Nav.Link>
+      ))
     );
-  };
+  });
 
   const GalleryChannelList = ({ g }) => {
     return (
@@ -148,14 +217,15 @@ function Main({ userData, galleries}) {
         ))
     );
   };
+  
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} userChannels={userChannels} gallerySize={galleryNavWidth} user={uservar}/>
+        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar}/>
       ))
     
     );
-  };
+  }; 
 
   const UserList = () => {
     return (
@@ -189,7 +259,7 @@ function Main({ userData, galleries}) {
                 key={index}  // Add a key to help React identify each item in the list
                 eventKey={item.username}
                 barSizes={galleryNavWidth + dmNavWidth}
-                user={uservar}
+                user={userVar}
                 header={item.username}
                 messages={directMessages}
               />
@@ -217,6 +287,20 @@ function Main({ userData, galleries}) {
         </Modal.Body>
     );
   };
+
+  const MessageList = ({ messages }) => {
+    return (
+      <span>
+        {messages.map((item, index) =>
+          <div className="message recipient flex items-center justify-end my-2">
+            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">{item.message}</div>
+            <User className="icon" />
+          </div>
+        )}
+      </span>
+    )
+  };
+
   const ModalAddChannel = () => {
     return(
         <Modal.Body> 
@@ -471,9 +555,10 @@ function Main({ userData, galleries}) {
           <Modal.Body>
             <h5 className="text-center">Your Status</h5>
             <Form>
-              <Col xs={6} md={4}>
                 <ProfilePic />
-              </Col >
+                <Row><Form.Label id="placeholder"></Form.Label></Row>
+                <Row><Form.Label id="placeholder"></Form.Label></Row>
+                <Row><input type="submit" value="Logout" onClick={logout}></input></Row>
             </Form>
           </Modal.Body>
         </Modal.Dialog>
@@ -483,7 +568,7 @@ function Main({ userData, galleries}) {
           <Modal.Header><div id="settings-close-button"><Button className="btn-close" onClick={handleClose}></Button></div></Modal.Header>
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
-              <Settings />
+              <Settings userVars={userVar}/>
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>
