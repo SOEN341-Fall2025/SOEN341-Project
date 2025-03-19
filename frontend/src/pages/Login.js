@@ -7,8 +7,8 @@ function Login({ onLogin }) {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showLogin, setShowLogin] = useState(true);
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordStrength, setPasswordStrength] = useState('Weak');
     const [passwordMatch, setPasswordMatch] = useState(true);
   

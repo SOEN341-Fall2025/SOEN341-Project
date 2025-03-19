@@ -56,7 +56,7 @@ function Main({ userData, galleries}) {
     settings: userData.settings
   });
   
-  useEffect(() => {
+  /*useEffect(() => {
     console.log(JSON.stringify(userData.settings));
     function setStyles() {
       const newUserVar = { ...userVar };
@@ -75,9 +75,9 @@ function Main({ userData, galleries}) {
     }
   
     setStyles();
-  }, [userVar.settings]);
-  
-  
+  }, [userVar.settings]);*/
+
+
     
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
