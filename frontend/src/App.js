@@ -11,7 +11,7 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [galleries, setGalleries] = useState([]);
   const [authStatus, setAuthStatus] = useState('checking'); // 'checking', 'authenticated', or 'unauthenticated'
-
+  const savedSession = localStorage.getItem('authToken');
   const fetchUserGalleries = async (token) => {
     try {
       const response = await fetch('/gal/retrieve', {
@@ -71,9 +71,11 @@ function App() {
       setUserData(data.user);
       setAuthStatus('authenticated');
       fetchUserGalleries(data.token);
+      setIsLoggedIn(true)
     } catch (error) {
       console.error('Login failed:', error);
       setAuthStatus('unauthenticated');
+      setIsLoggedIn(false);
     }
   };
 

@@ -43,7 +43,7 @@ function Main({ userData, galleries}) {
   const [directMessages, setDirectMessages] = useState([]);
 
   const logout = () => {    
-    localStorage.removeItem('auth-token');
+    localStorage.removeItem('authToken');
   }
   
   const [userVar, setUserVar] = useState({

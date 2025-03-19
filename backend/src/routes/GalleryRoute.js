@@ -53,7 +53,7 @@ router.delete("/api/gal/delete", async (req, res) => {
 });
 
 //Creation of a gallery
-router.post("/api/gal/create", async (req, res) => {
+router.post("/gal/create", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
@@ -82,7 +82,7 @@ router.post("/api/gal/create", async (req, res) => {
     const gallId = data.GalleryID;
 
     //Helper call
-    const addUser = await fetch('/api/gal/addCreator', {
+    const addUser = await fetch('http://localhost:4000/api/gal/addCreator', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

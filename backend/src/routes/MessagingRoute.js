@@ -84,7 +84,7 @@ router.get("/dm/retrieve", async (req, res) => {
 
 
 //Save private DM (When user is sending message)
-router.post("/dm/save", async (req, res) => {
+router.post("/api/dm/save", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
@@ -114,6 +114,7 @@ router.post("/dm/save", async (req, res) => {
             ]);
 
     if (databaseError) {
+        console.log("MADE IT HEREEE")
         return res.status(500).json({msg:"Message could not be saved.", databaseError});
     }
 

@@ -62,7 +62,7 @@ function ChatContainer({ barSizes, user, header, messages= [] }) {
     
     try {
         // Send POST request to the backend to save the message
-        const response = await fetch('/dm/save', {
+        const response = await fetch('/api/dm/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
