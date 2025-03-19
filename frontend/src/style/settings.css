@@ -102,9 +102,9 @@ input.form-control-color{
 }
 .btn-close{
     position: absolute !important;
-    top: 25%;
-    right: 5%;
-    z-index: 999;
+    top: 0;
+    right: 0;
+    z-index: 999;    
 }
 .divframe{
     padding: 10% 10% 10% 0;

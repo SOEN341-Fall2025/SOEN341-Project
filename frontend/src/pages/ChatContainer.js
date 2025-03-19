@@ -5,7 +5,38 @@ import { Resizable } from 're-resizable';
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
+
+
+
+
+
 function ChatContainer({barSizes, user, header}) {
+   const [newMessage, setNewMessage] = useState("");
+  const [directMessages, setDirectMessages] = useState([
+    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
+  ]);
+   const handleMessages = (newMessage) => {
+    setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
+  };
+
+  const handleSubmitMessages = (event) => {
+    event.preventDefault(); // Prevents page reload on submit
+    handleMessages(newMessage);
+    setNewMessage("");
+  };
+
+  const MessageList = ({ messages }) => {
+    return (
+      <span>
+        {messages.map((item, index) =>
+          <div className="message recipient flex items-center justify-end my-2">
+            <div className="text bg-[#7ed957] text-black p-2 rounded-lg mr-2 max-w-[60%]">{item.message}</div>
+            <User className="icon" />
+          </div>
+        )}
+      </span>
+    )
+  };
     var bars = Math.abs(barSizes);
     var bg = HexToRGBA(user.clrAccent, 0.7);
   return (
@@ -21,8 +52,7 @@ function ChatContainer({barSizes, user, header}) {
       >
         {/* Go Back Button */}
         <div className="back-button flex items-center cursor-pointer mb-2">
-          <img
-            src="images/arrow.png"
+          <ArrowLeft
             alt="Go Back"
             className="w-10 h-10 mr-2"
           />
@@ -49,7 +79,10 @@ function ChatContainer({barSizes, user, header}) {
             </div>
             <User className="icon" />
           </div>
+          <MessageList messages={directMessages} />
         </div>
+
+
 
         <Row id="chat-box" className="d-flex align-items-center">
           {/* Icons (Plus, Camera, Mic) */}
@@ -66,18 +99,20 @@ function ChatContainer({barSizes, user, header}) {
           </Col>
 
           {/* Input Box and Send Button */}
-          <Col className="flex-grow-1">
-            <div className="chat-input d-flex gap-2 align-items-center">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-grow-1 p-2 rounded border"
-              />
-              <button className="p-2 bg-[#4facfe] text-white rounded-md">
-                Send
-              </button>
-            </div>
-          </Col>
+          <Col id="chat-input"className="">
+                              <form onSubmit={handleSubmitMessages}>
+                                <div className="d-flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    placeholder="Type a message..."
+                                    className="flex-grow-1 p-2 rounded border"
+                                  />
+                                  <button type="submit" className="p-2 bg-[#4facfe] text-gray rounded-md">Send</button>
+                                </div>
+                              </form>
+                            </Col>
         </Row>
       </div>
     </div>

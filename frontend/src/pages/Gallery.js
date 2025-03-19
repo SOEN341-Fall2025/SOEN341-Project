@@ -7,35 +7,41 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
-function Gallery({ item, index, userChannels, gallerySize, user }) {  
-  
+function Gallery({ item, index, galleryChannels, gallerySize, user }) {  
     const [showState, setShow] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
+    const [thisChannels, setTheseChannels] = useState(galleryChannels);  
+    const [newChannelName, setNewChannelName] = useState("");
     function handleClick(key) { setShow(key); }
-    const GalleryChannelsList = ({ galleryName, channels }) => {
-        return (
-            <span>
-            {channels.map((item, index) => {
-                // Check if the galleryName matches the item's galleryName
-                if (galleryName === item.GalleryName) {
-                return (
-                    <Nav.Link key={index} eventKey={item.channelName}>
-                    <span className="channel-icon">
-                        <Icon name={item.icon || FindClosestIcon(item.channelName)} size={24} />
-                    </span>
-                    {item.channelName}
-                    </Nav.Link>
-                );
-                }
-                return null; // Ensure the map function returns something in all cases
-            })}
-            </span>
-        );
+    const GalleryChannelsList = () => {
+      thisChannels.map((item, index) => {
+          return (
+              <Nav.Link key={index} eventKey={item.ChannelName}>
+              <span className="channel-icon">
+              <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
+              </span>
+              {item.ChannelName}
+              </Nav.Link>
+          );
+          return null; // Ensure the map function returns something in all cases
+      });
     };
-      
-
+    const GalleryChannelList = ({ channels }) => {
+      if(channels.length > 0){
+        return (
+          channels.map((item, index) => (
+              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => setNewChannelName(item.ChannelName)}>
+                <span className="channel-icon">
+                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
+                </span>
+                {item.ChannelName}
+              </Nav.Link>
+            ))
+        );
+      }
+    };
   return (
-    <Tab.Pane eventKey={item.GalleryName} className="gallery-pane">
+    <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
           <Tab.Container id="">
             <Col id="sidebar-channels" style={{ width: user.sizeInnerSidebar}} >
               <Nav
@@ -49,15 +55,8 @@ function Gallery({ item, index, userChannels, gallerySize, user }) {
                 </Row>
                 <Nav.Link className="seperator" disabled>
                   <hr />
-                  <hr />
                 </Nav.Link>
-                <Nav.Link>
-                  <icons.Gamepad2Icon /> Game Room
-                </Nav.Link>
-                <GalleryChannelsList
-                  galleryName={item.GalleryName}
-                  channels={userChannels}
-                />
+                <GalleryChannelList channels={thisChannels}/>
                 <Nav.Link
                   onClick={() => handleClick("addChannel-modal")}
                   className="add-channel"

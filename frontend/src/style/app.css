@@ -1,7 +1,9 @@
+
 :root{
-  --color-accent: #c9ffed;
-  --color-bar: #76bea6;
-  --color-bkg: azure;
+  --color-accent: #e6d08e;
+  --color-bar: #d2a292;
+  --color-bar-gradient: #d1d292;
+  --color-bkg: #f0ffff;
   --user-sidebar-length: 3.5vw;
   --user-dm-length: 2.5vw;
 }
@@ -43,10 +45,16 @@ html, section{
 }
 body{
   background-image: url("../assets/background.png") !important;
-  backdrop-filter: brightness(90%) sepia(20%) !important;
+  backdrop-filter: brightness(90%) contrast(110%) !important;
   background-repeat: no-repeat !important;
   width: 100% !important;
   overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
 }
 .carousel-caption{
   width: 100% !important;
@@ -56,7 +64,7 @@ body{
 #gallery-sidebar-resizable{
   height: 100vh !important;
   background-color: var(--color-accent) !important;
-  background: linear-gradient(to right, var(--color-accent), var(--color-bar)) !important;
+  background: linear-gradient(to right, var(--color-bar-gradient), var(--color-bar), var(--color-bar)) !important;
   overflow: hidden !important;
   /*position: absolute !important;
   left: 0;
@@ -78,7 +86,7 @@ body{
   width: 19vw !important;
   height: fit-content !important;
 }
-#settings-modal, #gallery-sidebar-resizable, #status-modal{
+#settings-modal, #gallery-sidebar-resizable{
   padding: 0 !important;
   margin: 0 !important;
 }
@@ -121,11 +129,15 @@ body{
   right: 50px !important;
   top: 50px !important;
 }
-#settings-modal .modal-header, #settings-modal .modal-body, #status-modal .modal-header, #status-modal .modal-body{
+#settings-modal .modal-body, #settings-modal .modal-header{
   margin: 0 !important;
   padding: 0 !important;
-}#status-modal{
+}
+#status-modal{
   width: 30% !important;
+}
+.modal-dialog-centered{
+  display: flex !important;
 }
 @keyframes App-logo-spin {
   from {
@@ -164,7 +176,7 @@ body{
 }
 #sidebar-channels {
   /*background-color: white;*/
-  background: linear-gradient(to right, var(--color-bar), rgba(154, 218, 197, 0.95), rgba(154, 218, 197, 0.80), rgba(255, 255, 255, 0.65));
+  background: linear-gradient(to right, var(--color-bar), var(--color-accent));
   /*float: left;
   margin-left: 20px;*/
   height: 100vh !important;
@@ -175,18 +187,18 @@ body{
   z-index: 5;
   left: var(--user-sidebar-length);*/
 }
-/*
+
 .chat-container {
-  
-  height: 80vh;
-  bottom: 8vh; 
-  max-width: 90vw;
-  background: var(--color-accent);  Light blue 
-  position: absolute;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-}*/
+  position: relative; /* Ensure the container is the reference for absolute positioning */
+  height: 80vh; /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-box {
+  flex-grow: 1; /* Allow the chat box to take up remaining space */
+  overflow-y: auto; /* Enable scrolling for messages */
+}
 
 /* Back Button */
 .back-button {
@@ -207,7 +219,7 @@ body{
   font-size: 18px;
   font-weight: bold;
   padding: 10px;
-  background: linear-gradient(to right, #cdffd8, #94b9ff);
+  background: linear-gradient(to right, var(--color-accent), var(--color-bar));
   color: rgb(15, 12, 12);
   border-radius: 5px;
 }
@@ -336,4 +348,32 @@ body{
   border-radius: 30px 30px 30px 30px;
 }
 
+.hover-text {
+  position: relative;
+}
 
+.hover-text-content {
+  visibility: hidden;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.hover-text:hover .hover-text-content {
+  visibility: visible;
+  opacity: 1;
+}
