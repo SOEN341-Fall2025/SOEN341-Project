@@ -307,15 +307,18 @@ router.get("/api/gallery/getChannels", async (req, res) => {
     }
     try {
         const { galleryName } = req.query;
-        console.log("DEBUG: " + galleryName)
         if (!galleryName) {
             return res.status(400).json({ error: "Gallery name was not received." });
         }
+
         const { data, error } = await supabase
         .from('Galleries')
         .select('GalleryID') 
-        .eq('GalleryName', galleryName).single();
+        .eq('GalleryName', galleryName)
+        .single();
+
         if (error) {
+          console.log(error);
             return res.status(400).json({ msg: error.message, data: {"GalleryID": null} });
         }
         

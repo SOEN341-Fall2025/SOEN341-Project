@@ -187,6 +187,10 @@ function Main({ userData, galleries}) {
     }
   }, []);
 
+  useEffect(() => {
+    console.log("Channels have been updated:", galleryChannels);
+  }, [galleryChannels]);
+
   const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
     const handleGalleryClick = useCallback((galleryName) => {
@@ -209,18 +213,18 @@ function Main({ userData, galleries}) {
     );
   });
 
-  const GalleryChannelList = ({ g }) => {
-    return (
-        g.map((item, index) => (
-          <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
-            <span className="channel-icon">
-              <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
-            </span>
-            {item.name}
-          </Nav.Link>
-        ))
-    );
-  };
+  // const GalleryChannelList = ({ g }) => {
+  //   return (
+  //       g.map((item, index) => (
+  //         <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
+  //           <span className="channel-icon">
+  //             <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
+  //           </span>
+  //           {item.name}
+  //         </Nav.Link>
+  //       ))
+  //   );
+  // };
   
   const GalleryPageList = ({ galleries }) => {
     return (        
