@@ -161,24 +161,28 @@ function Main({ userData, galleries}) {
     try {      
         const token = localStorage.getItem('auth-token');        
         
-        // Fetch gallery channels
         const channelsResponse = await fetch(`/api/gallery/getChannels?galleryName=${encodeURIComponent(name)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if(channelsResponse){
-          const channelsData = await channelsResponse.json();
-          //console.log("Channels response ", channelsData);    
-          const galleryName = Object.keys(channelsData)[0];
-          const channels = channelsData[galleryName];
-          if(!Array.isArray(channels)) {channels = [];}
-          //console.log("Channels ", channels); 
-          setGalleryChannels(prevChannels => {
-            //console.log('Setting galleryChannels:', JSON.stringify(channels));
-            return channels;
-          });        
+
+        if (!channelsResponse.ok) {
+          console.error("Failed to fetch channels:", channelsResponse.status);
+          setGalleryChannels([]);
+          return;
         }
+
+        const channelsData = await channelsResponse.json();  
+        const galleryName = Object.keys(channelsData)[0];
+        let channels = channelsData[galleryName];  
+
+        if (!Array.isArray(channels)) {
+          console.warn("Channels is not an array:", channels);
+          channels = [];
+        }
+
+        setGalleryChannels(channels);
     } catch (error) {
-      //console.error('Login failed:', error);
+      console.error("Error fetching channels:", error);
       setGalleryChannels([]);
     }
   }, []);

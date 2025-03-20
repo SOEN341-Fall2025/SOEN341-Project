@@ -7,7 +7,7 @@ import ChatContainer from './ChatContainer.js';
 function Gallery({ item, index, userChannels, gallerySize, user }) {  
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
-    const [userChannelsList, setUserChannelsList] = useState(userChannels);   
+    const [userChannelsList, setUserChannelsList] = useState(userChannels || []);   
     const [newChannelName, setNewChannelName] = useState("");
     const [newGalleryName, setNewGalleryName] = useState(item.GalleryName);
 
