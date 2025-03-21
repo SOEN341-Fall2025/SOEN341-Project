@@ -219,6 +219,49 @@ router.get("/api/gal/getID/:galleryName", async (req, res) => {
 
 });
 
+// Channel API calls ==================================================================================================
+
+//Creation of a channel in a gallery
+router.post("/gal/createChannel", async (req, res) => {    
+
+  const token = req.header("Authorization")?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+  try{
+      // Get the user based on the token
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (authError || !user) {
+          console.error('Authentication Error:', authError); // Log error for debugging
+          return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+      }  
+
+      console.log("body ", req.body);  // Log error for debugging
+      const { channelName, galleryID } = req.body;    
+      console.log('User role:', user.role);
+      const { data, error: databaseError } = await supabase
+          .from("Channels")
+          .insert(
+              {
+                  ChannelName: channelName,
+                  Created_at: new Date().toISOString(),
+                  GalleryID: galleryID
+              }
+          );
+
+      if (databaseError) {
+          return res.status(500).json({msg:"Channel could not be created.", databaseError, data});
+      }              
+      res.status(200).json({msg:"Channel was successfully created.", data});
+  }
+  catch (err) {
+      console.log(err);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+
+});
+
 router.get("/api/gallery/all", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
