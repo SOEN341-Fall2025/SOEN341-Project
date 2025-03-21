@@ -345,8 +345,7 @@ router.post("/gal/channel/sendMsg", async(req, res) => {
 
   const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
   const galleryIDdata = await galIDresponse.json();
-  const galleryID = galleryIDdata.data.GalleryID;
-
+  const galleryID = await galleryIDdata.data.GalleryID;
     const { data, error: databaseError } = await supabase
         .from('ChannelMessages')
         .insert([

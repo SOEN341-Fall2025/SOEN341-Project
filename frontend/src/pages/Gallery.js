@@ -196,7 +196,12 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
           console.log(data.updatedData);
         }
 
-        setChannelMessage(data.updatedData);
+        const messagesAndUsernames = data.updatedData.map(item => ({
+            message: item.Msg,
+            username: item.Username,
+          }));
+        console.log(messagesAndUsernames);
+        setChannelMessage(messagesAndUsernames);
     
       } catch (error) {
         console.error('Error fetching channel messages:', error.message);

@@ -104,28 +104,28 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   const [currentUsername, setCurrentUsername] = useState(user.username);
 
   const handleChannelMessages = (newMessage) => {
-    setDirectMessages([
+    setChannelMessages([
       ...channelMessages,
-      { Username: currentUsername, Message: newMessage }
+      { message: newMessage, username: currentUsername }
     ]);
-
-    //saveMessage(bubblerUser,newMessage);
+    saveChannelMessage(channelName, newMessage);
   };
 
   const handleSubmitChannelMessages = (event) => {
     event.preventDefault();  // Prevent page reload on submit
-    handleMessages(newMessage);  // Add the new message
+    handleChannelMessages(newMessage);  // Add the new message
     setNewMessage("");  // Clear input field
   };
 
   // Message List Component
   const ChannelMessageList = ({ messages }) => {
+    
     return (
       <span>
         {messages.map((item, index) => (
-          <div key={index} className={`message ${item.Username === user.username ? "user" : "recipient"} flex items-center my-2`}>
-            <div className={`text ${item.Username === user.username ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.PopperUsername === popperUser ? "ml-2" : "mr-2"} max-w-[60%]`}>
-              {item.Message}
+          <div key={index} className={`message ${item.Username !== user.username ? "user" : "recipient"} flex items-center my-2`}>
+            <div className={`text ${item.Username !== user.username ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.Username !== user.username ? "ml-2" : "mr-2"} max-w-[60%]`}>
+              {item.message}
             </div>
             <User className="icon" />
           </div>
@@ -135,38 +135,45 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   };
 
 
-  const saveChannelMessage = async (channelName, galleryName, message) => {
+  const saveChannelMessage = async (channelName, newMessage) => {
+    const token = localStorage.getItem('authToken');
+  
+    // Check if the token is available
+    if (!token) {
+      console.error('No authentication token found.');
+      return;
+    }
+  
     try {
-      // Prepare the request body
-      const body = JSON.stringify({ channelName, galleryName, message });
-  
-      // Assuming you have a function to get the auth token from local storage, cookies, or state
-      const authToken = getAuthToken();  // Replace this with the actual method you're using to retrieve the auth token
-  
       // Make a POST request to the backend API
-      const response = await fetch('http://localhost:3000/api/gal/saveChannelMessages', {
-        method: 'POST',  // POST method for sending data to the server
+      const response = await fetch('/gal/channel/sendMsg', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,  // Send the auth token in the Authorization header
+          'Authorization': `Bearer ${token}`, // Send the auth token in the Authorization header
         },
-        body,  // Send the message data as the request body
+        body: JSON.stringify({ message: newMessage, channelName: channelName }),
       });
   
-      // Check if the request was successful
+      // Check if the response was successful
       if (!response.ok) {
-        throw new Error('Failed to save message');
+        // Try to read the error response and log it
+        const errorData = await response.json();
+        console.error('Error from server:', errorData.msg || 'Failed to save message');
+        throw new Error(errorData.msg || 'Failed to save message');
       }
   
       // Parse the response data
       const data = await response.json();
       console.log('Message saved:', data);
   
-      // Handle the success case (for example, update your UI or state)
-      return data;
+      // Handle success (e.g., update UI, state, etc.)
+      return data; // You might want to return the message data here for further use
   
     } catch (error) {
       console.error('Error saving message:', error.message);
+      // Optionally return or display an error message
+      return { error: error.message }; // You can return an error object or perform other UI updates
     }
   };
 
@@ -247,7 +254,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
             </div>
   
             {/* Display Messages */}
-            <MessageList messages={channelMessages} />
+            <ChannelMessageList messages={channelMessages} />
           </div>
   
           {/* Input Section */}
@@ -266,7 +273,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   
             {/* Input Box and Send Button */}
             <Col id="chat-input" className="">
-              <form onSubmit={handleSubmitMessages}>
+              <form onSubmit={handleSubmitChannelMessages}>
                 <div className="d-flex gap-2">
                   <input
                     type="text"
