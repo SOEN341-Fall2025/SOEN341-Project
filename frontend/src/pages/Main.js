@@ -80,8 +80,6 @@ function Main({ userData, galleries}) {
       UpdateStyle('--color-accent', newUserVar.clrAccent);
       UpdateStyle('--color-bar', newUserVar.clrNavbar);
       UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
-      //console.log(newUserVar.clrNavbarGradient);
-      
     }
   
       setStyles();
