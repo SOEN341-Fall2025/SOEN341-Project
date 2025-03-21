@@ -88,23 +88,23 @@ function Main({ userData, galleries}) {
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
    function handleClick(key) { setShowState(key); }
-  const handleChannels = (newGalleryName, newChannelName, newIcon) => {
-    setUserChannels([...userChannels, { galleryName: newGalleryName, channelName: newChannelName, icon: newIcon }]);
-  };
-
-  const handleSubmitChannel = (event) => {
-    event.preventDefault();
-    handleChannels(newGalleryName, newChannelName, '');
-  }
-
+  
+  
   const handleGalleries = (newname, newicon) => {
-    setUserGalleries([...userGalleries, { GalleryName: newname, icon: newicon }]);
-    createGallery(newname);
+    setUserGalleries(Object.values([...userGalleries, { GalleryName: newname, icon: newicon }]));
+    console.log(userGalleries)
   };
   
   const handleSubmitGallery = (event) => {
-    event.preventDefault();  // Prevents page reload on submit
-    handleGalleries(newName, '');  // Pass the new name and any other parameters
+    event.preventDefault();
+    //console.log("submission gallery");
+    if (!newName.trim()) {
+      alert("Gallery name cannot be empty!");
+      return;
+    }
+    createGallery(newName); //calls function to create gallery in the database
+    handleGalleries(newName, '');  // Proceed with gallery creation
+    handleClose();  //Close the modal *after* form is submitted.
   };
 
   const handleUsers = (newUserName) => {
@@ -143,9 +143,9 @@ function Main({ userData, galleries}) {
       let words = name.split(' ');
       let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
       return (
-        <span style={{ width: '50%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <span style={{ width: '50%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
           <Image src='bublii_bubble.png' id="avatar" style={{ height: '100%', width: '100%' }} />
-          <h1 className="carousel-caption" style={{ position: 'absolute', color: 'black' }}>&nbsp;{initials}</h1>
+          <h1 className="" style={{ position: 'absolute', color: 'black', margins: '0', width: '100%', textAlign: 'center', fontSize: '5vw' }}>{initials}</h1>
         </span>
       );
     } else {
@@ -161,8 +161,12 @@ function Main({ userData, galleries}) {
     try {      
         const token = localStorage.getItem('auth-token');        
         
-        const channelsResponse = await fetch(`/api/gallery/getChannels?galleryName=${encodeURIComponent(name)}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+        // Fetch gallery channels
+        const channelsResponse = await fetch(`/api/gal/getChannels?galleryName=${encodeURIComponent(name)}`, {
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
         });
 
         if (!channelsResponse.ok) {
@@ -295,49 +299,8 @@ function Main({ userData, galleries}) {
         )}
       </span>
     )
-  };
-
-  const ModalAddChannel = () => {
-    return(
-        <Modal.Body> 
-            <h5 className="text-center">Create a Channel</h5>
-            <form onSubmit={handleSubmitChannel}>
-              <Col>
-                <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-channel' value={newChannelName}
-                  onChange={(e) => setNewChannelName(e.target.value)}
-                  placeholder='Name of your new Channel' /></Row>
-                <Row><input type='submit' value="Submit" /></Row>
-              </Col>
-            </form>
-        </Modal.Body>
-    );
-  };
-
-  const ModalAddUser = () => {
-    return(
-        <Modal.Body> 
-            <h5 className="text-center">Add a User</h5>
-            <form onSubmit={handleSubmitUser}>
-            <Col>
-                <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-user' value={newUserName}
-                onChange={(e) => setNewUserName(e.target.value)}
-                placeholder='Name of your new User' /></Row>
-                <Row><input type='submit' value="Submit" /></Row>
-            </Col>
-            </form>
-        </Modal.Body>
-    );
-  };
-
-  const userProfile = {
-    // GET items from database
-    username: "@John",
-    displayname: "Johnny Sanders",
-    profilepic: "bublii_bubble.png",
-  };
-
+  };  
+  
   // SHARED ELEMENT LIST
   const contextValue = {
     ProfilePic: ProfilePic,
@@ -531,8 +494,8 @@ function Main({ userData, galleries}) {
             }}>
             <Col id="sidebar-list">
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
-                <Nav.Link eventKey="page-dm" onClick={fetchDmUsers}><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
-                <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
+                <Nav.Link eventKey="page-dm"><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
+                <Nav.Link className="separator" disabled></Nav.Link>
                 <GalleryList />
                 <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
                 <Nav.Link onClick={() => handleClick('status-modal')} className="mt-auto user-status"><span className="channel-icon"><CircleUser /></span> Me</Nav.Link>
@@ -548,10 +511,10 @@ function Main({ userData, galleries}) {
                         <Row id="sidebar-dm-options">
                         <Col>Private</Col>
                         </Row>
-                        <Nav.Link className="separator" disabled><hr /><hr /></Nav.Link>
-                        <UserList/>
-                        <Nav.Link onClick={() => handleClick('addUser-modal')} className="add-user"><span className="channel-icon"><Plus /></span> Add a User</Nav.Link>
-
+                        <div className="separator" disabled></div>
+                        <Nav.Link><icons.User /> John Doe</Nav.Link>
+                        <Nav.Link><icons.User /> Jane Doe</Nav.Link>
+                        <Nav.Link><icons.User /> Julie Doe</Nav.Link>
                     </Nav>                      
                     </Col>
                     <UserChatList usernames={userNames}/>
@@ -562,11 +525,8 @@ function Main({ userData, galleries}) {
         </Row >
       </Tab.Container>
       <Modal show={showState === 'addGallery-modal'} onHide={handleClose} id="addGallery-modal" className="modal-dialog-centered">
-        <Modal.Dialog >
-          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-          <ModalAddGallery />
-        </Modal.Dialog>
-      </Modal>
+        <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header> <ModalAddGallery /> </Modal.Dialog>
+       </Modal>
 
       <Modal show={showState === 'addUser-modal'} onHide={handleClose} id="addUser-modal" className="modal-dialog-centered">
         <Modal.Dialog >

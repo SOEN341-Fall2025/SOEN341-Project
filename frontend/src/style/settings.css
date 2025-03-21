@@ -20,9 +20,9 @@ img.form-control{
     font-variant-caps: all-petite-caps;
     font-weight: bold;    
 }
-label.labelnav{    
-    /*color: black;*/
-}
+/*label.labelnav{    
+    color: black;
+}*/
 label.form-control-color{
     width: fit-content !important;
     background-color: transparent;
@@ -88,9 +88,9 @@ input.form-control-color{
     display: flex !important;
     justify-content: space-between !important;
 }
-.justify-between *{
+/*.justify-between *{
     max-width: 30% !important;
-}
+}*/
 .justify-end, .justify-end *{
     display: flex !important;
     justify-content: end !important;

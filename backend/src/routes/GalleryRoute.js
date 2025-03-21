@@ -3,7 +3,7 @@ const router = express.Router();
 import { supabase } from "../server.js";
 
 //Deletion of a gallery
-router.delete("/api/gal/delete", async (req, res) => {
+router.delete("/gal/delete", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
@@ -61,22 +61,65 @@ router.post("/gal/create", async (req, res) => {
         return res.status(401).json(error);
     }
     
-    const { galleryName } = req.body;
-
-    const { data, error: databaseError } = await supabase
-        .from('Galleries')
-        .insert([
-            {
-                GalleryName: galleryName,
-                Created_at: new Date().toISOString(),
-                Creator_id: user.id
-            }
-            ])
-        .select("GalleryID")
-        .single();
-
-    if (databaseError) {
-        return res.status(500).json({msg:"Gallery could not be created.", databaseError});
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token provided" });
+    }
+    try{
+        // Get the user based on the token
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        
+        if (authError || !user) {
+            console.error('Authentication Error:', authError); // Log error for debugging
+            return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+        }  
+        
+        console.error('user ', user.id); // Log error for debugging
+          
+        const { galleryName } = req.body;    
+        const userID = "" + user.id;    
+        console.log('User role:', user.role);
+        const { data, error: databaseError } = await supabase
+            .from("Galleries")
+            .insert(
+                {
+                    GalleryName: galleryName,
+                    Created_at: new Date().toISOString(),
+                    Creator_id: userID
+                }
+            )
+            .select('GalleryID')
+            .single();
+        
+        if (databaseError) {
+            return res.status(500).json({msg:"Gallery could not be created.", databaseError});
+        }
+        
+        const gallId = data.GalleryID;    
+        const body = JSON.stringify({
+            UserID: userID,
+            GalleryID: gallId,
+        });
+        console.log("body ", body);
+        //Helper call
+        const addUser = await fetch('http://localhost:4000/gal/addCreator', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                UserID: userID,
+                GalleryID: gallId,
+            }),
+        });
+        
+        await addUser.json();
+        
+        res.status(200).json({msg:"Gallery was successfully created.", data});
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 
     const gallId = data.GalleryID;
@@ -151,10 +194,10 @@ router.get("/gal/retrieve", async (req, res) => {
 
 
 //Helper call to add the creator of the gallery inside the GalleryMembers table
-router.post("/api/gal/addCreator", async (req, res) => {
-
+router.post("/gal/addCreator", async (req, res) => {
+    
+    console.log("body ", req.body);
     const { UserID, GalleryID } = req.body;
-
     const { data, error: databaseError } = await supabase
         .from('GalleryMembers')
         .insert([
@@ -163,7 +206,7 @@ router.post("/api/gal/addCreator", async (req, res) => {
                 UserID: UserID,
                 GalleryRole: true
             }
-            ]);
+        ]);
 
     if (databaseError) {
         return res.status(500).json({msg:"Gallery member could not be recorded.", databaseError});
@@ -175,7 +218,7 @@ router.post("/api/gal/addCreator", async (req, res) => {
 
 
 //Helper method to verify is user can delete gallery
-router.post("/api/gal/verifyCreator", async (req, res) => {
+router.post("/gal/verifyCreator", async (req, res) => {
 
     const { UserID, GalleryID } = req.body;
 
@@ -198,7 +241,7 @@ router.post("/api/gal/verifyCreator", async (req, res) => {
 });
 
 //Helper method to get gallery ID from gallery name
-router.get("/api/gal/getID/:galleryName", async (req, res) => {
+router.get("/gal/getID/:galleryName", async (req, res) => {
     
     const { galleryName } = req.params;
     
@@ -374,10 +417,22 @@ router.get("/api/gallery/all", async (req, res) => {
       return res.status(401).json({ error: "Unauthorized: No token provided" });
     }
     try {
+        
+        // Get the user based on the token
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+        
+        if (authError || !user) {
+            console.error('Authentication Error:', authError); // Log error for debugging
+            return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+        }
+      
       // Step 1: Get all gallery IDs from GalleryMembers for this user
       const { data: memberships, error: membershipError } = await supabase
-      .from('GalleryMembers')
-      .select('*');
+      .from("GalleryMembers")
+      .select('*')
+      .eq("UserID", user.id);
+      
+      //console.log("user id ", user);
       //console.log(memberships);
       if (membershipError) throw membershipError;
       // Extract gallery IDs into an array
@@ -398,6 +453,7 @@ router.get("/api/gallery/all", async (req, res) => {
       
       res.status(200).json(galleries);
     } catch (err) {
+        console.log(err);
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
@@ -474,6 +530,7 @@ router.get("/api/gallery/getChannels", async (req, res) => {
         }
         
         if (!data) {
+            console.log("DEBUG: " + data);
             return res.status(404).json({ msg: "Gallery not found", data: {"GalleryID": null} });
         }
         

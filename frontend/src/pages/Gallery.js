@@ -17,7 +17,6 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
     function handleClick(key) { setShowState(key); }
 
 
-
     const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
     const [dmNavWidth, setDmNavWidth] = useState(17);
     const [channelMessages, setChannelMessage] = useState([]);
@@ -74,7 +73,6 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
           </Modal.Body>
         );
     };
-
     const GalleryChannelList = ({ channels }) => {
       if(channels.length > 0){
         return (
