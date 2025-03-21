@@ -191,21 +191,6 @@ function Main({ userData, galleries}) {
     console.log("Channels have been updated:", galleryChannels);
   }, [galleryChannels]);
 
-  const getGalleryID = async (galleryName) => {
-    try {
-      const response = await fetch(`/api/gal/getID/${galleryName}`);
-      const data = await response.json();
-      if (response.ok) {
-        console.log("GalleryID for", galleryName, "is:", data.galleryID);
-        return data.galleryID;
-      } else {
-        throw new Error("GalleryID not found.");
-      }
-    } catch (error) {
-      console.error("Error fetching GalleryID:", error);
-      return null;  // Return null if error occurs
-    }};
-
   const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
     const handleGalleryClick = useCallback((galleryName) => {

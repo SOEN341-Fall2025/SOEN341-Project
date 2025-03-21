@@ -118,26 +118,27 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
         );
       };
 
-    const getGalleryID = async (galleryName) => {
-        try {
-          const response = await fetch(`/api/gal/getID/${galleryName}`);
-          const data = await response.json();
-          if (response.ok) {
-            console.log("GalleryID for", galleryName, "is:", data.data.GalleryID);
-            return data.galleryID;
-          } else {
-            throw new Error("GalleryID not found.");
-          }
-        } catch (error) {
-          console.error("Error fetching GalleryID:", error);
-          return null;  // Return null if error occurs
-        }};
+  const getGalleryID = async (galleryName) => {
+      try {
+        const response = await fetch(`/api/gal/getID/${galleryName}`);
+        const data = await response.json();
+        if (response.ok) {
+          console.log("GalleryID for", galleryName, "is:", data.data.GalleryID);
+          return data.data.GalleryID;
+        } else {
+          throw new Error("GalleryID not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching GalleryID:", error);
+        return null;  // Return null if error occurs
+      }};
 
   const createChannel = async (channelName, galleryName) => {
     // Get the auth token, for example from localStorage or a cookie
     const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
 
-    getGalleryID(galleryName);
+    const galleryId = await getGalleryID(galleryName);
+    console.log("GalleryId ", galleryId);
 
     try {
       const response = await fetch('/gal/createChannel', {
@@ -146,7 +147,7 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` // Pass token as Bearer in the Authorization header
         },
-        body: JSON.stringify({ channelName, galleryName }), 
+        body: JSON.stringify({ channelName, galleryId }), 
       });
 
       const result = await response.json();

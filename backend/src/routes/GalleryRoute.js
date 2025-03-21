@@ -237,7 +237,7 @@ router.post("/gal/createChannel", async (req, res) => {
       }  
 
       console.log("body ", req.body);  // Log error for debugging
-      const { channelName, galleryID } = req.body;    
+      const { channelName, galleryId } = req.body;    
       console.log('User role:', user.role);
       const { data, error: databaseError } = await supabase
           .from("Channels")
@@ -245,7 +245,7 @@ router.post("/gal/createChannel", async (req, res) => {
               {
                   ChannelName: channelName,
                   Created_at: new Date().toISOString(),
-                  GalleryID: galleryID
+                  GalleryID: galleryId
               }
           );
 
