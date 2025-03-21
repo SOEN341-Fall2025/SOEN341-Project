@@ -332,6 +332,41 @@ router.get("/api/get/galleryID-channelName/:channelName", async (req, res) => {
 
 });
 
+//Send a message in a channel
+router.post("/gal/channel/sendMsg", async(req, res) => {
+
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+  if (!user) {
+    return res.status(401).json({ error: "Authenticated user was not provided." });
+  }
+
+  const { message, channelName } = req.body;
+
+  const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
+  const galleryIDdata = await galIDresponse.json();
+  const galleryID = galleryIDdata.data.GalleryID;
+
+    const { data, error: databaseError } = await supabase
+        .from('ChannelMessages')
+        .insert([
+            {
+                User_id: user.id,
+                Msg: message,
+                Gallery_id: galleryID,
+                Channel_name: channelName
+            }
+            ]);
+
+    if (databaseError) {
+        return res.status(500).json({msg:"Message could not be saved.", databaseError});
+    }
+
+    res.status(200).json({msg:"Message was saved successfully", data});
+
+});
+
+
 //Retrieve all possible galleries
 router.get("/api/gallery/all", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
