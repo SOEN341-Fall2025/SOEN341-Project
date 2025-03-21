@@ -60,7 +60,7 @@ function Main({ userData, galleries}) {
     userID: userData.user_id,
     settings: userData.settings
   });
-  
+
   useEffect(() => {
     console.log(JSON.stringify(userData.settings));
     function setStyles() {
@@ -77,12 +77,12 @@ function Main({ userData, galleries}) {
   
       setUserVar(newUserVar);
   
-      UpdateStyle("--color-accent", newUserVar.clrAccent);
-      UpdateStyle("--color-bar", newUserVar.clrNavbar);
-      UpdateStyle("--color-bar-gradient", newUserVar.clrNavbarGradient);
+      UpdateStyle('--color-accent', newUserVar.clrAccent);
+      UpdateStyle('--color-bar', newUserVar.clrNavbar);
+      UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
     }
   
-    setStyles();
+      setStyles();
   }, [userVar.settings]);
     
   /*SECTION - FUNCTIONS */
@@ -213,19 +213,6 @@ function Main({ userData, galleries}) {
     );
   });
 
-  // const GalleryChannelList = ({ g }) => {
-  //   return (
-  //       g.map((item, index) => (
-  //         <Nav.Link eventKey={item.name} onClick={() => setNewGalleryName(item.name)}>
-  //           <span className="channel-icon">
-  //             <Icon name={item.icon || FindClosestIcon(item.name)} size={24} />
-  //           </span>
-  //           {item.name}
-  //         </Nav.Link>
-  //       ))
-  //   );
-  // };
-  
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
