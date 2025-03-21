@@ -2,7 +2,7 @@
 import '../style/app.css';
 import '../style/settings.css';
 import '../style/style.css';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef} from 'react';
 import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToPX } from '../AppContext.js';
 import Settings from './Settings.js';
 import Gallery from './Gallery.js';
@@ -14,12 +14,11 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 
+
 function Main({ userData, galleries}) {    
       
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
-  const [newName, setNewName] = useState("");
-
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const [newUserName, setNewUserName] = useState("");
@@ -29,6 +28,7 @@ function Main({ userData, galleries}) {
   const [dmNavWidth, setDmNavWidth] = useState(17);  
   const [userGalleries, setUserGalleries] = useState(galleries); 
   const [error, setError] = useState(false);
+  
 
   const[userNames, setUserNames] = useState([]);
   
@@ -104,7 +104,7 @@ function Main({ userData, galleries}) {
   
   const handleSubmitGallery = (event) => {
     event.preventDefault();  // Prevents page reload on submit
-    handleGalleries(newName, '');  // Pass the new name and any other parameters
+    handleGalleries(newGalleryName, '');  // Pass the new name and any other parameters
   };
 
   const handleUsers = (newUserName) => {
@@ -133,6 +133,16 @@ function Main({ userData, galleries}) {
     handleMessages(newMessage);
     setNewMessage("");
   };
+
+
+
+  const handleInputChange = (e) => {
+    setNewGalleryName(e.target.value);
+  };
+  
+
+  
+
   
   /*SECTION - ELEMENTS */
 
@@ -265,20 +275,23 @@ function Main({ userData, galleries}) {
       </>
     );
   };
-  
+ 
   const ModalAddGallery = () => {
+    const [newGalleryName, setNewGalleryName] = useState("");
+    const galleryInputRef = useRef(null);
     return(
         <Modal.Body> 
             <h5 className="text-center">Create a Gallery</h5>
             <form onSubmit={handleSubmitGallery}>
             <Col>
                 <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-gallery' value={newName}
-                onChange={(e) => setNewName(e.target.value)}
+                <Row><input ref={galleryInputRef} type='text' id='newName-gallery' value={newGalleryName}
+
+                onChange={(e) => setNewGalleryName(e.target.value)}
                 placeholder='Name of your new Gallery' /></Row>
                 <Row><input type='submit' value="Submit" /></Row>
             </Col>
-            </form>
+          </form>
         </Modal.Body>
     );
   };
