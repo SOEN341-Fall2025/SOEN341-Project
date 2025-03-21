@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToVW, ToPX } from '../AppContext';
 import { Resizable } from 're-resizable';
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
@@ -13,7 +13,14 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
     const [newTitle, setNewTitle] = useState("");
     const handleClose = () => setShowState(false);
     function handleClick(key) { setShowState(key); }
-    const GalleryChannelsList = () => {
+
+
+
+    const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
+    const [dmNavWidth, setDmNavWidth] = useState(17);
+    const [channelMessages, setChannelMessage] = useState([]);
+
+    const ChannelsList = () => {
       thisChannels.map((item, index) => {
           return (
               <Nav.Link key={index} eventKey={item.ChannelName}>
@@ -38,7 +45,8 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
         return;
       }
       handleChannels(newTitle, ''); 
-      createChannel(newTitle, item.GalleryID); 
+      console.log(thisChannels[0].galleryID);
+      createChannel(newTitle, thisChannels[0].galleryID); 
       handleClose();  //Close the modal *after* form is submitted.
     };
     const ModalAddChannel = () => {
@@ -61,6 +69,7 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
           </Modal.Body>
         );
     };
+
     const GalleryChannelList = ({ channels }) => {
       if(channels.length > 0){
         return (
@@ -75,6 +84,34 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
         );
       }
     };
+
+
+
+
+    const ChannelPagesList = ({ channels, channelName }) => {
+        return (
+          <>
+            {channels.map((item, index) => {
+              // Check if the channel name matches the item’s ChannelName
+              if (channelName === item.ChannelName) {
+                return (
+                  <ChatContainer
+                    key={index} // Add a key to help React identify each item in the list
+                    eventKey={item.ChannelName}
+                    barSizes={galleryNavWidth + dmNavWidth}
+                    user={user}
+                    header={item.ChannelName}
+                    messages={channelMessages}
+                    type={"Channel"}
+                  />
+                );
+              }
+              return null; // If the condition is not met, return null to render nothing
+            })}
+          </>
+        );
+      };
+
   const createChannel = async (channelName, galleryID) => {
     // Get the auth token, for example from localStorage or a cookie
     const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
@@ -106,6 +143,32 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
       alert('An error occurred while creating the gallery.');
     }
   };
+
+  const retrieveChannelMessages = async (channelName) => {
+
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+  
+    try {
+      // Send POST request to backend to create gallery
+      const response = await fetch('/gal/msgChannel', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ channelName })
+      });
+
+      const result = await response.json();
+      console.log(result);
+
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while fetching channel messages.');
+    }
+
+  };
+
   return (
     <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
           <Tab.Container id="">
@@ -135,7 +198,7 @@ function Gallery({ item, index, galleryChannels, gallerySize, user }) {
               </Nav>
             </Col>
           </Tab.Container>
-        <ChatContainer barSizes={(Number(gallerySize) + Number(channelNavWidth))} header={item.channelName} user={user}/>
+        <ChannelPagesList channels={thisChannels} channelName={newChannelName}/>
         <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
           <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalAddChannel /></Modal.Dialog>
         </Modal>

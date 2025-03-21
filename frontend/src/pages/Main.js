@@ -257,6 +257,7 @@ function Main({ userData, galleries}) {
                 user={userVar}
                 header={item.username}
                 messages={directMessages}
+                type={"Channel"}
               />
             );
           }
@@ -477,6 +478,42 @@ function Main({ userData, galleries}) {
       console.error('An error occurred:', error);
       alert('An error occurred while creating the gallery.');
     }
+  };
+
+  const saveChannels = async(channelName, galleryID) =>{
+
+    // Get the auth token, for example from localStorage or a cookie
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+
+    try {
+      // Send POST request to backend to create gallery
+      const response = await fetch('/gal/createChannel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ channelName,galleryID }), // Pass the gallery name in the body
+      });
+
+      const result = await response.json();
+  
+      if (!response.ok) {
+        // Handle server error
+        console.error('Error:', result);
+        alert('Failed to save channel: ' + result.msg || 'Unknown error');
+        return;
+      }
+  
+      // Successfully created the gallery
+      console.log('Channel saved:', result);
+      alert('Channel successfully!');
+
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while saving the channel.');
+    }
+
   };
   
   return(
