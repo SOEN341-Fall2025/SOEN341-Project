@@ -4,7 +4,7 @@ import { User, ArrowLeft, Camera, Mic, Plus } from 'lucide-react';  // Assuming 
 import { Row, Col, Nav } from 'react-bootstrap';
 import { HexToRGBA } from '../AppContext';
 
-function ChatContainer({ barSizes, user, header, messages= [], type }) {
+function ChatContainer({ barSizes, user, header, messages= [], type, galleryName, channelName }) {
   const [popperUser, setPopperUser] = useState("");  // For storing the other user's name
   const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
   const [newMessage, setNewMessage] = useState(""); // Input for new messages
@@ -101,6 +101,74 @@ function ChatContainer({ barSizes, user, header, messages= [], type }) {
   //Channel Messaging
 
   const [channelMessages, setChannelMessages] = useState(messages);
+  const [currentUsername, setCurrentUsername] = useState(user.username);
+
+  const handleChannelMessages = (newMessage) => {
+    setDirectMessages([
+      ...channelMessages,
+      { Username: currentUsername, Message: newMessage }
+    ]);
+
+    //saveMessage(bubblerUser,newMessage);
+  };
+
+  const handleSubmitChannelMessages = (event) => {
+    event.preventDefault();  // Prevent page reload on submit
+    handleMessages(newMessage);  // Add the new message
+    setNewMessage("");  // Clear input field
+  };
+
+  // Message List Component
+  const ChannelMessageList = ({ messages }) => {
+    return (
+      <span>
+        {messages.map((item, index) => (
+          <div key={index} className={`message ${item.Username === user.username ? "user" : "recipient"} flex items-center my-2`}>
+            <div className={`text ${item.Username === user.username ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.PopperUsername === popperUser ? "ml-2" : "mr-2"} max-w-[60%]`}>
+              {item.Message}
+            </div>
+            <User className="icon" />
+          </div>
+        ))}
+      </span>
+    );
+  };
+
+
+  const saveChannelMessage = async (channelName, galleryName, message) => {
+    try {
+      // Prepare the request body
+      const body = JSON.stringify({ channelName, galleryName, message });
+  
+      // Assuming you have a function to get the auth token from local storage, cookies, or state
+      const authToken = getAuthToken();  // Replace this with the actual method you're using to retrieve the auth token
+  
+      // Make a POST request to the backend API
+      const response = await fetch('http://localhost:3000/api/gal/saveChannelMessages', {
+        method: 'POST',  // POST method for sending data to the server
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,  // Send the auth token in the Authorization header
+        },
+        body,  // Send the message data as the request body
+      });
+  
+      // Check if the request was successful
+      if (!response.ok) {
+        throw new Error('Failed to save message');
+      }
+  
+      // Parse the response data
+      const data = await response.json();
+      console.log('Message saved:', data);
+  
+      // Handle the success case (for example, update your UI or state)
+      return data;
+  
+    } catch (error) {
+      console.error('Error saving message:', error.message);
+    }
+  };
 
 
 

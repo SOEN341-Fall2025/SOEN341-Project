@@ -79,7 +79,9 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
       if(channels.length > 0){
         return (
           channels.map((item, index) => (
-              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => setNewChannelName(item.ChannelName)}>
+              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
+                fetchChannelMessages(item.ChannelName);
+              }}>
                 <span className="channel-icon">
                   <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
                 </span>
@@ -105,6 +107,8 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
                     header={item.ChannelName}
                     messages={channelMessages}
                     type={"Channel"}
+                    galleryName={name}
+                    channelName={item.ChannelName}
                   />
                 );
               }
@@ -161,6 +165,43 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
       console.error('An error occurred:', error);
       alert('An error occurred while creating the gallery.');
     }
+  };
+
+  const fetchChannelMessages = async (channelName) =>{
+
+    const token = localStorage.getItem('authToken');
+
+    try {
+    
+        // Fetch the messages for the channel
+        const response = await fetch(`/gal/msgChannel/${channelName}`, {
+          method: 'GET',  // Use GET if you're not sending a body in the request. Otherwise, use POST.
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,  // Assuming authToken is the user's JWT token
+          }
+        });
+    
+        if (!response.ok) {
+          throw new Error('Failed to fetch messages');
+        }
+    
+        // Parse the response JSON
+        const data = await response.json();
+        console.log(data);
+    
+        // Handle the updated data (i.e., render the messages)
+        if (data.updatedData) {
+          // Do something with the updatedData, e.g., set state in React
+          console.log(data.updatedData);
+        }
+
+        setChannelMessage(data.updatedData);
+    
+      } catch (error) {
+        console.error('Error fetching channel messages:', error.message);
+      }
+    
   };
   return (
     <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
