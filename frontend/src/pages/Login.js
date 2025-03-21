@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import '../style/style.css'
 
 function Login({onLogin}){
-// Login state
+    // Login state
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     //Registration state
-      const [registerUsername, setRegisterUsername] = useState('');
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
-  
-  const [showLogin, setLogin] = useState(true);
+    const [registerUsername, setRegisterUsername] = useState('');
+    const [registerEmail, setRegisterEmail] = useState('');
+    const [registerPassword, setRegisterPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+    const [showLogin, setLogin] = useState(true);
 
     // Handle form submission
     const handleLoginSubmit = (e) => {
@@ -23,7 +23,7 @@ function Login({onLogin}){
 
     
       // Handle registration form submission
-  const handleRegisterSubmit = async (e) => {
+    const handleRegisterSubmit = async (e) => {
     console.log("DEBUG: handleRegisterSubmit has been called.");
     e.preventDefault();
     
