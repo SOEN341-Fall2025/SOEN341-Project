@@ -89,7 +89,47 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
         );
       }
     };
-  const createChannel = async (channelName, galleryID) => {
+
+    const ChannelPagesList = ({ channels, channelName }) => {
+        return (
+          <>
+            {channels.map((item, index) => {
+              // Check if the channel name matches the item’s ChannelName
+              if (channelName === item.ChannelName) {
+                return (
+                  <ChatContainer
+                    key={index} // Add a key to help React identify each item in the list
+                    eventKey={item.ChannelName}
+                    barSizes={galleryNavWidth + dmNavWidth}
+                    user={user}
+                    header={item.ChannelName}
+                    messages={channelMessages}
+                    type={"Channel"}
+                  />
+                );
+              }
+              return null; // If the condition is not met, return null to render nothing
+            })}
+          </>
+        );
+      };
+
+    const getGalleryID = async (galleryName) => {
+        try {
+          const response = await fetch(`/api/gal/getID/${galleryName}`);
+          const data = await response.json();
+          if (response.ok) {
+            console.log("GalleryID for", galleryName, "is:", data.data.GalleryID);
+            return data.galleryID;
+          } else {
+            throw new Error("GalleryID not found.");
+          }
+        } catch (error) {
+          console.error("Error fetching GalleryID:", error);
+          return null;  // Return null if error occurs
+        }};
+
+  const createChannel = async (channelName, galleryName) => {
     // Get the auth token, for example from localStorage or a cookie
     const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
 
