@@ -533,7 +533,9 @@ function Main({ userData, galleries}) {
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
                 <Nav.Link eventKey="page-dm" onClick={fetchDmUsers}><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
                 <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
-                <GalleryList />
+                <span id="galleries-scroll">
+                  <GalleryList />
+                </span>
                 <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
                 <Nav.Link onClick={() => handleClick('status-modal')} className="mt-auto user-status"><span className="channel-icon"><CircleUser /></span> Me</Nav.Link>
                 <Nav.Link onClick={() => handleClick('settings-modal')} className=""><span className="channel-icon"><LoaderPinwheel /></span> Settings</Nav.Link>
