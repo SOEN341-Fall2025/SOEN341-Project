@@ -83,19 +83,19 @@ function Login({ onLogin }) {
                     <form>
                     <h1>Sign Up</h1>
                         <div className="input-box">
-                            <input type="text" placeholder="Username" required />
+                            <input type="text" placeholder="Username" value={registerUsername} onChange={(e) => setRegisterUsername(e.target.value)} required />
                             <i className='bx bxs-user'></i>
                     </div>
                         <div className="input-box">
-                            <input type="email" placeholder="Email" required />
+                            <input type="email" placeholder="Email" value={registerEmail} onChange={(e) => setRegisterEmail(e.target.value)} required />
                             <i className='bx bxs-envelope'></i>
                     </div>
                         <div className="input-box">
-                            <input type={showPassword ? "text" : "password"} placeholder="Create password" value={registerPassword} onChange={handlePasswordChange} required />
+                            <input type={showPassword ? "text" : "password"} placeholder="Create password" value={registerPassword} onChange={(e) => setRegisterPassword(e.target.value)} required />
                             <i className={`bx ${showPassword ? 'bx bxs-lock-open-alt' : 'bx bxs-lock-alt'}`} onClick={togglePasswordVisibility}></i>
                     </div>
                         <div className="input-box">
-                            <input type={showPassword ? "text" : "password"} placeholder="Confirm password" value={confirmPassword} onChange={handleConfirmPassword} required />
+                            <input type={showPassword ? "text" : "password"} placeholder="Confirm password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                             <i className={`bx ${showPassword ? 'bx bxs-lock-open-alt' : 'bx bxs-lock-alt'}`} onClick={togglePasswordVisibility}></i>
               </div>
                         {!passwordMatch && <p style={{ color: '#0052A5' }}> Passwords do not match</p>}
