@@ -219,6 +219,120 @@ router.get("/api/gal/getID/:galleryName", async (req, res) => {
 
 });
 
+// Channel API calls ==================================================================================================
+
+//Creation of a channel in a gallery
+router.post("/gal/createChannel", async (req, res) => {    
+
+  const token = req.header("Authorization")?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+  try{
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (authError || !user) {
+          console.error('Authentication Error:', authError); // Log error for debugging
+          return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+      }  
+
+      console.log("body ", req.body);  // Log error for debugging
+      const { channelName, galleryID } = req.body;    
+      console.log('User role:', user.role);
+      const { data, error: databaseError } = await supabase
+          .from("Channels")
+          .insert(
+              {
+                  ChannelName: channelName,
+                  Created_at: new Date().toISOString(),
+                  GalleryID: galleryID
+              }
+          );
+
+      if (databaseError) {
+          return res.status(500).json({msg:"Channel could not be created.", databaseError, data});
+      }              
+      res.status(200).json({msg:"Channel was successfully created.", data});
+  }
+  catch (err) {
+      console.log(err);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+
+});
+
+//Retrieving channel messages
+router.get("/gal/msgChannel", async (req, res) => {
+
+    const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+    if (error || !user) {
+        return res.status(401).json(error);
+    }
+
+    const { channelName } = req.body;
+
+    const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
+    const galleryIDdata = await galIDresponse.json();
+    const galleryID = galleryIDdata.data.GalleryID;
+
+    const { data, error: databaseError } = await supabase
+        .from('ChannelMessages')
+        .select('*')
+        .eq("Gallery_id", galleryID)
+        .eq("Channel_name", channelName);
+
+    if (databaseError) {
+        return res.status(500).json({msg:"Messages could not be fetched.", databaseError});
+    }
+
+    const updatedData = [];
+
+    for (let values of data) {
+        // Fetch the sender's username
+        const usernameResponse = await fetch(`http://localhost:4000/api/get/username-id/${values.User_id}`);
+        const usernameData = await usernameResponse.json();
+        const username = usernameData.data.username;
+
+        // Fetch the Bubbler's username
+        const msg = values.msg;
+
+        // Add the converted usernames to the DM object
+        updatedData.push({
+            ...values,
+            Username: username,
+            Message: msg
+        });
+    }
+
+    res.json({ msg: "Channel messages were fetched.", updatedData });
+
+});
+
+//Helper call: Retrieve gallery ID using channel's name
+router.get("/api/get/galleryID-channelName/:channelName", async (req, res) => {
+
+    const { channelName } = req.params;
+
+    if (!channelName) {
+        return res.status(400).json({ error: "Channel name was not received." });
+    }
+    
+    const { data, error } = await supabase
+    .from('Channels')
+    .select('GalleryID') 
+    .eq('ChannelName', channelName)
+    .single();
+
+    if (error) {
+        return res.status(400).json({ msg: error.message });
+    }
+
+    res.status(200).json({ msg: "Gallery ID was retrieved.", data });
+
+});
+
+//Retrieve all possible galleries
 router.get("/api/gallery/all", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -252,7 +366,8 @@ router.get("/api/gallery/all", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
-  
+
+//Retrieve all channels from every galleries
 router.get("/api/gallery/channels", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -299,7 +414,8 @@ router.get("/api/gallery/channels", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
+ 
+//Get channels from a specific gallery using its name
 router.get("/api/gallery/getChannels", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -362,4 +478,5 @@ router.get("/api/gallery/getChannels", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 export default router;
