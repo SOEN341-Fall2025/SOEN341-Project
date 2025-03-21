@@ -201,6 +201,21 @@ function Main({ userData, galleries}) {
     console.log("Channels have been updated:", galleryChannels);
   }, [galleryChannels]);
 
+  const getGalleryID = async (galleryName) => {
+    try {
+      const response = await fetch(`/api/gal/getID/${galleryName}`);
+      const data = await response.json();
+      if (response.ok) {
+        console.log("GalleryID for", galleryName, "is:", data.galleryID);
+        return data.galleryID;
+      } else {
+        throw new Error("GalleryID not found.");
+      }
+    } catch (error) {
+      console.error("Error fetching GalleryID:", error);
+      return null;  // Return null if error occurs
+    }};
+
   const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
     const handleGalleryClick = useCallback((galleryName) => {
@@ -212,7 +227,7 @@ function Main({ userData, galleries}) {
         <Nav.Link 
           eventKey={item.GalleryName} 
           key={index} 
-          onClick={() => handleGalleryClick(item.GalleryName)}
+          onClick={() => {handleGalleryClick(item.GalleryName)}}
         >
           <span className="channel-icon">
             <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
@@ -226,7 +241,7 @@ function Main({ userData, galleries}) {
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar}/>
+        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar} name={item.GalleryName}/>
       ))
     
     );
@@ -267,6 +282,7 @@ function Main({ userData, galleries}) {
                 user={userVar}
                 header={item.username}
                 messages={directMessages}
+                type={"Channel"}
               />
             );
           }
@@ -491,6 +507,42 @@ function Main({ userData, galleries}) {
       alert('An error occurred while creating the gallery.');
     }
   };
+
+  const saveChannels = async(channelName, galleryID) =>{
+
+    // Get the auth token, for example from localStorage or a cookie
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+
+    try {
+      // Send POST request to backend to create gallery
+      const response = await fetch('/gal/createChannel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ channelName,galleryID }), // Pass the gallery name in the body
+      });
+
+      const result = await response.json();
+  
+      if (!response.ok) {
+        // Handle server error
+        console.error('Error:', result);
+        alert('Failed to save channel: ' + result.msg || 'Unknown error');
+        return;
+      }
+  
+      // Successfully created the gallery
+      console.log('Channel saved:', result);
+      alert('Channel successfully!');
+
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while saving the channel.');
+    }
+
+  };
   
   return(
     <section>
@@ -577,6 +629,10 @@ function Main({ userData, galleries}) {
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
               <Settings userVars={userVar}/>
+              <Gallery 
+                userGalleries={userGalleries} 
+                setUserGalleries={setUserGalleries} 
+              />
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>

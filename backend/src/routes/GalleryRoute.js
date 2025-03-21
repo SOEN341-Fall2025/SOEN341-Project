@@ -229,7 +229,6 @@ router.post("/gal/createChannel", async (req, res) => {
     return res.status(401).json({ error: "Unauthorized: No token provided" });
   }
   try{
-      // Get the user based on the token
       const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
       if (authError || !user) {
@@ -333,6 +332,7 @@ router.get("/api/get/galleryID-channelName/:channelName", async (req, res) => {
 
 });
 
+//Retrieve all possible galleries
 router.get("/api/gallery/all", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -366,7 +366,8 @@ router.get("/api/gallery/all", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
-  
+
+//Retrieve all channels from every galleries
 router.get("/api/gallery/channels", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -414,6 +415,7 @@ router.get("/api/gallery/channels", async (req, res) => {
     }
 });
  
+//Get channels from a specific gallery using its name
 router.get("/api/gallery/getChannels", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
@@ -476,4 +478,5 @@ router.get("/api/gallery/getChannels", async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 export default router;

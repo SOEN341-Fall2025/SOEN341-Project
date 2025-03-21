@@ -4,7 +4,7 @@ import { User, ArrowLeft, Camera, Mic, Plus } from 'lucide-react';  // Assuming 
 import { Row, Col, Nav } from 'react-bootstrap';
 import { HexToRGBA } from '../AppContext';
 
-function ChatContainer({ barSizes, user, header, messages= [] }) {
+function ChatContainer({ barSizes, user, header, messages= [], type }) {
   const [popperUser, setPopperUser] = useState("");  // For storing the other user's name
   const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
   const [newMessage, setNewMessage] = useState(""); // Input for new messages
@@ -98,7 +98,15 @@ function ChatContainer({ barSizes, user, header, messages= [] }) {
   const bars = Math.abs(barSizes);  // Absolute value of bar sizes
   const bg = HexToRGBA(user.clrAccent, 0.7);  // Background color with transparency
 
+  //Channel Messaging
+
+  const [channelMessages, setChannelMessages] = useState(messages);
+
+
+
   return (
+    <>
+      {type === 'DM' ? (
     <div className="mainview no-parent-padding">
       <div id="top-box" style={{ backgroundColor: bg, left: `calc(${user.sizeInnerSidebar} + 5vw)` }}>
         <Nav.Link>
@@ -152,6 +160,62 @@ function ChatContainer({ barSizes, user, header, messages= [] }) {
         </Row>
       </div>
     </div>
+      ):(
+        <div className="mainview no-parent-padding">
+        <div id="top-box" style={{ backgroundColor: bg, left: `calc(${user.sizeInnerSidebar} + 5vw)` }}>
+          <Nav.Link>
+            <span></span> {header}
+          </Nav.Link>
+        </div>
+  
+        <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{
+          position: 'absolute', right: '2vw', backgroundColor: bg, height: '80vh', bottom: '8vh',
+          maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)`
+        }}>
+          {/* Chat Box */}
+          <div className="chat-box border rounded-lg p-4 bg-gray-100">
+            <div className="chat-header text-center font-bold text-lg p-2 bg-gradient-to-r from-[#cdffd8] to-[#94b9ff] text-black rounded-md">
+              {header}
+            </div>
+  
+            {/* Display Messages */}
+            <MessageList messages={channelMessages} />
+          </div>
+  
+          {/* Input Section */}
+          <Row id="chat-box" className="d-flex align-items-center">
+            <Col className="d-flex gap-2">
+              <div id="plus">
+                <Plus />
+              </div>
+              <div id="camera">
+                <Camera />
+              </div>
+              <div id="mic">
+                <Mic />
+              </div>
+            </Col>
+  
+            {/* Input Box and Send Button */}
+            <Col id="chat-input" className="">
+              <form onSubmit={handleSubmitMessages}>
+                <div className="d-flex gap-2">
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
+                    className="flex-grow-1 p-2 rounded border"
+                  />
+                  <button type="submit" className="p-2 bg-[#4facfe] text-gray rounded-md">Send</button>
+                </div>
+              </form>
+            </Col>
+          </Row>
+        </div>
+      </div>
+      )}
+    </>
   );
 }
 
