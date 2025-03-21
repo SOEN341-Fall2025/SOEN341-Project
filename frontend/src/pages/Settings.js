@@ -239,13 +239,22 @@ function Settings({userVars}) {
                               title="Choose your color"/> 
                         </div>
                     </Form.Group>
+                    <Form.Group className="divframe"> 
                     <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
                     <Row>
                       <div className="hover-text" style={{ width:'fit-content'}}>
                         <input className='btn btn-primary' type='submit' value="Done" onClick={handleDone}/>
                         <span className="hover-text-content">Warning: This will reload the page!</span>
                       </div>
-                    </Row>                    
+                    </Row>  
+                    </Form.Group> 
+                    <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-modal" >
+                      <Modal.Dialog className="modal-dialog modal-dialog-centered">
+                        <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                          <Modal.Body>                      
+                          </Modal.Body>
+                      </Modal.Dialog>
+                    </Modal>                 
                   </Tab.Pane>
                   
                   <Tab.Pane className="tab-pane" eventKey="settings-chats" role="tabpanel">

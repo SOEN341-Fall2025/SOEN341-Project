@@ -2,6 +2,31 @@ import express from "express";
 const router = express.Router();
 import { supabase } from "../server.js";
 
+router.get("/dm/fetch-user", async (req, res) => {
+
+    const { username } = req.query;  // Use req.query for GET parameters
+
+    if (!username) {
+        return res.status(400).json({ msg: "Username is required" });
+    }
+
+    // Fetch user data from Supabase
+    const { data, error: databaseError } = await supabase
+        .from("Users")
+        .select("username")
+        .eq("username", username).single();
+
+    if (databaseError) {
+        return res.status(500).json({ msg: "Users could not be fetched.", error: databaseError });
+    }
+
+    if (!data || data.length === 0) {
+        return res.status(404).json({ msg: "User not found." });
+    }
+
+    res.status(200).json({ msg: "Username is fetched", user: data });
+});
+
 
 //Retrieve private DM (When user is receiving message)
 router.get("/dm/retrieve", async (req, res) => {
@@ -12,9 +37,9 @@ router.get("/dm/retrieve", async (req, res) => {
         return res.status(401).json(error);
     }
 
-    const { email } = req.body;
+    const { username } = req.query;
 
-    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid/${email}`);
+    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid-username/${username}`);
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
@@ -29,13 +54,37 @@ router.get("/dm/retrieve", async (req, res) => {
         return res.status(500).json({msg:"Messages could not be fetched.", databaseError});
     }
 
-    res.json({ msg: "DMs were fetched.", data });
+    const updatedData = [];
+
+    for (let msg of data) {
+        // Fetch the Popper's username
+        const popperResponse = await fetch(`http://localhost:4000/api/get/username-id/${msg.PopperID}`);
+        const popperData = await popperResponse.json();
+        const popperUsername = popperData.data.username;
+
+        // Fetch the Bubbler's username
+        const bubblerResponse = await fetch(`http://localhost:4000/api/get/username-id/${msg.BubblerID}`);
+        const bubblerData = await bubblerResponse.json();
+        const bubblerUsername = bubblerData.data.username;
+
+        // Add the converted usernames to the DM object
+        updatedData.push({
+            ...msg,
+            PopperUsername: popperUsername,
+            BubblerUsername: bubblerUsername
+        });
+    }
+
+    console.log(updatedData);
+
+
+    res.json({ msg: "DMs were fetched.", updatedData });
 
 });
 
 
 //Save private DM (When user is sending message)
-router.post("/dm/save", async (req, res) => {
+router.post("/api/dm/save", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
@@ -43,9 +92,9 @@ router.post("/dm/save", async (req, res) => {
         return res.status(401).json(error);
     }
 
-    const { email, message } = req.body;
+    const { username, message } = req.body;
 
-    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid/${email}`);
+    const receiverInfo = await fetch(`http://localhost:4000/api/get/userid-username/${username}`);
     const receiverData = await receiverInfo.json();
     const receiverId = receiverData.data.user_id;
 
@@ -65,6 +114,7 @@ router.post("/dm/save", async (req, res) => {
             ]);
 
     if (databaseError) {
+        console.log("MADE IT HEREEE")
         return res.status(500).json({msg:"Message could not be saved.", databaseError});
     }
 
@@ -158,6 +208,29 @@ router.get("/api/get/userid/:email", async (req, res) => {
 
 });
 
+
+//Retrieve User uuid using a user's username
+router.get("/api/get/userid-username/:username", async (req, res) => {
+
+    const { username } = req.params;
+
+    if (!username) {
+        return res.status(400).json({ error: "Username was not received." });
+    }
+    
+    const { data, error } = await supabase
+    .from('Users')
+    .select('user_id') 
+    .eq('username', username)
+    .single();
+
+    if (error) {
+        return res.status(400).json({ msg: error.message });
+    }
+
+    res.status(200).json({ msg: "Uuid was retrieved.", data });
+
+});
 
 //Retrieve username using a user's email
 router.get("/api/get/username-email/:email", async (req, res) => {

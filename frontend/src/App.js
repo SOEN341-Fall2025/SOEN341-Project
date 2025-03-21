@@ -1,124 +1,135 @@
+import React, { useState, useEffect } from 'react';  
 import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
-import React, { useState, useEffect } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
 import { Loader } from 'lucide-react';
+
 function App() {
-  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [galleries, setGalleries] = useState([]);
-  const [galleryChannels, setGalleryChannels] = useState(null);
-  const [authStatus, setAuthStatus] = useState('checking'); // 'checking', 'authenticated', or 'unauthenticated'  
-  const [savedToken, setToken] = useState(null);
+  const [authStatus, setAuthStatus] = useState('checking'); // 'checking', 'authenticated', or 'unauthenticated'
+  const savedSession = localStorage.getItem('authToken');
+
+  const fetchUserGalleries = async (token) => {
+    try {
+      const response = await fetch('/gal/retrieve', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) throw new Error('Failed to retrieve galleries');
+      const result = await response.json();
+      setGalleries(result.galleries);
+    } catch (error) {
+      console.error('Error fetching galleries:', error);
+    }
+  };
+
+  const handleLogin = async (email, password) => {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      if (!data.token) throw new Error('Login failed');
+      
+      localStorage.setItem('authToken', data.token);
+      setUserData(data.user);
+      setAuthStatus('authenticated');
+      fetchUserGalleries(data.token);
+      setIsLoggedIn(true)
+
+    } catch (error) {
+      console.error('Login failed:', error);
+      setAuthStatus('unauthenticated');
+      setIsLoggedIn(false);
+    }
+  };
+
+  //Check if authToken exists first
   useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem('auth-token');
-      if (!token) {
-        setAuthStatus('unauthenticated');
-        return;
-      }
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      setAuthStatus('unauthenticated');
+      return;
+    }
   
+    // Fetch the auth status of the user using the token
+    fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.valid) {
+          setUserData(data.user);
+          setAuthStatus('authenticated');
+          fetchUserGalleries(token);
+        } else {
+          throw new Error('Invalid token');
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('authToken');
+        setAuthStatus('unauthenticated');
+      });
+  }, []); 
+  
+  // Fetch galleries when user data is changed
+  useEffect(() => {
+    if (userData) {
+      const token = localStorage.getItem('authToken');
       if (token) {
-        //console.log("Attempting to validate token...");
-        fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(response => {
-          //console.log("Token validation response status:", response.status);
-          return response.json();
-        })
+        fetchUserGalleries(token);
+      }
+    }
+  }, [userData]);
+  
+  // Auth status and user data is updated whenever authToken is modified
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      fetch('/api/auth/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(response => response.json())
         .then(data => {
-          //console.log("Token validation response:", data.valid);
           if (data.valid) {
-            //console.log("Token is valid, fetching user data and galleries...");
-            return Promise.all([
-              fetch('/api/get/me', { headers: { 'Authorization': `Bearer ${token}` } }),
-              fetch('/api/gal/all', { headers: { 'Authorization': `Bearer ${token}` } })
-            ]);
+            setUserData(data.user);
+            setAuthStatus('authenticated');
           } else {
             throw new Error('Invalid token');
           }
         })
-        .then(([userResponse, galleriesResponse]) => {
-          ////console.log("Galleries response status:", galleriesResponse.status);
-          return Promise.all([userResponse.json(), galleriesResponse.json()]);
-        })
-        .then(([userData, galleriesData]) => {
-          //console.log("User data received:", userData);
-          //console.log("Galleries data received:", galleriesData);
-          setUserData(userData.user[0]);
-          setGalleries(galleriesData);
-          setAuthStatus('authenticated');
-          //setIsLoggedIn(true);
-        })
-        .catch(error => {
-          console.error('Authentication failed:', error);
-          localStorage.removeItem('auth-token');
-          //setIsLoggedIn(false);
+        .catch(() => {
+          localStorage.removeItem('authToken');
           setAuthStatus('unauthenticated');
-          //setIsLoading(false);
-        })
-        //.finally(() => {setIsLoading(false);})
-        ;
-      } else {
-        //console.log("No token found, user is not logged in");
-        //setIsLoggedIn(false);
-        setAuthStatus('unauthenticated');
-        //setIsLoading(false);
-      }
-    };
-  
-    checkAuth();
-  }, [savedToken]);
-  
-  const login = async (email, password) => {
-    try {
-      // Perform login API call
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await response.json();
-      if (data.token) {
-      console.log("returned token: ", data.token);
-        localStorage.setItem('auth-token', data.token);        
-        setToken(data.token);
-        
-        // Fetch user data
-        const userResponse = await fetch('/api/get/me', {
-          headers: { 'Authorization': `Bearer ${data.token}` }
         });
-        const userData = await userResponse.json();
-        setUserData(userData.user[0]);
-        // Fetch user galleries
-        const galleriesResponse = await fetch('/api/gal/all', {
-          headers: { 'Authorization': `Bearer ${data.token}` }
-        });
-        const galleriesData = await galleriesResponse.json();
-        setGalleries(galleriesData);        
-        setAuthStatus('authenticated');
-        //setIsLoggedIn(true);
-      }
-    } catch (error) {
-      //console.error('Login failed:', error);
+    } else {
+      setAuthStatus('unauthenticated');
     }
-  };
-  
+  }, [authStatus]); 
+
   return (
-    <section>   
-    {authStatus === 'checking' ? (
-      <Loader />
-    ) : authStatus === 'authenticated' && userData && galleries ? (
-      <Main userData={userData} galleries={galleries} />
-    ) : (
-      <Login onLogin={login} />
-    )}    
-  </section>
+    <section>
+      {authStatus === 'checking' ? (
+        <Loader />
+      ) : authStatus === 'authenticated' && userData && galleries.length > 0 ? (
+        <Main userData={userData} galleries={galleries} />
+      ) : (
+        <Login onLogin={handleLogin} />
+      )}
+    </section>
   );
 }
 
 export default App;
+
