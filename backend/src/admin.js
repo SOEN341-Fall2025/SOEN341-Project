@@ -55,51 +55,47 @@ router.delete("/api/messages/:MsgId", async (req, res) => {
 });
 
 router.put("/api/gallery/:galleryId/members/admin", async (req, res) => {
-    const { galleryId } = req.params; // Extract galleryId from the URL
-    const { username } = req.body; // Username of the user to promote
-    const { adminUserId } = req.body; // ID of the admin making the request
-
-    console.log("Request received:", { galleryId, username, adminUserId });
-
+    const { galleryId } = req.params;
+    const { username, adminUserId } = req.body; // Destructure both values
+  
+    console.log("Verifying admin privileges for:", { adminUserId, galleryId,username });
+  
     const { data: adminCheck, error: adminError } = await supabase
-        .from("GalleryMembers")
-        .select("GalleryRole")
-        .eq("UserID", adminUserId)
-        .eq("GalleryID", galleryId)
-        .single();
-
-    if (adminError || !adminCheck || !adminCheck.GalleryRole) {
-        return res.status(403).json({ msg: "You are not authorized to perform this action in this gallery." });
+      .from("GalleryMembers")
+      .select("GalleryRole")
+      .eq("UserID", adminUserId) // Ensure this matches your column name
+      .eq("GalleryID", galleryId)
+      .single();
+  
+    if (adminError || !adminCheck?.GalleryRole) {
+      console.error("Admin check failed:", adminError || "No admin privileges");
+      return res.status(403).json({ msg: "Not authorized" });
     }
-
+  
     const { data: userData, error: userError } = await supabase
-        .from("Users") 
-        .select("UserID")
-        .eq("username", username) 
-        .single();
-
-    if (userError || !userData) {
-        return res.status(404).json({ msg: "User not found." });
+      .from("Users")
+      .select("user_id")
+      .eq("username", username)
+      .single();
+  
+    if (userError || !userData?.user_id) {
+      return res.status(404).json({ msg: "User not found" });
     }
-
-    const userId = userData.UserID; 
-
+  
     const { data: updateData, error: updateError } = await supabase
-        .from("GalleryMembers")
-        .update({ GalleryRole: true })
-        .eq("UserID", userId)
-        .eq("GalleryID", galleryId);
-
+      .from("GalleryMembers")
+      .update({ GalleryRole: true })
+      .eq("UserID", userData.user_id) // Use the found UserID
+      .eq("GalleryID", galleryId);
+      
+     console.log("UserID:", userData.user_id);
+     console.log("GalleryID:", galleryId);
+     console.log("Updated rows:", updateData);
     if (updateError) {
-        console.log("Update Error:", updateError);
-        return res.status(500).json({ msg: "Failed to update user role." });
+      console.error("Update failed:", updateError);
+      return res.status(500).json({ msg: "Promotion failed" });
     }
-
-    // Check if any rows were updated
-    if (!updateData || updateData.length === 0) {
-        return res.status(404).json({ msg: "No matching user found in the specified gallery." });
-    }
-
-    res.json({ msg: "User role updated to admin successfully in the specified gallery." });
-});
+  
+    return res.json({ msg: "User promoted successfully" });
+  });
 export default router;

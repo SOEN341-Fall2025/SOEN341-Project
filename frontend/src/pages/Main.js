@@ -196,9 +196,8 @@ function Main({ userData, galleries}) {
 
   const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
-    const handleGalleryClick = useCallback((galleryName, galleryId) => {
+    const handleGalleryClick = useCallback((galleryName) => {
       console.log("Getting Channels for " + galleryName);
-      setCurrentGalleryId(galleryId); // Store the current gallery ID
       getChannels(galleryName);
     }, [getChannels]);
     
@@ -207,7 +206,7 @@ function Main({ userData, galleries}) {
         <Nav.Link 
           eventKey={item.GalleryName} 
           key={index} 
-          onClick={() => handleGalleryClick(item.GalleryName, item.GalleryId)}
+          onClick={() => handleGalleryClick(item.GalleryName)}
         >
           <span className="channel-icon">
             <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
@@ -234,7 +233,7 @@ function Main({ userData, galleries}) {
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar}  currentGalleryId={currentGalleryId}/>
+        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar} />
       ))
     
     );
