@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, FindClosestIcon } from '../AppContext';
-import { Tab, Col, Row, Button, Nav, Modal } from 'react-bootstrap';
+import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToVW, ToPX } from '../AppContext';
+import { Resizable } from 're-resizable';
+import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
+import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
-import getCookie from './Settings.js'
-import * as icons from 'lucide-react';
 
 function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels, name }) {  
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
-    const [userChannelsList, setUserChannelsList] = useState(userChannels || []);   
+    const [thisChannels, setTheseChannels] = useState(galleryChannels);  
     const [newChannelName, setNewChannelName] = useState("");
-    const [newGalleryName, setNewGalleryName] = useState(item.GalleryName);
+    const [newTitle, setNewTitle] = useState("");
+    const handleClose = () => setShowState(false);
+    function handleClick(key) { setShowState(key); }
+
+
+
+
     const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
     const [dmNavWidth, setDmNavWidth] = useState(17);
     const [channelMessages, setChannelMessage] = useState([]);
-    const handleClose = () => setShowState(false);
-    function handleClick(key) { setShowState(key); }
-    const [thisChannels, setTheseChannels] = useState(galleryChannels);  
-    const [newTitle, setNewTitle] = useState("");
-
+    
     const GalleryChannelList = ({ galleryName, channels = [] }) => {
       return (
         <span>
@@ -53,6 +55,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           return null; // Ensure the map function returns something in all cases
       });
     };
+
     const handleChannels = (newname, galleryname) => {
       setTheseChannels(prevChannels => {
         const updatedChannels = [...prevChannels, { GalleryName: galleryname, ChannelName: newname }];
@@ -71,27 +74,24 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       createChannel(newTitle, name); 
       handleClose();  //Close the modal *after* form is submitted.
     };
-
     const ModalAddChannel = () => {
-        return (
-            <Modal.Body> 
-                <h5 className="text-center">Create a Channel</h5>
-                <form onSubmit={handleSubmitChannel}>
-                    <Col>
-                        <Row><label>Name:</label></Row>
-                        <Row>
-                            <input 
-                                type='text' 
-                                id='newName-channel' 
-                                value={newChannelName}
-                                onChange={(e) => setNewChannelName(e.target.value)}
-                                placeholder='Name of your new Channel' 
-                            />
-                        </Row>
-                        <Row><input type='submit' value="Submit" /></Row>
-                    </Col>
-                </form>
-            </Modal.Body>
+        return(
+          <Modal.Body> 
+              <h5 className="text-center">Create a Channel</h5>
+              <form onSubmit={handleSubmitChannel}>
+                <Col>
+                  <Row><label>Name:</label></Row>
+                  <Row>
+                    <input type='textarea' id='newName-channel' value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder='Name of your new Channel' 
+                    autoFocus
+                    />
+                    </Row>
+                  <Row><input type='submit' value="Submit" /></Row>
+                </Col>
+              </form>
+          </Modal.Body>
         );
     };
     const ChannelPagesList = ({ channels, channelName }) => {
@@ -303,5 +303,4 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       </Tab.Pane>
     );
 }
-
 export default Gallery;

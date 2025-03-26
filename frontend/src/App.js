@@ -1,7 +1,7 @@
+import React, { useState, useEffect } from 'react';  
 import './style/app.css';
 import './style/settings.css';
 import './style/style.css';
-import React, { useState, useEffect } from 'react';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
 import { Loader } from 'lucide-react';
@@ -132,3 +132,4 @@ function App() {
 }
 
 export default App;
+
