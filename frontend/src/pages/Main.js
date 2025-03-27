@@ -7,6 +7,7 @@ import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToPX } from '
 import Settings from './Settings.js';
 import Gallery from './Gallery.js';
 import ChatContainer from './ChatContainer.js';
+import Exhibit from './Exhibit.js';
 
 import $ from 'jquery';
 import { Resizable } from 're-resizable';
@@ -14,7 +15,32 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 
-function Main({ userData, galleries}) {    
+function Main({ userData, galleries}) {
+  
+  useEffect(() =>{
+
+    async function fetchUser(){
+    try {
+      const response = await fetch(`/api/get/username-email/${userData.email}`);
+      
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch username');
+      }
+      setUserVar((prevState) => ({
+        ...prevState,
+        username: result.data.username,
+      }));
+      setCurrentAuthUser(result.data.username);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  fetchUser();
+  
+  },[]);
       
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
@@ -24,6 +50,7 @@ function Main({ userData, galleries}) {
   const [newGalleryName, setNewGalleryName] = useState("");
   const [newUserName, setNewUserName] = useState("");
   const [currentUser, setCurrentUser] = useState("");
+  const [currentAuthUser, setCurrentAuthUser] = useState("");
 
   const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
   const [dmNavWidth, setDmNavWidth] = useState(17);  
@@ -57,7 +84,7 @@ function Main({ userData, galleries}) {
     username: userData.username,
     profilepic: userData.profile_picture_url,
     aboutme: userData.aboutme,
-    userID: userData.user_id,
+    userID: userData.id,
     settings: userData.settings
   });
 
@@ -237,11 +264,13 @@ function Main({ userData, galleries}) {
 
   useEffect(() => {
     console.log("currentUser:",currentUser);
+    console.log("currentAuthUser:",currentAuthUser);
     if(currentUser !== ""){
     fetchDMs(currentUser);
     }
       
     }, [currentUser]);
+
 
   const UserChatList = ({usernames}) => {
     return (
@@ -257,7 +286,7 @@ function Main({ userData, galleries}) {
                 user={userVar}
                 header={item.username}
                 messages={directMessages}
-                type={"Channel"}
+                type={"DM"}
               />
             );
           }
@@ -532,6 +561,7 @@ function Main({ userData, galleries}) {
             <Col id="sidebar-list">
               <Nav variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
                 <Nav.Link eventKey="page-dm" onClick={fetchDmUsers}><span className="channel-icon"><MessageCircleDashed /></span> Direct Messages</Nav.Link>
+                <Nav.Link eventKey="page-exhibit" ><span className="channel-icon"><icons.Palette /></span> Exhibit</Nav.Link>
                 <Nav.Link className="seperator" disabled><hr /><hr /></Nav.Link>
                 <GalleryList />
                 <Nav.Link onClick={() => handleClick('addGallery-modal')} className="add-gallery"><span className="channel-icon"><Plus /></span> Add a Gallery</Nav.Link>
@@ -556,7 +586,11 @@ function Main({ userData, galleries}) {
                     </Col>
                     <UserChatList usernames={userNames}/>
                 </Tab.Pane>
+                <Tab.Pane eventKey="page-exhibit">
+                  <Exhibit user={newUserName}/>
+                </Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
+              
             </Tab.Content>
           </Col>
         </Row >

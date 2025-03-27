@@ -5,6 +5,7 @@ import { Row, Col, Nav } from 'react-bootstrap';
 import { HexToRGBA } from '../AppContext';
 
 function ChatContainer({ barSizes, user, header, messages= [], type, galleryName, channelName }) {
+  console.log("AuthUser please",user.username);
   const [popperUser, setPopperUser] = useState("");  // For storing the other user's name
   const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
   const [newMessage, setNewMessage] = useState(""); // Input for new messages
@@ -119,17 +120,22 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 
   // Message List Component
   const ChannelMessageList = ({ messages }) => {
-    
+
     return (
       <span>
-        {messages.map((item, index) => (
-          <div key={index} className={`message ${item.Username !== user.username ? "user" : "recipient"} flex items-center my-2`}>
-            <div className={`text ${item.Username !== user.username ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.Username !== user.username ? "ml-2" : "mr-2"} max-w-[60%]`}>
-              {item.message}
+        {messages.map((item, index) => {
+          const isUserMessage = item.username !== user.username;
+          console.log(`Message from: ${item.username}, Current User: ${user.username}, Is User Message: ${isUserMessage}`);
+  
+          return (
+            <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
+              <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
+                {item.message}
+              </div>
+              <User className="icon" />
             </div>
-            <User className="icon" />
-          </div>
-        ))}
+          );
+        })}
       </span>
     );
   };
