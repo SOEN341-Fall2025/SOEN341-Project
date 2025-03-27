@@ -43,16 +43,21 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 
   // Message List Component
   const MessageList = ({ messages }) => {
+    
     return (
       <span>
-        {messages.map((item, index) => (
-          <div key={index} className={`message ${item.PopperUsername === popperUser ? "user" : "recipient"} flex items-center my-2`}>
-            <div className={`text ${item.PopperUsername === popperUser ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.PopperUsername === popperUser ? "ml-2" : "mr-2"} max-w-[60%]`}>
+        {messages.map((item, index) => {
+          const isUserMessage = item.PopperUsername !== popperUser;
+          return(
+          <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
+            {item.PopperUsername}
+            <User className="icon" />
+            <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
               {item.Message}
             </div>
-            <User className="icon" />
+            
           </div>
-        ))}
+  )})}
       </span>
     );
   };
@@ -129,10 +134,13 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   
           return (
             <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
+              <User className="icon" />
+              {item.username}
               <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
                 {item.message}
               </div>
-              <User className="icon" />
+              
+
             </div>
           );
         })}
