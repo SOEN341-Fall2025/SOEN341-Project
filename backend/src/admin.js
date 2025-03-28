@@ -54,6 +54,53 @@ router.delete("/api/messages/:MsgId", async (req, res) => {
     return res.status(200).json({ msg: "Message deleted successfully." });
 });
 
+//Delete Channels
+router.delete("/api/channels/:ChannelName", async (req, res) => {
+    
+  const { channelname } = req.params;
+  const { userId } = req.body; 
+
+  const { data: message, error: messageError } = await supabase
+      .from("Channels")
+      .select("GalleryID") 
+      .eq("ChannelName", channelname)
+      .single();
+       console.log("MSG:", channelname)       
+       console.log("Message:", message)
+  if (messageError || !message) {
+      return res.status(404).json({ msg: "Message not found." });
+  }
+
+  const messageGalleryId = message.GalleryID;
+
+  const { data: adminCheck, error: adminError } = await supabase
+      .from("GalleryMembers")
+      .select("GalleryRole") 
+      .eq("UserID", userId)
+      .eq("GalleryID", messageGalleryId) 
+      .single();
+
+      if (adminError) {
+          console.error("Supabase error:", adminError);
+          return res.status(500).json({ msg: "Database error." });
+      }
+  
+      if (!adminCheck || adminCheck.GalleryRole !== true) {
+          return res.status(403).json({ msg: "You are not an admin or not part of this gallery." });
+      }
+
+  const { error: deleteError } = await supabase
+      .from("Channels")
+      .delete()
+      .eq("ChannelName", channelname);
+
+  if (deleteError) {
+      return res.status(500).json({ msg: "Failed to delete channel." });
+  }
+
+  return res.status(200).json({ msg: "Channel deleted successfully." });
+});
+
 router.put("/api/gallery/:galleryId/members/admin", async (req, res) => {
     const { galleryId } = req.params;
     const { username, adminUserId } = req.body; // Destructure both values
@@ -98,7 +145,7 @@ router.put("/api/gallery/:galleryId/members/admin", async (req, res) => {
   
     return res.json({ msg: "User promoted successfully" });
   });
-  
+
 // Owner can remove admin role
   router.put("/api/gallery/:galleryId/members/owner", async (req, res) => {
     const { galleryId } = req.params;
@@ -143,4 +190,27 @@ router.put("/api/gallery/:galleryId/members/admin", async (req, res) => {
   
     return res.json({ msg: "User demoted successfully" });
   });
+
+  //Checks if user is admin
+  router.put("/api/gallery/:galleryId/members/checkadmin", async (req, res) => {
+    const { galleryId } = req.params;
+    const { adminUserId } = req.body; // Destructure both values
+  
+    console.log("Verifying admin privileges for:", { adminUserId, galleryId });
+  
+    const { data: adminCheck, error: adminError } = await supabase
+      .from("GalleryMembers")
+      .select("GalleryRole")
+      .eq("UserID", adminUserId) // Ensure this matches your column name
+      .eq("GalleryID", galleryId)
+      .single();
+  
+    if (adminError || !adminCheck?.GalleryRole) {
+      console.error("Admin check failed:", adminError || "No admin privileges");
+      return res.status(403).json({ msg: "Not authorized" });
+    }
+  
+  
+  });
+
 export default router;
