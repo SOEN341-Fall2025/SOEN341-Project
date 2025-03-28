@@ -29,6 +29,7 @@ function Main({ userData, galleries}) {
   const [dmNavWidth, setDmNavWidth] = useState(17);  
   const [userGalleries, setUserGalleries] = useState(galleries); 
   const [error, setError] = useState(false);
+  const [currentGalleryId, setCurrentGalleryId] = useState(null);
 
   const[userNames, setUserNames] = useState([]);
   
@@ -134,6 +135,8 @@ function Main({ userData, galleries}) {
     setNewMessage("");
   };
   
+
+
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
@@ -197,6 +200,7 @@ function Main({ userData, galleries}) {
       console.log("Getting Channels for " + galleryName);
       getChannels(galleryName);
     }, [getChannels]);
+    
     return (        
       userGalleries.map((item, index) => (
         <Nav.Link 
