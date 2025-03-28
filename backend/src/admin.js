@@ -98,4 +98,49 @@ router.put("/api/gallery/:galleryId/members/admin", async (req, res) => {
   
     return res.json({ msg: "User promoted successfully" });
   });
+  
+// Owner can remove admin role
+  router.put("/api/gallery/:galleryId/members/owner", async (req, res) => {
+    const { galleryId } = req.params;
+    const { username, OwnerUserId } = req.body; // Destructure both values
+  
+    console.log("Verifying admin privileges for:", { OwnerUserId, galleryId,username });
+  
+    const { data: OwnerCheck, error: OwnerError } = await supabase
+      .from("Galleries")
+      .select("Creator_id")
+      .eq("GalleryID", galleryId)
+      .single();
+  
+    if (OwnerError || !OwnerCheck?.Creator_id) {
+      console.error("Owner check failed:", OwnerError || "No Owner privileges");
+      return res.status(403).json({ msg: "Not authorized" });
+    }
+  
+    const { data: userData, error: userError } = await supabase
+      .from("Users")
+      .select("user_id")
+      .eq("username", username)
+      .single();
+  
+    if (userError || !userData?.user_id) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+  
+    const { data: updateData, error: updateError } = await supabase
+      .from("GalleryMembers")
+      .update({ GalleryRole: false })
+      .eq("UserID", userData.user_id) // Use the found UserID
+      .eq("GalleryID", galleryId);
+      
+     console.log("UserID:", userData.user_id);
+     console.log("GalleryID:", galleryId);
+     console.log("Updated rows:", updateData);
+    if (updateError) {
+      console.error("Update failed:", updateError);
+      return res.status(500).json({ msg: "Demotion failed" });
+    }
+  
+    return res.json({ msg: "User demoted successfully" });
+  });
 export default router;

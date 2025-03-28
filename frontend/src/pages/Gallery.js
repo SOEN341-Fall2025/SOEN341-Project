@@ -191,7 +191,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       };
       const [username, setUsername] = useState('');
      
-      const handleSubmit = async (e) => {
+      const handleSubmitAdmin = async (e) => {
         e.preventDefault();
         
         if (!username.trim()) {
@@ -210,7 +210,6 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
 
           console.log("Sending:", { galleryId, username, adminUserId });
 
-          // 3. Make the request (NO adminUserId in body!)
           const response = await fetch(`/api/gallery/${galleryId}/members/admin`, {
             method: 'PUT',
             headers: {
@@ -235,6 +234,49 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           alert(`Error: ${error.message}`);
         }
       };
+      const handleSubmitOwner = async (e) => {
+        e.preventDefault();
+        
+        if (!username.trim()) {
+          alert('Please enter a username');
+          return;
+        }
+      
+        try {
+          const galleryId = await getGalleryID(item.GalleryName);
+          if (!galleryId) throw new Error("Couldn't get gallery ID");
+      
+          const OwnerUserId = await getCurrentUserId();
+
+          const token = localStorage.getItem('authToken');
+          if (!token) throw new Error("Not authenticated");
+
+          console.log("Sending:", { galleryId, username, OwnerUserId });
+
+          const response = await fetch(`/api/gallery/${galleryId}/members/owner`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ username, OwnerUserId }), // Only send username
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Failed to demote user');
+          }
+      
+          const responseData = await response.json();
+          alert(responseData.msg || 'User demoted successfully');
+          setUsername('');
+          handleClose();
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
     return (
       <Tab.Pane eventKey={item.GalleryName} className="gallery-pane">
         <Tab.Container>
@@ -248,7 +290,10 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
               <Row id="sidebar-dm-options">
                 <Col>Channels
                   <Nav.Link onClick={() => handleClick('addAdmin-modal')} className="add-admin">
-                    <icons.Settings />
+                  <Plus />
+                  </Nav.Link>
+                  <Nav.Link onClick={() => handleClick('addOwner-modal')} className="add-Owner">
+                  <icons.Minus />
                   </Nav.Link>
                 </Col>
               </Row>
@@ -276,7 +321,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           </Modal.Dialog>
           <Modal.Body>
             <h5 className="text-center">Add an admin</h5>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmitAdmin}>
               <Col>
                 <Row><label>Username:</label></Row>
                 <Row>
@@ -293,7 +338,33 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
               </Col>
             </form>
           </Modal.Body>
+          
         </Modal>
+        <Modal show={showState === 'addOwner-modal'} onHide={handleClose} id="addOwner-modal" className="modal-dialog-centered">
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          </Modal.Dialog>
+          <Modal.Body></Modal.Body>
+        <Modal.Body>
+            <h5 className="text-center">Remove an admin</h5>
+            <form onSubmit={handleSubmitOwner}>
+              <Col>
+                <Row><label>Username:</label></Row>
+                <Row>
+                  <input
+                    type='text'
+                    id='username'
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                  />
+                </Row>
+                <Row>
+                  <Button type="submit">Remove admin</Button>
+                </Row>
+              </Col>
+            </form>
+          </Modal.Body>
+          </Modal>
         <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
           <Modal.Dialog>
             <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
