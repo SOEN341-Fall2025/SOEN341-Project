@@ -182,10 +182,167 @@ router.get("/dm/file/:DmID", async (req, res) => {
     res.status(200).json({ fileUrl: data.file_url });
 });
 
+// Attach file to Channel Message using Msg_id
+router.post("/channel/upload-file", upload.single("file"), async (req, res) => {
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
-// Upload art to gallery and update the gallery record with the URL
-router.post("/api/upload/gallery-file", upload.single("file"), async (req, res) => {
-  
-});  
+  if (error || !user) {
+      return res.status(401).json({ msg: "Unauthorized", error });
+  }
+
+  const { Msg_id } = req.body; // Message ID to attach the file to
+  const file = req.file;
+
+  if (!Msg_id) {
+      return res.status(400).json({ msg: "Missing Msg_id" });
+  }
+  if (!file) {
+      return res.status(400).json({ msg: "No file uploaded" });
+  }
+
+  // Verify Msg_id exists in the database
+  const { data: messageData, error: messageError } = await supabase
+      .from("ChannelMessages")
+      .select("Msg_id")
+      .eq("Msg_id", Msg_id)
+      .single();
+
+  if (messageError || !messageData) {
+      return res.status(404).json({ msg: "Channel message not found" });
+  }
+
+  // Upload file to Supabase Storage
+  const filePath = `channel_files/${uuidv4()}-${file.originalname}`;
+  const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("chat_files")
+      .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+      });
+
+  if (uploadError) {
+      return res.status(500).json({ msg: "File upload failed", error: uploadError });
+  }
+
+  const fileUrl = `https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/chat_files/${filePath}`;
+
+  // Update the existing ChannelMessage record with the file URL
+  const { data: updateData, error: dbError } = await supabase
+      .from("ChannelMessages")
+      .update({ file_url: fileUrl })
+      .eq("Msg_id", Msg_id);
+
+  if (dbError) {
+      return res.status(500).json({ msg: "Failed to attach file to channel message", error: dbError });
+  }
+
+  res.status(200).json({ msg: "File attached to channel message successfully", fileUrl });
+});
+
+// Retrieve file URL for a specific Msg_id
+router.get("/channel/file/:Msg_id", async (req, res) => {
+  const { Msg_id } = req.params;
+
+  // Validate Msg_id
+  if (!Msg_id) {
+      return res.status(400).json({ msg: "Missing Msg_id" });
+  }
+
+  // Fetch DM record by Msg_id
+  const { data, error } = await supabase
+      .from("ChannelMessages")
+      .select("file_url")
+      .eq("Msg_id", Msg_id)
+      .single();
+
+  if (error || !data) {
+      return res.status(404).json({ msg: "DM not found or no file attached", error });
+  }
+
+  // Return the file URL (or any other relevant info)
+  res.status(200).json({ fileUrl: data.file_url });
+});
+
+// Attach file to an Exhibit using post_id
+router.post("/exhibits/upload-file", upload.single("file"), async (req, res) => {
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+  if (error || !user) {
+    return res.status(401).json({ msg: "Unauthorized", error });
+  }
+
+  const { post_id } = req.body; // The post to attach the file to
+  const file = req.file;
+
+  if (!post_id) {
+    return res.status(400).json({ msg: "Missing post_id" });
+  }
+  if (!file) {
+    return res.status(400).json({ msg: "No file uploaded" });
+  }
+
+  // Check if file type is allowed
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    return res.status(400).json({ msg: "Invalid file type" });
+  }
+
+  // Verify post_id exists in the database
+  const { data: exhibitData, error: exhibitError } = await supabase
+    .from("Exhibits")
+    .select("post_id")
+    .eq("post_id", post_id)
+    .single();
+
+  if (exhibitError || !exhibitData) {
+    return res.status(404).json({ msg: "Exhibit not found" });
+  }
+
+  // Generate unique file path and upload file to Supabase Storage
+  const filePath = `exhibit_files/${uuidv4()}-${file.originalname}`;
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from("exhibit_files")
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+    });
+
+  if (uploadError) {
+    return res.status(500).json({ msg: "File upload failed", error: uploadError });
+  }
+
+  // Construct public file URL
+  const fileUrl = `https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/exhibit_files/${filePath}`;
+
+  // Update the existing Exhibit record with the file URL
+  const { data: updateData, error: dbError } = await supabase
+    .from("Exhibits")
+    .update({ file_url: fileUrl })
+    .eq("post_id", post_id);
+
+  if (dbError) {
+    return res.status(500).json({ msg: "Failed to attach file to exhibit", error: dbError });
+  }
+
+  res.status(200).json({ msg: "File attached to exhibit successfully", fileUrl });
+});
+
+// Retrieve file URL for a specific post_id
+router.get("/exhibits/file/:post_id", async (req, res) => {
+  const { post_id } = req.params;
+
+  if (!post_id) {
+    return res.status(400).json({ msg: "Missing post_id" });
+  }
+
+  const { data, error } = await supabase
+    .from("Exhibits")
+    .select("file_url")
+    .eq("post_id", post_id)
+    .single();
+
+  if (error || !data) {
+    return res.status(404).json({ msg: "Exhibit not found or no file attached", error });
+  }
+
+  res.status(200).json({ fileUrl: data.file_url });
+});
 
 export default router;
