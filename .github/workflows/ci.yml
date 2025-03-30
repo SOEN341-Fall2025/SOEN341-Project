@@ -28,7 +28,28 @@ jobs:
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm install --omit=optional
+        run: |
+          npm install --omit=optional
+          cd frontend && npm install --omit=optional
+          cd ../backend && npm install --omit=optional
+
+      # Step 4: Run frontend tests
+      - name: Run frontend tests
+        run: cd frontend && CI=true npm test
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NODE_ENV: test
+          CI: true
+
+      # Step 5: Run backend tests
+      - name: Run backend tests
+        run: cd backend && npm test
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NODE_ENV: test
+          CI: true
 
      
      
