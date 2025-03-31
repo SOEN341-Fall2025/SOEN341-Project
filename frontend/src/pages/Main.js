@@ -72,7 +72,6 @@ function Main({ userData, galleries}) {
   const logout = () => {    
     localStorage.removeItem('authToken');
   }
-  
   const [userVar, setUserVar] = useState({
     sizeGallerySidebar: "3.5vw",
     sizeInnerSidebar: "17vw",
@@ -87,6 +86,60 @@ function Main({ userData, galleries}) {
     userID: userData.id,
     settings: userData.settings
   });
+  // Add this with your other state declarations
+const [exhibitPosts, setExhibitPosts] = useState([
+  {
+    imageUrl: "../assets/background.jpg",
+    username: userVar.username,
+    caption: "I love Bubbles!",
+    timestamp: "2025-03-27T15:00:00-06:00",
+    likes: 4,
+    comments: [
+      {
+        id: 1,
+        username: "user1",
+        text: "loveeeee",
+        timestamp: "2025-03-27T15:05:00-06:00"
+      },
+      {
+        id: 2,
+        username: "user2",
+        text: "cute pic ;)",
+        timestamp: "2025-03-27T15:10:00-06:00"
+      }
+    ]
+  }
+]);
+
+useEffect(() => {
+  const fetchExhibitPosts = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch('/api/exhibit/posts', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setExhibitPosts(data.posts);
+    } catch (error) {
+      console.error('Error fetching exhibit posts:', error);
+    }
+  };
+
+  fetchExhibitPosts();  // Just fetch directly since we know we're authenticated
+}, []);  // Empty dependency array means run once on mount
+
+// Then update the Tab.Pane for exhibit:
+<Tab.Pane eventKey="page-exhibit">
+  {exhibitPosts.map((post, index) => (
+    <Exhibit 
+      key={index}
+      user={{ username: userVar.username }} 
+      post={post}
+    />
+  ))}
+</Tab.Pane>
+  
+
 
   useEffect(() => {
     console.log(JSON.stringify(userData.settings));
@@ -587,8 +640,30 @@ function Main({ userData, galleries}) {
                     <UserChatList usernames={userNames}/>
                 </Tab.Pane>
                 <Tab.Pane eventKey="page-exhibit">
-                  <Exhibit user={newUserName}/>
-                </Tab.Pane>
+  <Exhibit 
+    user={{ username: userVar.username }} 
+    post={{
+      imageUrl: "../assets/background.jpg",
+      username: userVar.username,
+      caption: "I love Bubbles!!",
+      timestamp: new Date().toISOString(),
+      likes: 0,
+      comments: [{
+        id: 1,
+        username: "user1",
+        text: "loveeeee",
+        timestamp: "2025-03-27T15:05:00-06:00"
+      },
+      {
+        id: 2,
+        username: "user2",
+        text: "cute pic ;)",
+        timestamp: "2025-03-27T15:10:00-06:00"
+      }]
+    }}
+  />
+
+</Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
               
             </Tab.Content>
