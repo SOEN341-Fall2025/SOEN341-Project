@@ -2,8 +2,26 @@ import express from "express";
 const router = express.Router();
 import { supabase } from "../server.js";
 
-// Retrieve all exhibits
-router.get("/api/exhibits", async (_req, res) => {
+// Helper function for authentication
+const authenticateUser = async (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ msg: "Unauthorized: No token provided." });
+    }
+
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+        return res.status(401).json({ msg: "Unauthorized: Invalid token.", error });
+    }
+
+    req.user = user; // Attach user data to the request for further use
+    next();
+};
+
+// Retrieve all exhibits (requires authentication)
+router.get("/api/exhibits", authenticateUser, async (_req, res) => {
     const { data, error } = await supabase
         .from('Exhibits')
         .select('*')
@@ -16,8 +34,8 @@ router.get("/api/exhibits", async (_req, res) => {
     res.json({ msg: "Exhibits fetched successfully.", data });
 });
 
-// Retrieve all Exhibit Comments
-router.get("/api/exhibit/comments", async (req, res) => {
+// Retrieve all Exhibit Comments (requires authentication)
+router.get("/api/exhibit/comments", authenticateUser, async (req, res) => {
     const { post_id } = req.query;
 
     if (!post_id) {
@@ -36,3 +54,5 @@ router.get("/api/exhibit/comments", async (req, res) => {
 
     res.json({ msg: "Comments fetched successfully.", data });
 });
+
+export default router;
