@@ -55,11 +55,11 @@ router.delete("/api/messages/:MsgId", async (req, res) => {
 });
 
 //Delete Channels
-router.delete("/api/channels/:ChannelName", async (req, res) => {
+router.delete("/api/channels/:channelname", async (req, res) => {
     
   const { channelname } = req.params;
   const { userId } = req.body; 
-
+  console.log("Verifying admin privileges for:", { userId, channelname });
   const { data: message, error: messageError } = await supabase
       .from("Channels")
       .select("GalleryID") 
