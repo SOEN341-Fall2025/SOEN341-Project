@@ -287,16 +287,19 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
               defaultActiveKey="Me"
               className="flex-column d-flex align-items-start"
             >
-              <Row id="sidebar-dm-options">
-                <Col>Channels
-                  <Nav.Link onClick={() => handleClick('addAdmin-modal')} className="add-admin">
-                  <Plus />
-                  </Nav.Link>
-                  <Nav.Link onClick={() => handleClick('addOwner-modal')} className="add-Owner">
-                  <icons.Minus />
-                  </Nav.Link>
-                </Col>
-              </Row>
+
+  <Col  id="sidebar-channels" style={{ width: user.sizeInnerSidebar }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+      <Nav.Link onClick={() => handleClick('addAdmin-modal')} className="add-admin" style={{ display: 'flex', alignItems: 'center', marginRight: '2px' }}>
+        <Plus />
+      </Nav.Link>
+      <div style={{ fontWeight: 'bold' }}>Channels</div>
+      <Nav.Link onClick={() => handleClick('addOwner-modal')} className="add-owner" style={{ display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
+        <icons.Minus />
+      </Nav.Link>
+    </div>
+  </Col>
+
               <Nav.Link className="seperator" disabled>
                 <hr />
                 <hr />
