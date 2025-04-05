@@ -1,10 +1,46 @@
 import '../style/style.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Send, Bookmark, User } from 'lucide-react';
 import backImage from '../assets/background.png';
 
 
 function Exhibit({ user, post }) {
+
+  useEffect(() =>{
+
+    const token = localStorage.getItem('authToken');
+
+    async function fetchExhibits (){
+      try {
+          const response = await fetch("/api/exhibits", {
+              method: "GET",
+              headers: {
+                  "Content-Type": "application/json",
+                   'Authorization': `Bearer ${token}`
+              },
+              credentials: "include", // Include cookies if authentication is required
+          });
+  
+          const result = await response.json();
+  
+          if (!response.ok) {
+              throw new Error(result.msg || "Failed to fetch exhibits");
+          }
+
+          console.log("Hello,",result)
+  
+          return result.data;
+      } catch (error) {
+          console.error("Error fetching exhibits:", error);
+          return [];
+      }
+  };
+
+  fetchExhibits();
+
+
+  },[]);
+
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(post.comments || []);
   const [likes, setLikes] = useState(post.likes || 0);
@@ -40,6 +76,8 @@ function Exhibit({ user, post }) {
     return new Date(dateString).toLocaleString('en-US', options);
   };
 
+
+
   return (
     <div className="instagram-post bg-white border border-gray-200 rounded-sm max-w-md mx-auto mb-8">
       {/* Post Header */}
@@ -53,7 +91,7 @@ function Exhibit({ user, post }) {
       {/* Post Image */}
       <div className="w-full aspect-square bg-gray-100 flex items-center justify-center">
         <img 
-          src={"backImage"} 
+          src={"https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/exhibituploads//1.png"} 
           alt="Post" 
           className="w-full h-full object-cover"
         />

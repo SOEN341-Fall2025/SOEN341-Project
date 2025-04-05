@@ -112,7 +112,7 @@ const [exhibitPosts, setExhibitPosts] = useState([
 ]);
 
 useEffect(() => {
-  const fetchExhibitPosts = async () => {
+  /*const fetchExhibitPosts = async () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await fetch('/api/exhibit/posts', {
@@ -125,7 +125,7 @@ useEffect(() => {
     }
   };
 
-  fetchExhibitPosts();  // Just fetch directly since we know we're authenticated
+  fetchExhibitPosts();  // Just fetch directly since we know we're authenticated*/
 }, []);  // Empty dependency array means run once on mount
 
 // Then update the Tab.Pane for exhibit:
