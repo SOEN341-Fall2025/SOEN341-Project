@@ -262,7 +262,7 @@ router.post("/gal/createChannel", async (req, res) => {
 });
 
 //Retrieving channel messages
-router.get("/gal/msgChannel", async (req, res) => {
+router.get("/gal/msgChannel/:channelName", async (req, res) => {
 
     const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
 
@@ -270,7 +270,7 @@ router.get("/gal/msgChannel", async (req, res) => {
         return res.status(401).json(error);
     }
 
-    const { channelName } = req.body;
+    const { channelName } = req.params;
 
     const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
     const galleryIDdata = await galIDresponse.json();
@@ -345,8 +345,7 @@ router.post("/gal/channel/sendMsg", async(req, res) => {
 
   const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
   const galleryIDdata = await galIDresponse.json();
-  const galleryID = galleryIDdata.data.GalleryID;
-
+  const galleryID = await galleryIDdata.data.GalleryID;
     const { data, error: databaseError } = await supabase
         .from('ChannelMessages')
         .insert([
@@ -512,6 +511,47 @@ router.get("/api/gallery/getChannels", async (req, res) => {
     } catch (err) {
       res.status(500).json({ error: "Internal Server Error" });
     }
+});
+
+router.post("/api/gal/saveChannelMessages", async (req, res) => {
+  // Extract user information from the JWT token
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+
+  if (error || !user) {
+      return res.status(401).json(error);
+  }
+
+  const { channelName, galleryName, message } = req.body;
+
+  // Fetch the gallery ID based on gallery name
+  const galleryIDResponse = await fetch(`/api/gal/getID/${galleryName}`);
+
+  if (!galleryIDResponse.ok) {
+      return res.status(404).json({ error: "Gallery not found" });
+  }
+
+  const galleryIDData = await galleryIDResponse.json();
+  const galleryID = galleryIDData.data.GalleryID;  // Assuming the gallery ID is under data.GalleryID
+
+  // Insert the message into the database
+  const { data, error: databaseError } = await supabase
+      .from('ChannelMessages')
+      .insert([
+          {
+              User_id: user.id,
+              Msg: message,
+              Gallery_id: galleryID,
+              Channel_name: channelName
+          }
+      ]);
+
+  if (databaseError) {
+      console.log("Error saving message:", databaseError);
+      return res.status(500).json({ msg: "Message could not be saved.", databaseError });
+  }
+
+  // Send a success response
+  res.status(200).json({ msg: "Message was saved successfully", data });
 });
 
 export default router;

@@ -127,3 +127,45 @@ body::before {
 #passwordStrength {
     display: none;
 }
+
+/* Instagram Post Styling */
+.instagram-post {
+    width: 100%;
+    max-width: 470px;
+    background: white;
+    margin: 0 auto 24px;
+  }
+  
+  /* Input field styling */
+  .instagram-post input {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .instagram-post input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+  
+  /* Like button animation */
+  @keyframes likeAnimation {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  
+  .instagram-post button:active svg {
+    animation: likeAnimation 0.45s ease-in-out;
+  }
+
+  .post-image-container {
+    width: 100%;
+    aspect-ratio: 1/1; /* Square ratio */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+ 
