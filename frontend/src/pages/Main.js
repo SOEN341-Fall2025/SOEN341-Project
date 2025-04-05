@@ -56,6 +56,7 @@ function Main({ userData, galleries}) {
   const [dmNavWidth, setDmNavWidth] = useState(17);  
   const [userGalleries, setUserGalleries] = useState(galleries); 
   const [error, setError] = useState(false);
+  const [currentGalleryId, setCurrentGalleryId] = useState(null);
 
   const[userNames, setUserNames] = useState([]);
   
@@ -214,6 +215,8 @@ useEffect(() => {
     setNewMessage("");
   };
   
+
+
   /*SECTION - ELEMENTS */
 
   const ProfilePic = () => {
@@ -277,6 +280,7 @@ useEffect(() => {
       console.log("Getting Channels for " + galleryName);
       getChannels(galleryName);
     }, [getChannels]);
+    
     return (        
       userGalleries.map((item, index) => (
         <Nav.Link 
@@ -640,30 +644,30 @@ useEffect(() => {
                     <UserChatList usernames={userNames}/>
                 </Tab.Pane>
                 <Tab.Pane eventKey="page-exhibit">
-  <Exhibit 
-    user={{ username: userVar.username }} 
-    post={{
-      imageUrl: "../assets/background.jpg",
-      username: userVar.username,
-      caption: "I love Bubbles!!",
-      timestamp: new Date().toISOString(),
-      likes: 0,
-      comments: [{
-        id: 1,
-        username: "user1",
-        text: "loveeeee",
-        timestamp: "2025-03-27T15:05:00-06:00"
-      },
-      {
-        id: 2,
-        username: "user2",
-        text: "cute pic ;)",
-        timestamp: "2025-03-27T15:10:00-06:00"
-      }]
-    }}
-  />
+                <Exhibit 
+                    user={{ username: userVar.username }} 
+                    post={{
+                      imageUrl: "../assets/background.jpg",
+                      username: userVar.username,
+                      caption: "I love Bubbles!!",
+                      timestamp: new Date().toISOString(),
+                      likes: 0,
+                      comments: [{
+                        id: 1,
+                        username: "user1",
+                        text: "loveeeee",
+                        timestamp: "2025-03-27T15:05:00-06:00"
+                      },
+                      {
+                        id: 2,
+                        username: "user2",
+                        text: "cute pic ;)",
+                        timestamp: "2025-03-27T15:10:00-06:00"
+                      }]
+                    }}
+                  />
 
-</Tab.Pane>
+              </Tab.Pane>
               <GalleryPageList galleries={userGalleries} />
               
             </Tab.Content>
