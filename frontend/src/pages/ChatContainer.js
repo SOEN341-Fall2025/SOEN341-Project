@@ -49,8 +49,8 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
         {messages.map((item, index) => {
           const isUserMessage = item.PopperUsername !== popperUser;
           return(
-          <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
-            {item.PopperUsername}
+          <div key={index} className={`message ${!isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
+            {item.BubblerUsername}
             <User className="icon" />
             <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
               {item.Message}
