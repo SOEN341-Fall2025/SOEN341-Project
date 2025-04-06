@@ -128,7 +128,7 @@ body::before {
     display: none;
 }
 
-/* Instagram Post Styling */
+
 .instagram-post {
     width: 100%;
     max-width: 470px;
@@ -136,7 +136,7 @@ body::before {
     margin: 0 auto 24px;
   }
   
-  /* Input field styling */
+
   .instagram-post input {
     border: none;
     padding: 0;
@@ -162,7 +162,7 @@ body::before {
 
   .post-image-container {
     width: 100%;
-    aspect-ratio: 1/1; /* Square ratio */
+    aspect-ratio: 1/1; 
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
