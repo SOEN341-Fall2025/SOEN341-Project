@@ -143,6 +143,7 @@ function Exhibit() {
       {showComments && (
       <div className={`comments-container ${showComments ? 'show' : ''}`} style={{
         overflowY: 'scroll',
+        height: '770px',
         width: '300px',
         background: 'white',
         borderRadius: '12px',
