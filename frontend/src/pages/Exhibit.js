@@ -83,9 +83,9 @@ function Exhibit({ user, post }) {
       {/* Post Header */}
       <div className="flex items-center p-4">
         <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
-          <User size={16} />
+          
         </div>
-        <span className="font-semibold text-sm">{post.username}</span>
+        <span className="font-semibold text-sm"><User size={24} />{post.username}</span>
       </div>
 
       {/* Post Image */}
@@ -104,7 +104,7 @@ function Exhibit({ user, post }) {
             <button onClick={handleLike}>
               <Heart 
                 size={24} 
-                fill={isLiked ? "red" : "none"} 
+                fill={isLiked ? "red" : "white"} 
                 color={isLiked ? "red" : "currentColor"} 
               />
             </button>
@@ -127,38 +127,42 @@ function Exhibit({ user, post }) {
           {formatDate(post.timestamp)}
         </div>
 
-        {/* Comments */}
-        {comments.map(comment => (
-          <div key={comment.id} className="mb-1">
-            <span className="font-semibold text-sm mr-2">{comment.username}</span>
-            <span className="text-sm">{comment.text}</span>
-          </div>
-        ))}
+        
       </div>
-
-      {/* Comment Input */}
-      <div className="border-t border-gray-200 p-4">
-        <form onSubmit={handleAddComment} className="flex items-center">
-          <input
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Add a comment..."
-            className="flex-grow outline-none text-sm"
-          />
-          <button 
-            type="submit" 
-            className={`font-semibold text-sm ml-2 ${
-              comment.trim() ? "text-blue-500" : "text-blue-300"
-            }`}
-            disabled={!comment.trim()}
-          >
-            Post
-          </button>
-        </form>
-      </div>
+      
     </div>
+        
   );
 }
 
 export default Exhibit;
+
+/* Comments { Comments }
+{comments.map(comment => (
+  <div key={comment.id} className="mb-1">
+    <span className="font-semibold text-sm mr-2">{comment.username}</span>
+    <span className="text-sm">{comment.text}</span>
+  </div>
+))}
+
+{/* Comment Input }
+<div className="border-t border-gray-200 p-4">
+<form onSubmit={handleAddComment} className="flex items-center">
+  <input
+    type="text"
+    value={comment}
+    onChange={(e) => setComment(e.target.value)}
+    placeholder="Add a comment..."
+    className="flex-grow outline-none text-sm"
+  />
+  <button 
+    type="submit" 
+    className={`font-semibold text-sm ml-2 ${
+      comment.trim() ? "text-blue-500" : "text-blue-300"
+    }`}
+    disabled={!comment.trim()}
+  >
+    Post
+  </button>
+</form>
+</div>*/
