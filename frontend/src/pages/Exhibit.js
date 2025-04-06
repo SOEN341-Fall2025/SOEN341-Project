@@ -18,6 +18,8 @@ function Exhibit() {
   const [likes, setLikes] = useState(samplePost.likes || 0);
   const [isLiked, setIsLiked] = useState(false);
 
+  const [showComments, setShowComments] = useState(false);
+
   const handleAddComment = (e) => {
     e.preventDefault();
     if (!comment.trim()) return;
@@ -46,6 +48,10 @@ function Exhibit() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const toggleComments = () => {
+    setShowComments(!showComments);
   };
 
   return (
@@ -110,7 +116,7 @@ function Exhibit() {
                   color={isLiked ? "red" : "currentColor"} 
                 />
               </button>
-              <MessageCircle size={24} />
+              <button onClick={toggleComments}> <MessageCircle size={24} /></button>
               <Send size={24} />
             </div>
             <Bookmark size={24} />
@@ -134,6 +140,7 @@ function Exhibit() {
       </div>
 
       {/* Right Side - Comments Container */}
+      {showComments && (
       <div className="comments-container" style={{
         width: '300px',
         background: 'white',
@@ -231,6 +238,7 @@ function Exhibit() {
           </form>
         </div>
       </div>
+    )}
     </div>
   );
 }
