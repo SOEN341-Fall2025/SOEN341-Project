@@ -141,12 +141,12 @@ function Exhibit() {
 
       {/* Right Side - Comments Container */}
       {showComments && (
-      <div className="comments-container" style={{
+      <div className={`comments-container ${showComments ? 'show' : ''}`} style={{
+        overflowY: 'scroll',
         width: '300px',
         background: 'white',
         borderRadius: '12px',
-        overflow: 'hidden',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        boxShadow: '0 4px 12px #000000',
         display: 'flex',
         flexDirection: 'column'
       }}>

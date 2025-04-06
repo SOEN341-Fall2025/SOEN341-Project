@@ -168,5 +168,15 @@ body::before {
     background-repeat: no-repeat;
   }
   
+  .comments-container {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  
+  .comments-container.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
   
  
