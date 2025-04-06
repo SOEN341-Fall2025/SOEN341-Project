@@ -58,7 +58,7 @@ function Exhibit() {
     <div className="posts-container" style={{
       display: 'flex',
       justifyContent: 'center',
-      gap: '40px',
+      gap: '0px',
       width: '100%',
       padding: '20px',
       position: 'absolute',
@@ -139,7 +139,7 @@ function Exhibit() {
         </div>
       </div>
 
-      {/* Right Side - Comments Container */}
+      {/*Comments Container */}
       {showComments && (
       <div className={`comments-container ${showComments ? 'show' : ''}`} style={{
         overflowY: 'scroll',
