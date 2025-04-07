@@ -31,6 +31,7 @@ jobs:
         run: npm install --omit=optional
       # Step 4: Run tests
       - name: Run tests
+        working-directory: ./backend
         run: npm test
         env:
           # Provide environment variables for testing
