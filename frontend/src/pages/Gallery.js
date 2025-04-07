@@ -29,22 +29,74 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
               {item.ChannelName}
               </Nav.Link>
           );
-          return null; // Ensure the map function returns something in all cases
+          
       });
+    };
+    //Delete channnel 
+    const handleDeleteChannel = async (channelName) => {
+      const token = localStorage.getItem('authToken');
+  
+      const userId = await getCurrentUserId();
+    
+      try {
+        const response = await fetch(`/api/channels/${channelName}?userId=${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          }, 
+        });
+    
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const text = await response.text();
+          throw new Error(`Invalid response (not JSON): ${text.slice(0, 80)}...`);
+        }
+    
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.msg || 'Failed to delete channel');
+        }
+    
+        setTheseChannels(prev => prev.filter(ch => ch.ChannelName !== channelName));
+        alert('Channel deleted successfully!');
+      } catch (error) {
+        console.error('Delete error:', error.message);
+        alert(`Failed to delete channel: ${error.message}`);
+      }
     };
 
     const GalleryChannelList = ({ channels }) => {
       if(channels.length > 0){
         return (
           channels.map((item, index) => (
-              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
+            <Nav.Link
+            eventKey={item.ChannelName}
+            key={index}
+            className="d-flex justify-content-between align-items-center"
+            style={{ width: '100%' }}
+          >
+            <span
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                setNewChannelName(item.ChannelName);
                 fetchChannelMessages(item.ChannelName);
-              }}>
-                <span className="channel-icon">
-                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
-                </span>
-                {item.ChannelName}
-              </Nav.Link>
+              }}
+            >
+              <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} /> {item.ChannelName}
+            </span>
+          
+            <icons.Minus
+              size={18}
+              color="#4F6FF7"
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation(); 
+                if (window.confirm(`Are you sure you want to delete ${item.ChannelName}?`)) {
+                  handleDeleteChannel(item.ChannelName);
+                }
+              }}
+            />
+          </Nav.Link>
             ))
         );
       }
