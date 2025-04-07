@@ -141,7 +141,7 @@ router.post("/gal/create", async (req, res) => {
     res.status(200).json({msg:"Gallery was successfully created.", data});
 
 });
-
+// retrieve list of gallery names from database given user id
 router.get("/gal/retrieve", async (req, res) => {
   // Get the token from the Authorization header
   const token = req.headers.authorization?.split(" ")[1];
@@ -176,8 +176,8 @@ router.get("/gal/retrieve", async (req, res) => {
   if (galleryIDs.length === 0) {
     return res.status(404).json({ msg: "No galleries found for this user." });
   }
-
-  // Fetch the actual galleries from the Galleries table
+  
+  // Fetch the list of gallery names from the Galleries table
   const { data, error: databaseError } = await supabase
     .from("Galleries")
     .select("GalleryName")
@@ -262,11 +262,12 @@ router.get("/gal/getID/:galleryName", async (req, res) => {
 
 });
 
+
 // Channel API calls ==================================================================================================
 
 //Creation of a channel in a gallery
 router.post("/gal/createChannel", async (req, res) => {    
-
+  
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) {
     return res.status(401).json({ error: "Unauthorized: No token provided" });
@@ -304,6 +305,73 @@ router.post("/gal/createChannel", async (req, res) => {
 
 });
 
+//Renaming of a channel in a gallery if user is gallery admin
+router.put("/gal/renameChannel", async (req, res) => {    
+  
+  const token = req.header("Authorization")?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+  
+  const { clickedName, galleryId, newTitle } = req.body;      
+  
+  try{
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (authError || !user) {
+          console.error('Authentication Error:', authError); // Log error for debugging
+          return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+      }  
+      
+      // Verify Admin Status of current user
+      const galAdmin = await supabase
+        .from("GalleryMembers")
+        .select("GalleryRole")
+        .eq('UserID', user.id)
+        .eq('GalleryID', galleryId);
+      
+      //console.log('User role:', user.role);
+      console.log(req.body);  // Log error for debugging
+      console.log(clickedName, galleryId, newTitle);  // Log error for debugging
+      console.log("Admin Role: ", galAdmin.data[0].GalleryRole);  // Log error for debugging
+      
+      if (galAdmin.data[0].GalleryRole == false) {
+        console.log("Unauthorized: Not admin of this gallery.");
+        return res.status(401).json({ error: "Unauthorized: Not admin of this gallery." });
+      }             
+      
+      const { data: row, error: Error } = await supabase
+        .from("Channels")
+        .select("*")
+        .eq("ChannelName", clickedName)
+        .eq("GalleryID", galleryId);
+      
+      
+      console.log("DEBUG SELECT", row);
+        
+      const { data: updatingRow, error: databaseError } = await supabase
+        .from("Channels")
+        .update({ChannelName: newTitle})
+        .eq("ChannelName", clickedName)
+        .eq("GalleryID", galleryId);
+      
+      if (databaseError) {
+          console.log("Database Error", databaseError);
+          return res.status(500).json({msg:"Channel could not be renamed.", databaseError});
+      }        
+      console.log(updatingRow);
+      return res.status(200).json({ msg: "Channel renamed successfully" });  
+  }
+  catch (err) {
+      console.log("Internal Server Error", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+  }
+
+});
+
+
+
+
 //Retrieving channel messages
 router.get("/gal/msgChannel", async (req, res) => {
 
@@ -314,7 +382,7 @@ router.get("/gal/msgChannel", async (req, res) => {
     }
 
     const { channelName } = req.body;
-
+    
     const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
     const galleryIDdata = await galIDresponse.json();
     const galleryID = galleryIDdata.data.GalleryID;
@@ -385,7 +453,7 @@ router.post("/gal/channel/sendMsg", async(req, res) => {
   }
 
   const { message, channelName } = req.body;
-
+  
   const galIDresponse = await fetch(`http://localhost:4000/api/get/galleryID-channelName/${channelName}`);
   const galleryIDdata = await galIDresponse.json();
   const galleryID = galleryIDdata.data.GalleryID;
@@ -411,7 +479,7 @@ router.post("/gal/channel/sendMsg", async(req, res) => {
 
 
 //Retrieve all possible galleries
-router.get("/api/gallery/all", async (req, res) => {
+router.get("/gal/all", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
       return res.status(401).json({ error: "Unauthorized: No token provided" });
@@ -451,7 +519,16 @@ router.get("/api/gallery/all", async (req, res) => {
       //console.log(galleries);
       if (galleryError) throw galleryError;
       
-      res.status(200).json(galleries);
+      if (galleries.length === 0) {
+        return res.status(200).json([]);
+      }
+      // Format the response
+      const formattedResponse =  galleries.map((gal, index) => ({
+              GalleryName: gal.GalleryName,
+              GalleryID: gal.GalleryID,
+              Creator_id: gal.Creator_id
+          }));
+      res.status(200).json(formattedResponse);
     } catch (err) {
         console.log(err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -500,6 +577,7 @@ router.get("/api/gallery/channels", async (req, res) => {
     }));
       
     console.log("All Channels" + channels);
+    
     res.json(response);
     } catch (err) {
       res.status(500).json({ error: "Internal Server Error" });
@@ -507,40 +585,35 @@ router.get("/api/gallery/channels", async (req, res) => {
 });
  
 //Get channels from a specific gallery using its name
-router.get("/api/gallery/getChannels", async (req, res) => {
+router.get("/gal/getChannels", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) {
       return res.status(401).json({ error: "Unauthorized: No token provided" });
     }
-    try {
-        const { galleryName } = req.query;
-        if (!galleryName) {
-            return res.status(400).json({ error: "Gallery name was not received." });
-        }
-
-        const { data, error } = await supabase
-        .from('Galleries')
-        .select('GalleryID') 
-        .eq('GalleryName', galleryName)
-        .single();
-
-        if (error) {
-          console.log(error);
-            return res.status(400).json({ msg: error.message, data: {"GalleryID": null} });
-        }
         
-        if (!data) {
-            console.log("DEBUG: " + data);
-            return res.status(404).json({ msg: "Gallery not found", data: {"GalleryID": null} });
-        }
+    const { galleryName, galleryID } = req.query;     
+    console.log("DEBUG REQ: ", req.query);   
+    if (!galleryName || !galleryID) {
+        return res.status(400).json({ error: "Gallery name was not received." });
+    }   
+    
+    try {        
+      
+      // Get the user based on the token
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      
+      if (authError || !user) {
+          console.error('Authentication Error:', authError); // Log error for debugging
+          return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+      }       
         
-        const galleryId = data.GalleryID;
-        console.log("DEBUG: " + galleryId);
+        //const galleryId = data.GalleryID;        console.log("DEBUG: " + galleryId);
+        console.log("DEBUG: " + galleryID);
         // Step 2: Get channels in each gallery details for these IDs
         const { data: channels, error: channelsError } = await supabase
         .from('Channels')
         .select('ChannelName')
-        .eq('GalleryID', galleryId);
+        .eq('GalleryID', galleryID);
     
         if (channelsError) {
         console.error('Error fetching channels:', channelsError);

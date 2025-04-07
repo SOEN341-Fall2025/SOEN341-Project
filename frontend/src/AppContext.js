@@ -1,8 +1,8 @@
 import React from 'react';
-import * as icons from 'lucide-react';
-import * as phosphor from '@phosphor-icons/react';
+import * as lucideIcons from 'lucide-react';
+import * as phosphorIcons from '@phosphor-icons/react';
+
 import { lazy, Suspense } from 'react';
-import { IconProps } from '@phosphor-icons/react';
 
 
 export const AppContext = React.createContext();
@@ -26,19 +26,21 @@ export function ToVW(px){ return (100 * (px / window.innerWidth)); }
 export function ToPX(vw){ return Math.ceil((window.innerWidth * vw / 100)); }
 export const Icon = ({ name, ...props }) => {
     const iconName = name || FindClosestIcon(props.alt || '');
-    const LucideIcon = icons[iconName];
-    return LucideIcon ? <LucideIcon {...props} /> : null;
+    const CustomIcon = phosphorIcons[iconName] || lucideIcons[iconName];
+    return CustomIcon ? <CustomIcon {...props} /> : null;
   };
+  
 export const FindClosestIcon = (name) => {
-    const iconNames = Object.keys(icons);
-    const words = name.toLowerCase().split(' ');
-
-    for (const word of words) {
-      const match = iconNames.find(iconName =>
-        iconName.toLowerCase().includes(word)
-      );
-      if (match) return match;
-    }
+    const iconNames = Object.keys(lucideIcons);
+    const icon2Names = Object.keys(phosphorIcons);
     
+    const words = name.toLowerCase().split(' ');
+    
+    for (const word of words) {
+      const match = icon2Names.find(iconName => iconName.toLowerCase().includes(word)) || 
+      iconNames.find(iconName => iconName.toLowerCase().includes(word));
+      if (match) return match;
+    }       
+
     return 'Hash'; // Default icon if no match found
   };

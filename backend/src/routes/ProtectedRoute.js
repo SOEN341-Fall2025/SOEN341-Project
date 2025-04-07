@@ -78,7 +78,7 @@ router.post("/api/auth/login", async (req, res) => {
     res.json({ msg: "Login successful", token: data.session.access_token });
 });
 
-// Get user info 
+// Get user metadata 
 router.get("/api/get/me", async (req, res) => {
     const token = req.header("Authorization")?.split(" ")[1];
     if (!token) return res.status(401).json({ msg: "Unauthorized" });
@@ -89,14 +89,14 @@ router.get("/api/get/me", async (req, res) => {
 
     const userId = data.user.id;
     //console.log(userId);
-    const { data: userData, error: userError } = await supabase
+    const { data: metadata, error: userError } = await supabase
         .from('Users')
         .select('*')
         .eq('user_id', userId);
 
     if (userError) return res.status(505).json({ msg: "Error fetching user data" });
-
-    res.json({ user: userData });
+    //console.log(metadata);
+    res.json(metadata);
 });
 // Get user auth 
 router.get("/api/auth/me", async (req, res) => {

@@ -5,7 +5,7 @@ import { useContext } from 'react';
 import { useState } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
-function Settings({userVars}) {
+function Settings({userVars, ProfilePic}) {
     
       const [modalState, setModalState] = useState("close");
       const handleClose = () => setModalState(false);
@@ -56,7 +56,6 @@ function Settings({userVars}) {
           const userId = userVars.userID;    
           updateUser(userId, "settings", userVars.settings);
       }
-      const { ProfilePic, Username, Displayname, Aboutme } = useContext(AppContext);
     return (      
       <section>
         <div className="settings">
@@ -78,20 +77,15 @@ function Settings({userVars}) {
                   <Tab.Pane eventKey="settings-profile">
                     <h3>Profile</h3>       
                     <Form.Group className="divframe">
-                      <Form.Label className="label px-1">Display Name</Form.Label>
-                      <div className="justify-between">
-                        <Form.Control type="text" plaintext defaultValue={Displayname} id="display-name" disabled />            
-                        <Button variant="secondary" id="modal-profile-1" onClick={() => handleClick('modal-profile-1')}>🖊</Button>
-                      </div>                    
                       <Form.Label className="label px-1">User Name</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control type="text" plaintext defaultValue={Username} id="user-name" disabled />
+                        <Form.Control type="text" plaintext defaultValue={userVars.username} id="user-name" disabled />
                         <Button variant="secondary" id="modal-profile-2" onClick={() => handleClick('modal-profile-2')}>🖊</Button>
                       </div>                    
                       <Form.Label className="label px-1">About Me</Form.Label>
                       <div className="justify-between">      
                       <div className="flex-grow">
-                        <Form.Control as="textarea" rows={5} style={{width:'10vw!important'}} placeholder={Aboutme} disabled /> </div>
+                        <Form.Control as="textarea" rows={5} style={{width:'10vw!important'}} placeholder={userVars.about_me} disabled /> </div>
                         <Button variant="secondary" id="modal-profile-3" onClick={() => handleClick('modal-profile-3')}>🖊</Button>
                       </div>      
                       <Form.Label className="label px-1">Avatar</Form.Label>   
