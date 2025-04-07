@@ -29,6 +29,18 @@ jobs:
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install --omit=optional
+      - name: Install test-specific dependencies
+        working-directory: ./backend
+        run: npm install --save-dev @babel/preset-env @babel/core babel-jest
+      # Step 4: Run tests
+      - name: Run tests
+        working-directory: ./backend
+        run: npm test
+        env:
+          # Provide environment variables for testing
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NODE_ENV: test
 
      
      
