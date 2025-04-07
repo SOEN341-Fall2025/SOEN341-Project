@@ -1,11 +1,11 @@
 
 import express from 'express';
 import request from 'supertest';
-import router from '../../../../src/routes/ProtectedRoute.js';
-import { supabase } from '../../../../src/server.js';
+import router from '../src/routes/ProtectedRoute.js';
+import { supabase } from '../src/server.js';
 
 // Mock supabase
-jest.mock('../../../../src/server.js', () => ({
+jest.mock('../src/server.js', () => ({
   supabase: {
     auth: {
       signInWithPassword: jest.fn()
