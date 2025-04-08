@@ -9,6 +9,7 @@ function Exhibit({ user, post }) {
   const [exhibits, setExhibits] = useState([]);
   const [DmID, setDmID] = useState("");
 
+  //fetch commments based on the post_id given (use for every exhibits, put it in a list)
   const fetchComments = async (post_id) => {
     const token = localStorage.getItem('authToken');
 
@@ -35,6 +36,7 @@ function Exhibit({ user, post }) {
     }
   };
 
+  //Uploads files to storage (modify soon to upload files to exhibits not dms)
   const uploadDmFile = async (file, DmID) => {
     const token = localStorage.getItem('authToken');
     const formData = new FormData();
@@ -66,7 +68,8 @@ function Exhibit({ user, post }) {
     }
   };
 
-  const handleFileChange = async (e) => {
+  // To handle the uploading (delete if not needed)
+  /*const handleFileChange = async (e) => {
     console.log("File input triggered");
     const file = e.target.files[0];
   
@@ -74,12 +77,13 @@ function Exhibit({ user, post }) {
       console.log("File selected:", file);
       await uploadDmFile(file, 35);
     }
-  };
+  };*/
 
   useEffect(() =>{
 
     const token = localStorage.getItem('authToken');
 
+    //retrieve all exhibits
     async function fetchExhibits (){
       try {
           const response = await fetch("/api/exhibits", {
@@ -175,7 +179,7 @@ function Exhibit({ user, post }) {
         />
       </div>
 
-      {/*
+      {/* To test the upload file function
       <div>
         <span>Upload:</span>
         <form>
