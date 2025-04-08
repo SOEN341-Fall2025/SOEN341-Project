@@ -4,7 +4,8 @@ import { User, ArrowLeft, Camera, Mic, Plus } from 'lucide-react';  // Assuming 
 import { Row, Col, Nav } from 'react-bootstrap';
 import { HexToRGBA } from '../AppContext';
 
-function ChatContainer({ barSizes, user, header, messages= [], type }) {
+function ChatContainer({ barSizes, user, header, messages= [], type, galleryName, channelName }) {
+  console.log("AuthUser please",user.username);
   const [popperUser, setPopperUser] = useState("");  // For storing the other user's name
   const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
   const [newMessage, setNewMessage] = useState(""); // Input for new messages
@@ -42,16 +43,21 @@ function ChatContainer({ barSizes, user, header, messages= [], type }) {
 
   // Message List Component
   const MessageList = ({ messages }) => {
+    
     return (
       <span>
-        {messages.map((item, index) => (
-          <div key={index} className={`message ${item.PopperUsername === popperUser ? "user" : "recipient"} flex items-center my-2`}>
-            <div className={`text ${item.PopperUsername === popperUser ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${item.PopperUsername === popperUser ? "ml-2" : "mr-2"} max-w-[60%]`}>
+        {messages.map((item, index) => {
+          const isUserMessage = item.PopperUsername !== popperUser;
+          return(
+          <div key={index} className={`message ${!isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
+            {item.BubblerUsername}
+            <User className="icon" />
+            <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
               {item.Message}
             </div>
-            <User className="icon" />
+            
           </div>
-        ))}
+  )})}
       </span>
     );
   };
@@ -101,6 +107,89 @@ function ChatContainer({ barSizes, user, header, messages= [], type }) {
   //Channel Messaging
 
   const [channelMessages, setChannelMessages] = useState(messages);
+  const [currentUsername, setCurrentUsername] = useState(user.username);
+
+  const handleChannelMessages = (newMessage) => {
+    setChannelMessages([
+      ...channelMessages,
+      { message: newMessage, username: currentUsername }
+    ]);
+    saveChannelMessage(channelName, newMessage);
+  };
+
+  const handleSubmitChannelMessages = (event) => {
+    event.preventDefault();  // Prevent page reload on submit
+    handleChannelMessages(newMessage);  // Add the new message
+    setNewMessage("");  // Clear input field
+  };
+
+  // Message List Component
+  const ChannelMessageList = ({ messages }) => {
+
+    return (
+      <span>
+        {messages.map((item, index) => {
+          const isUserMessage = item.username !== user.username;
+          console.log(`Message from: ${item.username}, Current User: ${user.username}, Is User Message: ${isUserMessage}`);
+  
+          return (
+            <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
+              <User className="icon" />
+              {item.username}
+              <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
+                {item.message}
+              </div>
+              
+
+            </div>
+          );
+        })}
+      </span>
+    );
+  };
+
+
+  const saveChannelMessage = async (channelName, newMessage) => {
+    const token = localStorage.getItem('authToken');
+  
+    // Check if the token is available
+    if (!token) {
+      console.error('No authentication token found.');
+      return;
+    }
+  
+    try {
+      // Make a POST request to the backend API
+      const response = await fetch('/gal/channel/sendMsg', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Send the auth token in the Authorization header
+        },
+        body: JSON.stringify({ message: newMessage, channelName: channelName }),
+      });
+  
+      // Check if the response was successful
+      if (!response.ok) {
+        // Try to read the error response and log it
+        const errorData = await response.json();
+        console.error('Error from server:', errorData.msg || 'Failed to save message');
+        throw new Error(errorData.msg || 'Failed to save message');
+      }
+  
+      // Parse the response data
+      const data = await response.json();
+      console.log('Message saved:', data);
+  
+      // Handle success (e.g., update UI, state, etc.)
+      return data; // You might want to return the message data here for further use
+  
+    } catch (error) {
+      console.error('Error saving message:', error.message);
+      // Optionally return or display an error message
+      return { error: error.message }; // You can return an error object or perform other UI updates
+    }
+  };
 
 
 
@@ -179,7 +268,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type }) {
             </div>
   
             {/* Display Messages */}
-            <MessageList messages={channelMessages} />
+            <ChannelMessageList messages={channelMessages} />
           </div>
   
           {/* Input Section */}
@@ -198,7 +287,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type }) {
   
             {/* Input Box and Send Button */}
             <Col id="chat-input" className="">
-              <form onSubmit={handleSubmitMessages}>
+              <form onSubmit={handleSubmitChannelMessages}>
                 <div className="d-flex gap-2">
                   <input
                     type="text"

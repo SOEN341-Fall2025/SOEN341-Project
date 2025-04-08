@@ -4,6 +4,7 @@ import './style/settings.css';
 import './style/style.css';
 import Login from './pages/Login.js';
 import Main from './pages/Main.js';
+import Exhibit from './pages/Exhibit';
 import { Loader } from 'lucide-react';
 
 function App() {
@@ -12,6 +13,33 @@ function App() {
   const [galleries, setGalleries] = useState([]);
   const [authStatus, setAuthStatus] = useState('checking'); // 'checking', 'authenticated', or 'unauthenticated'
   const savedSession = localStorage.getItem('authToken');
+
+  const post = {
+    imageUrl: "../assets/background.jpg",
+    username: "Alice",
+    caption: "I love Bubbles!",
+    timestamp: "2025-03-27T15:00:00-06:00",
+    likes: 4,
+    comments: [
+      {
+        id: 1,
+        username: "user1",
+        text: "loveeeee",
+        timestamp: "2025-03-27T15:05:00-06:00"
+      },
+      {
+        id: 2,
+        username: "user2",
+        text: "cute pic ;)",
+        timestamp: "2025-03-27T15:10:00-06:00"
+      }
+    ]
+  };
+
+  // Define user data (current viewer)
+  const user = {
+    username: "alice" // The logged-in user's username
+  };
 
   const fetchUserGalleries = async (token) => {
     try {
@@ -129,6 +157,7 @@ function App() {
       )}
     </section>
   );
+
 }
 
 export default App;
