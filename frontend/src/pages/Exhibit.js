@@ -10,6 +10,7 @@ function Exhibit({ user, post }) {
   const [exhibits, setExhibits] = useState([]);
   const [DmID, setDmID] = useState("");
 
+  //fetch commments based on the post_id given (use for every exhibits, put it in a list)
   const fetchComments = async (post_id) => {
     const token = localStorage.getItem('authToken');
 
@@ -36,6 +37,7 @@ function Exhibit({ user, post }) {
     }
   };
 
+  //Uploads files to storage (modify soon to upload files to exhibits not dms)
   const uploadDmFile = async (file, DmID) => {
     const token = localStorage.getItem('authToken');
     const formData = new FormData();
@@ -67,7 +69,8 @@ function Exhibit({ user, post }) {
     }
   };
 
-  const handleFileChange = async (e) => {
+  // To handle the uploading (delete if not needed)
+  /*const handleFileChange = async (e) => {
     console.log("File input triggered");
     const file = e.target.files[0];
   
@@ -75,80 +78,14 @@ function Exhibit({ user, post }) {
       console.log("File selected:", file);
       await uploadDmFile(file, 35);
     }
-  };
+  };*/
 
   useEffect(() =>{
 
     const token = localStorage.getItem('authToken');
-  
-    try {
-      const response = await fetch('/api/exhibit/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 💥 this is key
-        },
-        body: JSON.stringify({ post_id: postId, msg }),
-      });
-  
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Failed to post comment');
-  
-      console.log('Comment posted:', result.comment);
-    } catch (err) {
-      console.error('Error:', err.message);
-    }
-  };
 
-  //Uploads files to storage (modify soon to upload files to exhibits not dms)
-  const uploadExhibitFile = async (file, msg) => {
-    const token = localStorage.getItem('authToken');
-    const formData = new FormData();
-
-    formData.append("file", file);
-    formData.append("msg", msg);
-
-    try {
-        const response = await fetch("/exhibits/upload-file", {
-            method: "POST",
-            headers: {
-                'Authorization': `Bearer ${token}`, // Important: DO NOT set Content-Type here, browser will handle it
-            },
-            body: formData,
-        });
-
-        const result = await response.json();
-        console.log("Upload: ", result);
-
-        if (!response.ok) {
-            throw new Error(result.msg || "File upload failed");
-        }
-
-        console.log("File uploaded:", result.fileUrl);
-        return result.fileUrl;
-    } catch (error) {
-        console.error("Upload error:", error.message);
-        return null;
-    }
-  };
-
-  // To handle the uploading (delete if not needed)
-  const handleFileChange = async (e) => {
-    console.log("File input triggered");
-    const file = e.target.files[0];
-  
-    if (file) {
-      console.log("File selected:", file);
-      await uploadExhibitFile(file, 1);
-    }
-  };
-
-  useEffect(() => {
-
-    const token = localStorage.getItem('authToken');
-
-    // retrieve all exhibits
-    async function fetchExhibits () {
+    //retrieve all exhibits
+    async function fetchExhibits (){
       try {
           const response = await fetch("/api/exhibits", {
               method: "GET",
@@ -255,7 +192,7 @@ function Exhibit({ user, post }) {
         />
       </div>
 
-      {/*
+      {/* To test the upload file function
       <div>
         <span>Upload:</span>
         <form>
