@@ -6,6 +6,76 @@ import backImage from '../assets/background.png';
 
 function Exhibit({ user, post }) {
 
+  const [exhibits, setExhibits] = useState([]);
+  const [DmID, setDmID] = useState("");
+
+  const fetchComments = async (post_id) => {
+    const token = localStorage.getItem('authToken');
+
+    try {
+        const response = await fetch(`/api/exhibit/comments?post_id=${encodeURIComponent(post_id)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            credentials: "include"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.msg || "Failed to fetch comments");
+        }
+        console.log("result of comments",result);
+        return result.data; // Successfully fetched comments
+    } catch (error) {
+        console.error("Error fetching comments:", error.message);
+        return []; // Return an empty array on error
+    }
+  };
+
+  const uploadDmFile = async (file, DmID) => {
+    const token = localStorage.getItem('authToken');
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("DmID", DmID);
+
+    try {
+        const response = await fetch("/dm/upload-file", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`, // Important: DO NOT set Content-Type here, browser will handle it
+            },
+            body: formData,
+        });
+
+        const result = await response.json();
+        console.log("Upload: ", result);
+
+        if (!response.ok) {
+            throw new Error(result.msg || "File upload failed");
+        }
+
+        console.log("File uploaded:", result.fileUrl);
+        return result.fileUrl;
+    } catch (error) {
+        console.error("Upload error:", error.message);
+        return null;
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    console.log("File input triggered");
+    const file = e.target.files[0];
+  
+    if (file) {
+      console.log("File selected:", file);
+      await uploadDmFile(file, 35);
+    }
+  };
+
   useEffect(() =>{
 
     const token = localStorage.getItem('authToken');
@@ -27,19 +97,27 @@ function Exhibit({ user, post }) {
               throw new Error(result.msg || "Failed to fetch exhibits");
           }
 
-          console.log("Hello,",result)
+          setExhibits(result);
   
           return result.data;
       } catch (error) {
           console.error("Error fetching exhibits:", error);
           return [];
       }
-  };
+  }
 
   fetchExhibits();
+  fetchComments(1);
+
 
 
   },[]);
+
+  useEffect(() => {
+
+    console.log(exhibits)
+
+  }, [exhibits]);
 
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(post.comments || []);
@@ -96,6 +174,14 @@ function Exhibit({ user, post }) {
           className="w-full h-full object-cover"
         />
       </div>
+
+      {/*
+      <div>
+        <span>Upload:</span>
+        <form>
+          <input type='file' id='user' capture="user" accept='image/*' onChange={handleFileChange} />
+        </form>
+      </div> */}
 
       {/* Post Actions */}
       <div className="p-4">
@@ -157,6 +243,7 @@ function Exhibit({ user, post }) {
           </button>
         </form>
       </div>
+      
     </div>
   );
 }

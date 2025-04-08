@@ -710,10 +710,6 @@ useEffect(() => {
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
               <Settings userVars={userVar}/>
-              <Gallery 
-                userGalleries={userGalleries} 
-                setUserGalleries={setUserGalleries} 
-              />
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>
