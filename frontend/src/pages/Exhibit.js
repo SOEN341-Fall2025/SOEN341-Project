@@ -1,6 +1,6 @@
 import '../style/style.css';
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Send, Bookmark, User } from 'lucide-react';
+import { Plus, Heart, MessageCircle, Send, Bookmark, User } from 'lucide-react';
 
 function Exhibit() {
   const [comment, setComment] = useState("");
@@ -76,9 +76,9 @@ function Exhibit() {
       }}>
         <div className="flex items-center p-4">
           <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
-            <User size={16} />
+            <User size={24} /><span className="font-semibold text-sm">{samplePost.username}</span>
           </div>
-          <span className="font-semibold text-sm">{samplePost.username}</span>
+          
         </div>
 
         <div style={{
@@ -240,6 +240,16 @@ function Exhibit() {
         </div>
       </div>
     )}
+    <button 
+  className="create-exhibit-btn"
+  onClick={() => {
+    // Add your create exhibit logic here
+    console.log("Create Exhibit clicked!");
+  }}
+>
+  <Plus size={18} /> {/* Add this import at the top: import { Plus } from 'lucide-react'; */}
+  Create Exhibit!
+</button>
     </div>
   );
 }
