@@ -1,10 +1,128 @@
 import '../style/style.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Send, Bookmark, User } from 'lucide-react';
 import backImage from '../assets/background.png';
 
 
 function Exhibit({ user, post }) {
+
+  const [exhibits, setExhibits] = useState([]);
+  const [postID, setpostID] = useState("");
+
+  //fetch commments based on the post_id given (use for every exhibits, put it in a list)
+  const fetchComments = async (post_id) => {
+    const token = localStorage.getItem('authToken');
+
+    try {
+        const response = await fetch(`/api/exhibit/comments?post_id=${encodeURIComponent(post_id)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            credentials: "include"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.msg || "Failed to fetch comments");
+        }
+        console.log("result of comments",result);
+        return result.data; // Successfully fetched comments
+    } catch (error) {
+        console.error("Error fetching comments:", error.message);
+        return []; // Return an empty array on error
+    }
+  };
+
+  //Uploads files to storage (modify soon to upload files to exhibits not dms)
+  const uploadExhibitFile = async (file, post_id) => {
+    const token = localStorage.getItem('authToken');
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("post_id", post_id);
+
+    try {
+        const response = await fetch("/exhibits/upload-file", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${token}`, // Important: DO NOT set Content-Type here, browser will handle it
+            },
+            body: formData,
+        });
+
+        const result = await response.json();
+        console.log("Upload: ", result);
+
+        if (!response.ok) {
+            throw new Error(result.msg || "File upload failed");
+        }
+
+        console.log("File uploaded:", result.fileUrl);
+        return result.fileUrl;
+    } catch (error) {
+        console.error("Upload error:", error.message);
+        return null;
+    }
+  };
+
+  // To handle the uploading (delete if not needed)
+  const handleFileChange = async (e) => {
+    console.log("File input triggered");
+    const file = e.target.files[0];
+  
+    if (file) {
+      console.log("File selected:", file);
+      await uploadExhibitFile(file, 1);
+    }
+  };
+
+  useEffect(() =>{
+
+    const token = localStorage.getItem('authToken');
+
+    //retrieve all exhibits
+    async function fetchExhibits (){
+      try {
+          const response = await fetch("/api/exhibits", {
+              method: "GET",
+              headers: {
+                  "Content-Type": "application/json",
+                   'Authorization': `Bearer ${token}`
+              },
+              credentials: "include", // Include cookies if authentication is required
+          });
+  
+          const result = await response.json();
+  
+          if (!response.ok) {
+              throw new Error(result.msg || "Failed to fetch exhibits");
+          }
+
+          setExhibits(result);
+  
+          return result.data;
+      } catch (error) {
+          console.error("Error fetching exhibits:", error);
+          return [];
+      }
+  }
+
+  fetchExhibits();
+  fetchComments(1);
+
+
+
+  },[]);
+
+  useEffect(() => {
+
+    console.log(exhibits)
+
+  }, [exhibits]);
+
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState(post.comments || []);
   const [likes, setLikes] = useState(post.likes || 0);
@@ -58,6 +176,14 @@ function Exhibit({ user, post }) {
           className="w-full h-full object-cover"
         />
       </div>
+
+       {
+      <div>
+        <span>Upload:</span>
+        <form>
+          <input type='file' id='user' capture="user" accept='image/*' onChange={handleFileChange} />
+        </form>
+      </div> }
 
       {/* Post Actions */}
       <div className="p-4">

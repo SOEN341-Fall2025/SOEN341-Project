@@ -112,7 +112,7 @@ const [exhibitPosts, setExhibitPosts] = useState([
   }
 ]);
 
-useEffect(() => {
+/*useEffect(() => {
   const fetchExhibitPosts = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -127,7 +127,7 @@ useEffect(() => {
   };
 
   fetchExhibitPosts();  // Just fetch directly since we know we're authenticated
-}, []);  // Empty dependency array means run once on mount
+}, []);  // Empty dependency array means run once on mount*/
 
 // Then update the Tab.Pane for exhibit:
 <Tab.Pane eventKey="page-exhibit">

@@ -18,12 +18,15 @@ import FileUploadRoute from "./routes/FileUploadRoute.js";
 import GalleryRoute from "./routes/GalleryRoute.js";
 import User from "./user.js";
 import Admin from "./admin.js";
+import ExhibitRoute from "./routes/ExhibitRoute.js";
+
 app.use(ProtectedRoute);
 app.use(MessagingRoute);
 app.use(FileUploadRoute);
 app.use(GalleryRoute);
 app.use(User);
 app.use(Admin);
+app.use(ExhibitRoute);
 
 
 //Retrieves information of the current directory
