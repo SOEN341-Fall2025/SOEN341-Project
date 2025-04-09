@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+
+
+import React, { useState } from 'react';
 import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToVW, ToPX } from '../AppContext';
 import { Resizable } from 're-resizable';
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
+<<<<<<< HEAD
 
 function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {  
   
@@ -23,6 +26,15 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
     const [channelMessages, setChannelMessage] = useState([]);
 
     const ChannelsList = () => {
+=======
+function Gallery({ item, index, galleryChannels, gallerySize, user }) {  
+    const [showState, setShow] = useState("close"); 
+    const [channelNavWidth, setChannelSize] = useState(17);  
+    const [thisChannels, setTheseChannels] = useState(galleryChannels);  
+    const [newChannelName, setNewChannelName] = useState("");
+    function handleClick(key) { setShow(key); }
+    const GalleryChannelsList = () => {
+>>>>>>> parent of 8726506e (Merge branch '58-update-database-to-integrate-images' of https://github.com/SOEN341-Fall2025/SOEN341-Project into 58-update-database-to-integrate-images)
       thisChannels.map((item, index) => {
           return (
               <Nav.Link key={index} eventKey={item.ChannelName}>
@@ -35,6 +47,7 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
           return null; // Ensure the map function returns something in all cases
       });
     };
+<<<<<<< HEAD
 
     const handleChannels = (newname, galleryname) => {
       setTheseChannels(prevChannels => {
@@ -75,13 +88,19 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
         );
     };
 
+=======
+>>>>>>> parent of 8726506e (Merge branch '58-update-database-to-integrate-images' of https://github.com/SOEN341-Fall2025/SOEN341-Project into 58-update-database-to-integrate-images)
     const GalleryChannelList = ({ channels }) => {
       if(channels.length > 0){
         return (
           channels.map((item, index) => (
+<<<<<<< HEAD
               <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
                 fetchChannelMessages(item.ChannelName);
               }}>
+=======
+              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => setNewChannelName(item.ChannelName)}>
+>>>>>>> parent of 8726506e (Merge branch '58-update-database-to-integrate-images' of https://github.com/SOEN341-Fall2025/SOEN341-Project into 58-update-database-to-integrate-images)
                 <span className="channel-icon">
                   <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
                 </span>
@@ -91,6 +110,7 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
         );
       }
     };
+<<<<<<< HEAD
 
     const ChannelPagesList = ({ channels, channelName }) => {
         return (
@@ -209,6 +229,8 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
       }
     
   };
+=======
+>>>>>>> parent of 8726506e (Merge branch '58-update-database-to-integrate-images' of https://github.com/SOEN341-Fall2025/SOEN341-Project into 58-update-database-to-integrate-images)
   return (
     <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
           <Tab.Container id="">
@@ -238,11 +260,16 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
               </Nav>
             </Col>
           </Tab.Container>
+<<<<<<< HEAD
         <ChannelPagesList channels={thisChannels} channelName={newChannelName}/>
         <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
           <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalAddChannel /></Modal.Dialog>
         </Modal>
+=======
+        <ChatContainer barSizes={(Number(gallerySize) + Number(channelNavWidth))} header={item.channelName} user={user}/>
+>>>>>>> parent of 8726506e (Merge branch '58-update-database-to-integrate-images' of https://github.com/SOEN341-Fall2025/SOEN341-Project into 58-update-database-to-integrate-images)
     </Tab.Pane>
   );
 }
+
 export default Gallery;

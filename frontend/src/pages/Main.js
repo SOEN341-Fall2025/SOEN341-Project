@@ -45,7 +45,6 @@ function Main({ userData, galleries}) {
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
-
   const [newChannelName, setNewChannelName] = useState("");
   const [newGalleryName, setNewGalleryName] = useState("");
   const [newUserName, setNewUserName] = useState("");
@@ -67,10 +66,12 @@ function Main({ userData, galleries}) {
     { galleryName: 'Gift Ideas', channelName: 'General', icon: 'hashtag' }]
   );
   const [newMessage, setNewMessage] = useState("");
-  const [directMessages, setDirectMessages] = useState([]);
+  const [directMessages, setDirectMessages] = useState([
+    { senderID: 'Alice', receiverID: "John Doe", message: "I hope you have a good day" }
+  ]);
 
   const logout = () => {    
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('auth-token');
   }
   const [userVar, setUserVar] = useState({
     sizeGallerySidebar: "3.5vw",
@@ -144,26 +145,25 @@ useEffect(() => {
   useEffect(() => {
     console.log(JSON.stringify(userData.settings));
     function setStyles() {
-      if (!userData?.settings) {
-        console.warn("userData.settings is undefined, skipping setStyles.");
-        return; // Exit the function early if settings are not available
-      }
-  
       const newUserVar = { ...userVar };
-      newUserVar.clrAccent = userData.settings?.clrAccent || userVar.clrNavbar;
-      newUserVar.clrChat = userData.settings?.clrChat || userVar.clrNavbar;
-      newUserVar.clrNavbar = userData.settings?.clrNavbar || userVar.clrNavbar;
-      newUserVar.clrNavbarGradient = userData.settings?.clrNavbarGradient || userVar.clrNavbarGradient;
-  
+      newUserVar.clrAccent = userData.settings.clrAccent || userVar.clrNavbar;
+      newUserVar.clrChat = userData.settings.clrChat || userVar.clrNavbar;
+      newUserVar.clrNavbar = userData.settings.clrNavbar || userVar.clrNavbar;
+      newUserVar.clrNavbarGradient = userData.settings.clrNavbarGradient || userVar.clrNavbarGradient;
+      
       setUserVar(newUserVar);
   
       UpdateStyle('--color-accent', newUserVar.clrAccent);
       UpdateStyle('--color-bar', newUserVar.clrNavbar);
       UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
+      //console.log(newUserVar.clrNavbarGradient);
+      
     }
   
-      setStyles();
+    setStyles();
   }, [userVar.settings]);
+  
+  
     
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
@@ -178,31 +178,13 @@ useEffect(() => {
   }
 
   const handleGalleries = (newname, newicon) => {
-    setUserGalleries([...userGalleries, { GalleryName: newname, icon: newicon }]);
-    createGallery(newname);
+    setUserGalleries([...userGalleries, { name: newname, icon: newicon }]);
   };
   
   const handleSubmitGallery = (event) => {
     event.preventDefault();  // Prevents page reload on submit
     handleGalleries(newName, '');  // Pass the new name and any other parameters
   };
-
-  const handleUsers = (newUserName) => {
-    setUserNames([...userNames, {username: newUserName}]);
-  };
-
-  const handleSubmitUser = async (event) => {
-    event.preventDefault();  // Prevents page reload on submit
-    console.log("handleSubmitUser is accessed");
-    const verifyUser = await fetchUser(newUserName);  // Pass the new name and any other parameters
-    console.log("Verify User", verifyUser);
-    if(verifyUser){
-      handleUsers(newUserName);
-    }else{
-      console.log("Unsuccessful");
-    }
-  };
-
   
   const handleMessages = (newMessage) => {
     setDirectMessages([...directMessages, { senderID: 'Jane Doe', receiverID: 'John Doe', message: newMessage }]);
@@ -241,35 +223,27 @@ useEffect(() => {
     try {      
         const token = localStorage.getItem('auth-token');        
         
+        // Fetch gallery channels
         const channelsResponse = await fetch(`/api/gallery/getChannels?galleryName=${encodeURIComponent(name)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-
-        if (!channelsResponse.ok) {
-          console.error("Failed to fetch channels:", channelsResponse.status);
-          setGalleryChannels([]);
-          return;
+        if(channelsResponse){
+          const channelsData = await channelsResponse.json();
+          //console.log("Channels response ", channelsData);    
+          const galleryName = Object.keys(channelsData)[0];
+          const channels = channelsData[galleryName];
+          if(!Array.isArray(channels)) {channels = [];}
+          //console.log("Channels ", channels); 
+          setGalleryChannels(prevChannels => {
+            //console.log('Setting galleryChannels:', JSON.stringify(channels));
+            return channels;
+          });        
         }
-
-        const channelsData = await channelsResponse.json();  
-        const galleryName = Object.keys(channelsData)[0];
-        let channels = channelsData[galleryName];  
-
-        if (!Array.isArray(channels)) {
-          console.warn("Channels is not an array:", channels);
-          channels = [];
-        }
-
-        setGalleryChannels(channels);
     } catch (error) {
-      console.error("Error fetching channels:", error);
+      //console.error('Login failed:', error);
       setGalleryChannels([]);
     }
   }, []);
-
-  useEffect(() => {
-    console.log("Channels have been updated:", galleryChannels);
-  }, [galleryChannels]);
 
   const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
@@ -282,7 +256,7 @@ useEffect(() => {
         <Nav.Link 
           eventKey={item.GalleryName} 
           key={index} 
-          onClick={() => {handleGalleryClick(item.GalleryName)}}
+          onClick={() => handleGalleryClick(item.GalleryName)}
         >
           <span className="channel-icon">
             <Icon name={item.icon || FindClosestIcon(item.GalleryName)} size={24} />
@@ -296,13 +270,13 @@ useEffect(() => {
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar} name={item.GalleryName}/>
+        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar}/>
       ))
     
     );
   }; 
 
-  const UserList = () => {
+  const GalleryChannelList = ({ g }) => {
     return (
       userNames.map((item, index) =>
         <Nav.Link eventKey={item.username} onClick={() => setCurrentUser(item.username)}>
@@ -359,7 +333,7 @@ useEffect(() => {
                 <Row><input type='text' id='newName-gallery' value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder='Name of your new Gallery' /></Row>
-                <Row><input type='submit' value="Submit" /></Row>
+                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
             </Col>
             </form>
         </Modal.Body>
@@ -389,25 +363,8 @@ useEffect(() => {
                 <Row><input type='text' id='newName-channel' value={newChannelName}
                   onChange={(e) => setNewChannelName(e.target.value)}
                   placeholder='Name of your new Channel' /></Row>
-                <Row><input type='submit' value="Submit" /></Row>
+                <Row><input type='submit' value="Submit" onClick={handleClose} /></Row>
               </Col>
-            </form>
-        </Modal.Body>
-    );
-  };
-
-  const ModalAddUser = () => {
-    return(
-        <Modal.Body> 
-            <h5 className="text-center">Add a User</h5>
-            <form onSubmit={handleSubmitUser}>
-            <Col>
-                <Row><label>Name:</label></Row>
-                <Row><input type='text' id='newName-user' value={newUserName}
-                onChange={(e) => setNewUserName(e.target.value)}
-                placeholder='Name of your new User' /></Row>
-                <Row><input type='submit' value="Submit" /></Row>
-            </Col>
             </form>
         </Modal.Body>
     );
@@ -427,177 +384,6 @@ useEffect(() => {
     Displayname: "Johnny Dough",
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
-
-  const fetchUser = async (username) => {
-    let verifyUser = false;
-    try {
-      // Make GET request to the backend with the Authorization header
-      const response = await fetch(`/dm/fetch-user?username=${username}`);
-      if (!response.ok) {
-        return verifyUser;
-      } 
-
-      const result = await response.json();
-      console.log(result.user.username,username);
-      
-      verifyUser = (username === result.user.username) && !userNames.some(user => user.username === username);
-
-      
-    } catch (error) {
-      setError('An error occurred while fetching galleries: ' + error.message);
-    }
-    return verifyUser;
-
-  };
-
-  //fetch the users' name if they have ever contacted with the logged in user
-  const fetchDmUsers = async () => {
-
-    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
-  
-    try {
-      // Send POST request to backend to create gallery
-      const response = await fetch('/dm/contacts', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
-        },
-      });
-
-      const result = await response.json();
-
-      setUserNames(result.data.map(contact => ({...contact})));
-
-    } catch (error) {
-      console.error('An error occurred:', error);
-      alert('An error occurred while fetching contacts.');
-    }
-  
-
-  };
-
-  const fetchDMs = async (username) => {
-    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
-
-    try {
-        // Send GET request to backend to retrieve DMs
-        const response = await fetch(`/dm/retrieve?username=${username}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,  // Pass the token in Authorization header
-            },
-        });
-
-        // Check if the response is OK (status code 200)
-        if (!response.ok) {
-            throw new Error('Failed to fetch DMs');
-        }
-
-        // Parse the JSON response
-        const result = await response.json();
-
-        if (result?.updatedData) {
-          // Map the relevant fields (Message, PopperID, BubblerID)
-          const messageDetails = result.updatedData.map(item => ({
-              PopperUsername: item.PopperUsername,
-              BubblerUsername: item.BubblerUsername,
-              Message: item.Message
-          }));
-
-          // Log the message details to see the output
-          setDirectMessages(messageDetails);
-      } else {
-          console.log('No messages found');
-      }
-
-        // Handle the result (you can process or display it)
-        if (result.msg === "DMs were fetched.") {
-            console.log('Fetched DMs:', result.updatedData);
-            // Do something with the data, e.g., display messages
-        } else {
-            console.error('Error fetching DMs:', result);
-        }
-    } catch (error) {
-        console.error('An error occurred:', error);
-        alert('An error occurred while fetching DMs.');
-    }
-};
-
-  // Push the gallery to database
-  const createGallery = async (galleryName) => {
-    // Get the auth token, for example from localStorage or a cookie
-    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
-  
-    try {
-      // Send POST request to backend to create gallery
-      const response = await fetch('/gal/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
-        },
-        body: JSON.stringify({ galleryName }), // Pass the gallery name in the body
-      });
-  
-      const result = await response.json();
-  
-      if (!response.ok) {
-        // Handle server error
-        console.error('Error:', result);
-        alert('Failed to create gallery: ' + result.msg || 'Unknown error');
-        return;
-      }
-  
-      // Successfully created the gallery
-      console.log('Gallery created:', result);
-      alert('Gallery created successfully!');
-  
-      // Optionally, you can update the UI here with the new gallery or trigger a re-fetch of galleries
-  
-    } catch (error) {
-      console.error('An error occurred:', error);
-      alert('An error occurred while creating the gallery.');
-    }
-  };
-
-  const saveChannels = async(channelName, galleryID) =>{
-
-    // Get the auth token, for example from localStorage or a cookie
-    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
-
-    try {
-      // Send POST request to backend to create gallery
-      const response = await fetch('/gal/createChannel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Pass token as Bearer in the Authorization header
-        },
-        body: JSON.stringify({ channelName,galleryID }), // Pass the gallery name in the body
-      });
-
-      const result = await response.json();
-  
-      if (!response.ok) {
-        // Handle server error
-        console.error('Error:', result);
-        alert('Failed to save channel: ' + result.msg || 'Unknown error');
-        return;
-      }
-  
-      // Successfully created the gallery
-      console.log('Channel saved:', result);
-      alert('Channel successfully!');
-
-    } catch (error) {
-      console.error('An error occurred:', error);
-      alert('An error occurred while saving the channel.');
-    }
-
-  };
-  
   return(
     <section>
       <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
@@ -632,12 +418,12 @@ useEffect(() => {
                         <Col>Private</Col>
                         </Row>
                         <Nav.Link className="separator" disabled><hr /><hr /></Nav.Link>
-                        <UserList/>
-                        <Nav.Link onClick={() => handleClick('addUser-modal')} className="add-user"><span className="channel-icon"><Plus /></span> Add a User</Nav.Link>
-
+                        <Nav.Link><icons.User /> John Doe</Nav.Link>
+                        <Nav.Link><icons.User /> Jane Doe</Nav.Link>
+                        <Nav.Link><icons.User /> Julie Doe</Nav.Link>
                     </Nav>                      
                     </Col>
-                    <UserChatList usernames={userNames}/>
+                    <ChatContainer barSizes={galleryNavWidth + dmNavWidth} user={userVar}/>
                 </Tab.Pane>
                 <Tab.Pane eventKey="page-exhibit">
   <Exhibit 
@@ -676,14 +462,6 @@ useEffect(() => {
           <ModalAddGallery />
         </Modal.Dialog>
       </Modal>
-
-      <Modal show={showState === 'addUser-modal'} onHide={handleClose} id="addUser-modal" className="modal-dialog-centered">
-        <Modal.Dialog >
-          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
-          <ModalAddUser />
-        </Modal.Dialog>
-      </Modal>
-
       <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>

@@ -9,22 +9,13 @@ body{
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url('../assets/img2.jpg') no-repeat !important;
+    background: url('../assets/img1.jpg') no-repeat;
     background-size: cover;
     background-position: center;
 }
-body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; 
-}
 .wrapper{
     width: 420px;
-    background: rgba(255, 255, 255, 0.9);
+    background: transparent;
     border: 2px solid #0052A5 !important;
     backdrop-filter: blur(15px);
     box-shadow: 10px rgba(0,0,0, .5);
@@ -67,22 +58,8 @@ body::before {
 .wrapper .text{
     display: flex;
     justify-content: space-between;
-    align-items: center;
     font-size: 14.5px;
     margin: -15px 0 15px;
-    width: 100%;
-}
-.wrapper .text label {
-    display: flex;
-    align-items: center;
-    gap: 5px; 
-    white-space: nowrap;
-}
-
-.wrapper .text a {
-    white-space: nowrap;
-    padding-left: 90px;
-    margin-left: auto;
 }
 .text label input{
     accent-color: #0052A5;
@@ -93,7 +70,7 @@ body::before {
    text-decoration: none;
    
 }
-.wrapper .text a:hover{
+.text a:hover{
     text-decoration: underline;
 }
 .wrapper .button{
@@ -111,19 +88,14 @@ body::before {
     font-size: 14.5px;
     text-align: center;
 }
-.wrapper .register-link a:hover {
-    text-decoration: underline; 
-}
 .wrapper .login-link{
     font-size: 14.5px;
     text-align: center;
 }
-.wrapper .login-link a:hover {
-    text-decoration: underline; 
-}
 #registerWrapper {
     display: none;
 }
+<<<<<<< HEAD
 #passwordStrength {
     display: none;
 }
@@ -169,3 +141,10 @@ body::before {
   }
   
  
+=======
+.close{
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+>>>>>>> parent of 8726506e (Merge branch '58-update-database-to-integrate-images' of https://github.com/SOEN341-Fall2025/SOEN341-Project into 58-update-database-to-integrate-images)
