@@ -190,7 +190,7 @@ function Exhibit({ user, post }) {
 
   const toggleComments = (postID) => {
 
-    setShowComments(true);
+    setShowComments(!showComments);
     setpostID(postID);
   };
 
