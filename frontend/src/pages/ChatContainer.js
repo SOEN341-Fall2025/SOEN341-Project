@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User, ArrowLeft, Camera, Mic, Plus } from 'lucide-react';  // Assuming you're using lucide-react
 import { Row, Col, Nav } from 'react-bootstrap';
 import { HexToRGBA } from '../AppContext';
@@ -10,6 +10,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
   const [newMessage, setNewMessage] = useState(""); // Input for new messages
   const [directMessages, setDirectMessages] = useState(messages);  // Messages list
+  const fileInputRef = useRef(null);
 
   // Update popper user based on the header and messages
   useEffect(() => {
@@ -42,25 +43,44 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   };
 
   // Message List Component
-  const MessageList = ({ messages }) => {
-    
+const MessageList = ({ messages }) => {
+  return messages.map((item, index) => {
+    // define the boolean before using it
+    const isUserMessage = item.PopperUsername === popperUser;
+
     return (
-      <span>
-        {messages.map((item, index) => {
-          const isUserMessage = item.PopperUsername === popperUser;
-          return(
-          <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
-            <User className="icon" />
-            {item.BubblerUsername}
-            <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
-              {item.Message}
-            </div>
-            
-          </div>
-  )})}
-      </span>
+      <div
+        key={index}
+        className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}
+      >
+        <User className="icon" />
+        <div
+          className={`
+            text
+            ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"}
+            p-2 rounded-lg
+            ${isUserMessage ? "ml-2" : "mr-2"}
+            max-w-[60%]
+          `}
+        >
+          {item.file_url ? (
+            <a
+              href={item.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline flex items-center gap-1"
+            >
+              📎 Download
+            </a>
+          ) : (
+            item.Message
+          )}
+        </div>
+      </div>
     );
-  };
+  });
+};
+
 
   const saveMessage = async (username, newMessage) => {
     // Retrieve the auth token from localStorage
@@ -191,6 +211,68 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
     }
   };
 
+  // Create a bare‐bones DM so we get its DmID back
+  const createEmptyDM = async () => {
+    const token = localStorage.getItem('authToken');
+    const res = await fetch('/api/dm/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        username: popperUser,  // who we’re sending to
+        message: '',           // empty text
+      }),
+    });
+    const { data, msg } = await res.json();
+    if (!res.ok) throw new Error(msg || 'Failed to create DM');
+    // Supabase returns inserted rows in data array
+    return data[0].DmID;
+  };
+
+  // Upload the file against that DmID
+  const handleFileChange = async e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      // get DmID
+      const DmID = await createEmptyDM();
+
+      // upload
+      const token = localStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('DmID', DmID);
+
+      const res = await fetch('/dm/upload-file', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`, // do NOT set Content-Type
+        },
+        body: formData,
+      });
+      const { fileUrl, msg } = await res.json();
+      if (!res.ok) throw new Error(msg || 'Upload failed');
+
+      // update UI
+      setDirectMessages(dms => [
+        ...dms,
+        {
+          PopperUsername: bubblerUser,
+          BubblerUsername: popperUser,
+          file_url: fileUrl,
+        }
+      ]);
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      // allow re‑uploading the same file if needed
+      e.target.value = '';
+    }
+  };
 
 
   return (
@@ -220,9 +302,22 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
         {/* Input Section */}
         <Row id="chat-box" className="d-flex align-items-center">
           <Col className="d-flex gap-2">
-            <div id="plus">
-              <Plus />
-            </div>
+          <div
+            id="plus"
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              console.log('PLUS clicked');
+              fileInputRef.current?.click();
+            }}
+          >
+            <Plus />
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+          </div>
             <div id="camera">
               <Camera />
             </div>
