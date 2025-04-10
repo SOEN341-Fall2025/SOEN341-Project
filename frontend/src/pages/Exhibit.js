@@ -203,9 +203,10 @@ function Exhibit({ user, post }) {
     });
   };
 
-  const toggleComments = () => {
-    setShowComments(!showComments);
-    //setpostID(postID);
+  const toggleComments = (postID) => {
+
+    setShowComments(true);
+    setpostID(postID);
   };
 
   const ExhibitList = ({ exhibits }) => {
@@ -268,7 +269,7 @@ function Exhibit({ user, post }) {
                       color={isLiked ? "red" : "currentColor"} 
                     />
                   </button>
-                  <button onClick={toggleComments}>
+                  <button onClick={() => toggleComments(item.post_id)}>
                     <MessageCircle size={24} />
                   </button>
                   <Send size={24} />
@@ -341,7 +342,7 @@ function Exhibit({ user, post }) {
             }}
           >
             {comments
-              //.filter((comment) => comment.post_id === postID) // Ensure only comments for the current post are displayed
+              .filter((comment) => comment.post_id === postID) // Ensure only comments for the current post are displayed
               .map((comment) => (
                 <div key={comment.comment_id} style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
