@@ -631,7 +631,7 @@ useEffect(() => {
             <Tab.Content id="pages-content">                  
                 <Tab.Pane eventKey="page-dm" className="no-parent-padding">
                     <Col id="sidebar-dm">
-                    <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
+                    <Nav id="dm-list" variant="pills" defaultActiveKey="Me" /*className="flex-column d-flex align-items-start"*/>
                         <Row id="sidebar-dm-options">
                         <Col>Private</Col>
                         </Row>
@@ -714,10 +714,6 @@ useEffect(() => {
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
               <Settings userVars={userVar}/>
-              <Gallery 
-                userGalleries={userGalleries} 
-                setUserGalleries={setUserGalleries} 
-              />
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>
