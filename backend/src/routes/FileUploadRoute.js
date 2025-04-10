@@ -270,36 +270,25 @@ router.post("/exhibits/upload-file", upload.single("file"), async (req, res) => 
     return res.status(401).json({ msg: "Unauthorized", error });
   }
 
-  const { post_id } = req.body; // The post to attach the file to
+  const { msg } = req.body; // The post to attach the file to
   const file = req.file;
-
-  if (!post_id) {
-    return res.status(400).json({ msg: "Missing post_id" });
+  
+  if (!msg) {
+    return res.status(400).json({ msg: "Missing message" });
   }
   if (!file) {
     return res.status(400).json({ msg: "No file uploaded" });
   }
 
   // Check if file type is allowed
-  if (!allowedMimeTypes.includes(file.mimetype)) {
+  if (!Object.keys(allowedMimeTypes).includes(file.mimetype)) {
     return res.status(400).json({ msg: "Invalid file type" });
   }
 
-  // Verify post_id exists in the database
-  const { data: exhibitData, error: exhibitError } = await supabase
-    .from("Exhibits")
-    .select("post_id")
-    .eq("post_id", post_id)
-    .single();
-
-  if (exhibitError || !exhibitData) {
-    return res.status(404).json({ msg: "Exhibit not found" });
-  }
-
   // Generate unique file path and upload file to Supabase Storage
-  const filePath = `exhibit_files/${uuidv4()}-${file.originalname}`;
+  const filePath = `${uuidv4()}-${file.originalname}`;
   const { data: uploadData, error: uploadError } = await supabase.storage
-    .from("exhibit_files")
+    .from("exhibituploads")
     .upload(filePath, file.buffer, {
       contentType: file.mimetype,
     });
@@ -309,19 +298,24 @@ router.post("/exhibits/upload-file", upload.single("file"), async (req, res) => 
   }
 
   // Construct public file URL
-  const fileUrl = `https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/exhibit_files/${filePath}`;
+  const fileUrl = `https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/exhibituploads//${filePath}`;
 
-  // Update the existing Exhibit record with the file URL
-  const { data: updateData, error: dbError } = await supabase
+  const {data: insertData, error: dbError} = await supabase
     .from("Exhibits")
-    .update({ file_url: fileUrl })
-    .eq("post_id", post_id);
+    .insert([{
+
+      poster_id: user.id,
+      file_url: fileUrl,
+      msg: msg
+    }]
+
+    );
 
   if (dbError) {
     return res.status(500).json({ msg: "Failed to attach file to exhibit", error: dbError });
   }
 
-  res.status(200).json({ msg: "File attached to exhibit successfully", fileUrl });
+  res.status(200).json({ msg: "File attached to exhibit successfully", data: insertData });
 });
 
 // Retrieve file URL for a specific post_id
