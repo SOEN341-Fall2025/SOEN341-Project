@@ -189,6 +189,7 @@ function Exhibit({ user, post }) {
 
   const [comment, setComment] = useState("");
   
+
   const samplePost = {
     username: "alice",
     caption: "love Bubbles!!",
@@ -204,8 +205,10 @@ function Exhibit({ user, post }) {
     e.preventDefault();
     if (!comment.trim()) return;
     
+
     postComment(postID,comment);
     
+
     setComment("");
   };
 
@@ -222,6 +225,7 @@ function Exhibit({ user, post }) {
       hour: '2-digit',
       minute: '2-digit'
     });
+
   };
 
   const toggleComments = (postID) => {
@@ -318,10 +322,12 @@ function Exhibit({ user, post }) {
           
           
         ))}
+
       </div>
       
     );
   };
+
 
   const CommentList = ({postID, comments}) => {
     return (
@@ -441,10 +447,12 @@ function Exhibit({ user, post }) {
               </button>
             </form>
           </div>
+
         </div>
       )
     );
   };
+
 
   const ModalAddExhibit = () => {
     const [file, setFile] = useState(null);
@@ -527,6 +535,7 @@ function Exhibit({ user, post }) {
   className="create-exhibit-btn"
   onClick={() => {
     handleClick('addExhibit-modal')
+
     console.log("Create Exhibit clicked!");
   }}
 >
@@ -534,12 +543,14 @@ function Exhibit({ user, post }) {
   Create Exhibit!
 </button>
 
+
 <Modal show={showState === 'addExhibit-modal'} onHide={handleClose} id="addExhibit-modal" className="modal-dialog-centered">
         <Modal.Dialog >
           <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
           <ModalAddExhibit />
         </Modal.Dialog>
       </Modal>
+
     </div>
   );
 }
