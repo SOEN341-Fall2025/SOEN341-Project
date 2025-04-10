@@ -258,9 +258,9 @@ function Exhibit({ user, post }) {
           >
             {/* Your post content... */}
             <div className="flex items-center p-4">
-              <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+              <span className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-3">
                 <User size={24} />
-              </div>
+              </span>
               <span className="font-semibold text-sm">{item.username}</span>
             </div>
   
