@@ -112,8 +112,8 @@ const [exhibitPosts, setExhibitPosts] = useState([
   }
 ]);
 
-/*useEffect(() => {
-  const fetchExhibitPosts = async () => {
+useEffect(() => {
+  /*const fetchExhibitPosts = async () => {
     try {
       const token = localStorage.getItem('authToken');
       const response = await fetch('/api/exhibit/posts', {
@@ -126,8 +126,8 @@ const [exhibitPosts, setExhibitPosts] = useState([
     }
   };
 
-  fetchExhibitPosts();  // Just fetch directly since we know we're authenticated
-}, []);  // Empty dependency array means run once on mount*/
+  fetchExhibitPosts();  // Just fetch directly since we know we're authenticated*/
+}, []);  // Empty dependency array means run once on mount
 
 // Then update the Tab.Pane for exhibit:
 <Tab.Pane eventKey="page-exhibit">
@@ -645,7 +645,7 @@ const [exhibitPosts, setExhibitPosts] = useState([
                 </Tab.Pane>
                 <Tab.Pane eventKey="page-exhibit">
                 <Exhibit 
-                    user={{ username: userVar.username }} 
+                    user={ userVar } 
                     post={{
                       imageUrl: "../assets/background.jpg",
                       username: userVar.username,
