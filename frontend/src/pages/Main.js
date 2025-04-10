@@ -645,7 +645,7 @@ useEffect(() => {
                 </Tab.Pane>
                 <Tab.Pane eventKey="page-exhibit">
                 <Exhibit 
-                    user={{ username: userVar.username }} 
+                    user={ userVar } 
                     post={{
                       imageUrl: "../assets/background.jpg",
                       username: userVar.username,
