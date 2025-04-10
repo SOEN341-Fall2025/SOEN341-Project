@@ -1,6 +1,7 @@
 import '../style/style.css';
 import React, { useState, useEffect } from 'react';
 import {Plus, Heart, MessageCircle, Send, Bookmark, User } from 'lucide-react';
+import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
 import backImage from '../assets/background.png';
 
 
@@ -12,6 +13,10 @@ function Exhibit({ user, post }) {
   const [comments, setComments] = useState([]);
 
   const [commentsLoaded, setCommentsLoaded] = useState(false);
+
+  const [showState, setShowState] = useState("close");
+  const handleClose = () => setShowState(false);
+  function handleClick(key) { setShowState(key); }
 
 
   //fetch commments based on the post_id given (use for every exhibits, put it in a list)
@@ -43,13 +48,35 @@ function Exhibit({ user, post }) {
     }
   };*/
 
+  const postComment = async (postId, msg) => {
+    const token = localStorage.getItem('authToken');
+  
+    try {
+      const response = await fetch('/api/exhibit/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // 💥 this is key
+        },
+        body: JSON.stringify({ post_id: postId, msg }),
+      });
+  
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Failed to post comment');
+  
+      console.log('Comment posted:', result.comment);
+    } catch (err) {
+      console.error('Error:', err.message);
+    }
+  };
+
   //Uploads files to storage (modify soon to upload files to exhibits not dms)
-  const uploadExhibitFile = async (file, post_id) => {
+  const uploadExhibitFile = async (file, msg) => {
     const token = localStorage.getItem('authToken');
     const formData = new FormData();
 
     formData.append("file", file);
-    formData.append("post_id", post_id);
+    formData.append("msg", msg);
 
     try {
         const response = await fetch("/exhibits/upload-file", {
@@ -177,14 +204,8 @@ function Exhibit({ user, post }) {
     e.preventDefault();
     if (!comment.trim()) return;
     
-    const newComment = {
-      id: Date.now(),
-      username: "You",
-      text: comment,
-      timestamp: new Date().toISOString()
-    };
+    postComment(postID,comment);
     
-    setComments([...comments, newComment]);
     setComment("");
   };
 
@@ -424,6 +445,59 @@ function Exhibit({ user, post }) {
       )
     );
   };
+
+  const ModalAddExhibit = () => {
+    const [file, setFile] = useState(null);
+    const [message, setMessage] = useState("");
+  
+    const handleFileChange = (event) => {
+      setFile(event.target.files[0]);
+    };
+  
+    const createExhibit = (event) => {
+      event.preventDefault();
+      if (file && message) {
+        uploadExhibitFile(file, message);
+      } else {
+        alert("Please provide both a message and a file.");
+      }
+
+      handleClose();
+      window.location.reload();
+    };
+  
+    return (
+      <Modal.Body>
+        <h5 className="text-center">Create a Channel</h5>
+        <form onSubmit={createExhibit}>
+          <Col>
+            <Row>
+              <label>Msg:</label>
+            </Row>
+            <Row>
+              <input
+                type="text"
+                id="newMsg-exhibit"
+                placeholder="put a message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </Row>
+            <Row>
+              <input
+                type="file"
+                accept="image/png, image/jpeg"
+                onChange={handleFileChange}
+              />
+            </Row>
+            <Row>
+              <input type="submit" value="Submit" />
+            </Row>
+          </Col>
+        </form>
+      </Modal.Body>
+    );
+  };
   return (
     <div className="posts-container" style={{
       display: 'flex',
@@ -452,13 +526,20 @@ function Exhibit({ user, post }) {
     <button 
   className="create-exhibit-btn"
   onClick={() => {
-    // Add your create exhibit logic here
+    handleClick('addExhibit-modal')
     console.log("Create Exhibit clicked!");
   }}
 >
   <Plus size={18} /> {/* Add this import at the top: import { Plus } from 'lucide-react'; */}
   Create Exhibit!
 </button>
+
+<Modal show={showState === 'addExhibit-modal'} onHide={handleClose} id="addExhibit-modal" className="modal-dialog-centered">
+        <Modal.Dialog >
+          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          <ModalAddExhibit />
+        </Modal.Dialog>
+      </Modal>
     </div>
   );
 }
