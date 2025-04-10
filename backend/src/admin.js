@@ -7,7 +7,7 @@ dotenv.config();
 const router = express.Router();
 
 
-// DELETE message route
+// DELETE message channels
 router.delete("/api/messages/:MsgId", async (req, res) => {
   const { MsgId } = req.params;
   const { userId } = req.query;  
@@ -47,10 +47,89 @@ router.delete("/api/messages/:MsgId", async (req, res) => {
   if (deleteError) {
     return res.status(500).json({ msg: "Failed to delete message." });
   }
+    if (deleteError) {
+        return res.status(500).json({ msg: "Failed to delete message." });
+    }
 
-  return res.status(200).json({ msg: "Message deleted successfully." });
+    return res.status(200).json({ msg: "Message deleted successfully." });
 });
 
+router.delete("/api/Dm/:DmId", async (req, res) => {
+    
+  const { DmId } = req.params;
+  const { userId } = req.body; 
+
+  const { data: message, error: messageError } = await supabase
+  .from("DMs")
+  .select("BubblerID") 
+  .eq("DmID", DmId)
+  .single();
+  
+console.log("DM Message ID:", DmId);       
+console.log("Message Data:", message);
+console.log("Error:", messageError);
+
+if (messageError || !message) {
+  return res.status(404).json({ msg: "Message not found." });
+}
+
+// Check if the current user is the sender of the message
+if (message.BubblerID !== userId) {
+  return res.status(403).json({ msg: "You can only delete your own messages." });
+}
+
+// If checks pass, delete the message
+const { data ,error: deleteError } = await supabase
+  .from("DMs")
+  .delete()
+  .eq("DmID", DmId);
+console.log("data", data)
+if (deleteError) {
+  console.error("Delete error:", deleteError);
+  return res.status(500).json({ msg: "Failed to delete message." });
+}
+
+  return res.status(200).json({ msg: "Message deleted successfully." });
+return res.status(200).json({ msg: "Message deleted successfully." });
+});
+
+router.delete("/api/Dm/:DmId", async (req, res) => {
+    
+  const { DmId } = req.params;
+  const { userId } = req.body; 
+
+  const { data: message, error: messageError } = await supabase
+  .from("DMs")
+  .select("BubblerID") 
+  .eq("DmID", DmId)
+  .single();
+  
+console.log("DM Message ID:", DmId);       
+console.log("Message Data:", message);
+console.log("Error:", messageError);
+
+if (messageError || !message) {
+  return res.status(404).json({ msg: "Message not found." });
+}
+
+// Check if the current user is the sender of the message
+if (message.BubblerID !== userId) {
+  return res.status(403).json({ msg: "You can only delete your own messages." });
+}
+
+// If checks pass, delete the message
+const { data ,error: deleteError } = await supabase
+  .from("DMs")
+  .delete()
+  .eq("DmID", DmId);
+console.log("data", data)
+if (deleteError) {
+  console.error("Delete error:", deleteError);
+  return res.status(500).json({ msg: "Failed to delete message." });
+}
+
+return res.status(200).json({ msg: "Message deleted successfully." });
+});
 
 //Delete Channels
 router.delete("/api/channels/:channelname", async (req, res) => {

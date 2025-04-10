@@ -75,15 +75,15 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   };
 
   //Delete DMs
-  const deleteDirectMessage = async (msgId, index) => {
+  const deleteDirectMessage = async (DmId, index) => {
     const token = localStorage.getItem("authToken");
     const userId = user.id;
 
     const originalMessages = [...directMessages];
     setDirectMessages((prev) => prev.filter((_, i) => i !== index));
-
+    console.log(DmId);
     try {
-      const response = await fetch(`/api/messages/${msgId}?userId=${userId}`, {
+      const response = await fetch(`/api/messages/${DmId}?userId=${userId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -196,7 +196,6 @@ const deleteChannelMessage = async (msgId, index) => {
   const token = localStorage.getItem("authToken");
   const userId = user.id;
 
-  // Optimistically remove from UI
   const originalMessages = [...channelMessages];
   setChannelMessages((prev) => prev.filter((_, i) => i !== index));
 
