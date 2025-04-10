@@ -18,57 +18,29 @@ function Exhibit({ user, post }) {
   const handleClose = () => setShowState(false);
   function handleClick(key) { setShowState(key); }
 
-
-  //fetch commments based on the post_id given (use for every exhibits, put it in a list)
-  /*const fetchComments = async () => {
-    const token = localStorage.getItem('authToken');
-
-    try {
-        const response = await fetch(`/api/exhibit/comments}`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            credentials: "include"
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.msg || "Failed to fetch comments");
-        }
-        console.log("result of comments",result);
-
-        setComments(result.data)
-        return result.data; // Successfully fetched comments
-    } catch (error) {
-        console.error("Error fetching comments:", error.message);
-        return []; // Return an empty array on error
-    }
-  };*/
-
   const postComment = async (postId, msg) => {
-    const token = localStorage.getItem('authToken');
-  
-    try {
-      const response = await fetch('/api/exhibit/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 💥 this is key
-        },
-        body: JSON.stringify({ post_id: postId, msg }),
-      });
-  
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Failed to post comment');
-  
-      console.log('Comment posted:', result.comment);
-    } catch (err) {
-      console.error('Error:', err.message);
-    }
-  };
+  const token = localStorage.getItem('authToken');
+
+  try {
+    const response = await fetch('/api/exhibit/comments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ post_id: postId, msg }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to post comment');
+
+    console.log('Comment posted:', result.comment);
+    return result.comment; // Return the new comment
+  } catch (err) {
+    console.error('Error:', err.message);
+    return null;
+  }
+};
 
   //Uploads files to storage (modify soon to upload files to exhibits not dms)
   const uploadExhibitFile = async (file, msg) => {
@@ -200,14 +172,6 @@ function Exhibit({ user, post }) {
 
   const [showComments, setShowComments] = useState(false);
 
-  const handleAddComment = (e) => {
-    e.preventDefault();
-    if (!comment.trim()) return;
-    
-    postComment(postID,comment);
-    
-    setComment("");
-  };
 
   const handleLike = () => {
     setLikes(isLiked ? likes - 1 : likes + 1);
@@ -314,22 +278,52 @@ function Exhibit({ user, post }) {
               </div>
             </div>
           </div>
-          
-          
-          
         ))}
       </div>
       
     );
   };
 
-  const CommentList = ({postID, comments}) => {
-    return (
+  const CommentList = React.memo(({ postID, comments, setComments }) => {
+    const [localComment, setLocalComment] = useState("");
+    const [isPosting, setIsPosting] = useState(false);
+    const [error, setError] = useState(null);
+  
+    const handleAddComment = async (e) => {
+      e.preventDefault();
+      if (!localComment.trim()) return;
       
+      setIsPosting(true);
+      try {
+        const newComment = await postComment(postID, localComment);
+        if (newComment) {
+          // Ensure the new comment has all required fields
+          const completeComment = {
+            ...newComment,
+            post_id: postID, // Make sure post_id is included
+            username: user?.username || "Anonymous", // Fallback username
+            created_at: new Date().toISOString() // Current time if not provided
+          };
+          
+          setComments(prev => [...prev, completeComment]);
+          setLocalComment("");
+        }
+      } catch (error) {
+        setError("Failed to post comment");
+        setTimeout(() => setError(null), 3000);
+      } finally {
+        setIsPosting(false);
+      }
+    };
+  
+    // Filter comments for the current post and sort by date
+    const filteredComments = comments
+      .filter(comment => comment.post_id === postID)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  
+    return (
       showComments && (
-        
-        <div
-          className={`comments-container ${showComments ? 'show' : ''}`}
+        <div className={`comments-container ${showComments ? 'show' : ''}`}
           style={{
             position: 'fixed',
             right: 0,
@@ -344,72 +338,87 @@ function Exhibit({ user, post }) {
           }}
         >
           {/* Header */}
-          <div
-            style={{
-              padding: '16px',
-              borderBottom: '1px solid #eee',
-              fontWeight: '600',
-            }}
-          >
-            Comments
+          <div style={{
+            padding: '16px',
+            borderBottom: '1px solid #eee',
+            fontWeight: '600',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span>Comments</span>
+            <button 
+              onClick={() => setShowComments(false)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              ×
+            </button>
           </div>
   
+          {/* Error Message */}
+          {error && (
+            <div style={{
+              padding: '8px',
+              background: '#ffebee',
+              color: '#c62828',
+              textAlign: 'center'
+            }}>
+              {error}
+            </div>
+          )}
+  
           {/* Comments List */}
-          <div
-            style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '16px',
-            }}
-          >
-            {comments
-              .filter((comment) => comment.post_id === postID) // Ensure only comments for the current post are displayed
-              .map((comment) => (
-                <div key={comment.comment_id} style={{ marginBottom: '16px' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
+            {filteredComments.length > 0 ? (
+              filteredComments.map((comment) => (
+                <div key={comment.comment_id || comment.created_at} style={{ marginBottom: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-                    <div
-                      style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '50%',
-                        backgroundColor: '#ddd',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: '8px',
-                      }}
-                    >
-                      <User size={12} /> {/* Assuming User is an icon or component */}
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      backgroundColor: '#ddd',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: '8px',
+                    }}>
+                      <User size={12} />
                     </div>
-                    <span style={{ fontWeight: '600', fontSize: '14px' }}>{comment.username}</span>
+                    <span style={{ fontWeight: '600', fontSize: '14px' }}>
+                      {comment.username}
+                    </span>
                   </div>
-                  <p style={{ fontSize: '14px', marginLeft: '32px' }}>{comment.msg}</p>
-                  <div
-                    style={{
-                      fontSize: '12px',
-                      color: '#999',
-                      marginLeft: '32px',
-                      marginTop: '4px',
-                    }}
-                  >
+                  <p style={{ fontSize: '14px', marginLeft: '32px' }}>
+                    {comment.msg}
+                  </p>
+                  <div style={{
+                    fontSize: '12px',
+                    color: '#999',
+                    marginLeft: '32px',
+                    marginTop: '4px',
+                  }}>
                     {formatDate(comment.created_at)}
                   </div>
                 </div>
-              ))}
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', color: '#999', padding: '16px' }}>
+                No comments yet
+              </div>
+            )}
           </div>
   
-          {/* Comment Input */}
-          <div
-            style={{
-              padding: '16px',
-              borderTop: '1px solid #eee',
-            }}
-          >
+          {/* Comment Input Form */}
+          <div style={{
+            padding: '16px',
+            borderTop: '1px solid #eee',
+          }}>
             <form onSubmit={handleAddComment} style={{ display: 'flex' }}>
               <input
                 type="text"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={localComment}
+                onChange={(e) => setLocalComment(e.target.value)}
                 placeholder="Add a comment..."
                 style={{
                   flex: 1,
@@ -419,16 +428,17 @@ function Exhibit({ user, post }) {
                   outline: 'none',
                   fontSize: '14px',
                 }}
+                disabled={isPosting}
               />
               <button
                 type="submit"
-                disabled={!comment.trim()}
+                disabled={!localComment.trim() || isPosting}
                 style={{
                   marginLeft: '8px',
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  backgroundColor: comment.trim() ? '#3897f0' : '#ddd',
+                  backgroundColor: localComment.trim() ? '#3897f0' : '#ddd',
                   color: 'white',
                   border: 'none',
                   display: 'flex',
@@ -437,14 +447,14 @@ function Exhibit({ user, post }) {
                   cursor: 'pointer',
                 }}
               >
-                <Send size={16} />
+                {isPosting ? '...' : <Send size={16} />}
               </button>
             </form>
           </div>
         </div>
       )
     );
-  };
+  });
 
   const ModalAddExhibit = () => {
     const [file, setFile] = useState(null);
@@ -521,7 +531,7 @@ function Exhibit({ user, post }) {
 
       {/*Comments Container */}
 
-      <CommentList postID={postID} comments={comments}/>
+      <CommentList postID={postID} comments={comments} setComments={setComments} />
       
     <button 
   className="create-exhibit-btn"
