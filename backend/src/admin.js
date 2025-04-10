@@ -9,50 +9,48 @@ const router = express.Router();
 
 // DELETE message route
 router.delete("/api/messages/:MsgId", async (req, res) => {
-    
-    const { MsgId } = req.params;
-    const { userId } = req.body; 
+  const { MsgId } = req.params;
+  const { userId } = req.query;  
+  console.log("params: " + MsgId + " and query: " + userId );
+  if (!userId) return res.status(400).json({ msg: "Missing user ID." });
 
-    const { data: message, error: messageError } = await supabase
-        .from("ChannelMessages")
-        .select("Gallery_id") 
-        .eq("Msg_id", MsgId)
-        .single();
-         console.log("MSG:", MsgId)       
-         console.log("Message:", message)
-    if (messageError || !message) {
-        return res.status(404).json({ msg: "Message not found." });
-    }
+  const { data: message, error: messageError } = await supabase
+    .from("ChannelMessages")
+    .select("Gallery_id")
+    .eq("Msg_id", MsgId)
+    .single();
 
-    const messageGalleryId = message.Gallery_id;
+  if (messageError || !message) {
+    return res.status(404).json({ msg: "Message not found." });
+  }
+  const messageGalleryId = message.Gallery_id;
+  const { data: adminCheck, error: adminError } = await supabase
+    .from("GalleryMembers")
+    .select("GalleryRole")
+    .eq("UserID", userId)
+    .eq("GalleryID", messageGalleryId)
+    .single();
 
-    const { data: adminCheck, error: adminError } = await supabase
-        .from("GalleryMembers")
-        .select("GalleryRole") 
-        .eq("UserID", userId)
-        .eq("GalleryID", messageGalleryId) 
-        .single();
+  if (adminError) {
+    return res.status(500).json({ msg: "Database error." });
+  }
 
-        if (adminError) {
-            console.error("Supabase error:", adminError);
-            return res.status(500).json({ msg: "Database error." });
-        }
-    
-        if (!adminCheck || adminCheck.GalleryRole !== true) {
-            return res.status(403).json({ msg: "You are not an admin or not part of this gallery." });
-        }
+  if (!adminCheck || adminCheck.GalleryRole !== true) {
+    return res.status(403).json({ msg: "You are not an admin or not part of this gallery." });
+  }
 
-    const { error: deleteError } = await supabase
-        .from("ChannelMessages")
-        .delete()
-        .eq("Msg_id", MsgId);
+  const { error: deleteError } = await supabase
+    .from("ChannelMessages")
+    .delete()
+    .eq("Msg_id", MsgId);
 
-    if (deleteError) {
-        return res.status(500).json({ msg: "Failed to delete message." });
-    }
+  if (deleteError) {
+    return res.status(500).json({ msg: "Failed to delete message." });
+  }
 
-    return res.status(200).json({ msg: "Message deleted successfully." });
+  return res.status(200).json({ msg: "Message deleted successfully." });
 });
+
 
 //Delete Channels
 router.delete("/api/channels/:channelname", async (req, res) => {

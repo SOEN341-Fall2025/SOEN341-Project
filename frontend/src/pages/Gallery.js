@@ -86,15 +86,14 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
             </span>
           
             <icons.Minus
-              size={18}
-              color="#4F6FF7"
-              style={{ cursor: 'pointer' }}
-              onClick={(e) => {
-                e.stopPropagation(); 
-                if (window.confirm(`Are you sure you want to delete ${item.ChannelName}?`)) {
-                  handleDeleteChannel(item.ChannelName);
-                }
-              }}
+             size={18}
+             className="cursor-pointer text-[#4F6FF7] hover:text-white transition"
+             onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm(`Are you sure you want to delete ${item.ChannelName}?`)) {
+                handleDeleteChannel(item.ChannelName);
+              }
+             }}
             />
           </Nav.Link>
             ))
