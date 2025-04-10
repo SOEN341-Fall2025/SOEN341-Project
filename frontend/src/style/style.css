@@ -22,6 +22,7 @@ body::before {
     height: 100%;
     z-index: -1; 
 }
+
 .wrapper{
     width: 420px;
     background: rgba(255, 255, 255, 0.9);
@@ -179,6 +180,31 @@ body::before {
     opacity: 1;
   }
 
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+
+  @keyframes float2 {
+    0% {
+      transform: translateY(0px) translateX(0px);
+    }
+    50% {
+      transform: translateY(-5px) translateX(-5px);
+    }
+    100% {
+      transform: translateY(0px) translateX(0px);
+    }
+  }
+
   /* Create Exhibit Button */
 .create-exhibit-btn {
   position: fixed;
@@ -199,6 +225,9 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
+
+  /* 👇 Add the animation here */
+  animation: float 0.4s ease-in-out infinite;
 }
 
 .create-exhibit-btn:hover {

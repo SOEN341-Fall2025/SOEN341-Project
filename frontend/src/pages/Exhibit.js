@@ -253,7 +253,9 @@ function Exhibit({ user, post }) {
               borderRadius: '12px',
               overflow: 'hidden',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              flexShrink: 0 // important for scrollable children
+              flexShrink: 0, // important for scrollable children
+
+              animation: 'float 1.5s ease-in-out infinite'
             }}
           >
             {/* Your post content... */}
@@ -323,125 +325,171 @@ function Exhibit({ user, post }) {
     );
   };
 
-  const CommentList = ({postID, comments}) => {
-    return (
-      
-      showComments && (
-        
-        <div
-          className={`comments-container ${showComments ? 'show' : ''}`}
-          style={{
-            position: 'fixed',
-            right: 0,
-            overflowY: 'scroll',
-            height: '770px',
-            width: '300px',
-            background: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px #000000',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* Header */}
-          <div
-            style={{
-              padding: '16px',
-              borderBottom: '1px solid #eee',
-              fontWeight: '600',
-            }}
-          >
-            Comments
-          </div>
+  const CommentList = ({ postID, comments }) => {
+    // Helper function to generate a random animation duration
+    const getRandomDuration = () => `${Math.random() * 2 + 1}s`; // Random duration between 1s and 3s
   
-          {/* Comments List */}
+    return (
+      showComments && (
+        <>
+          {/* Bubble images with unique random animation durations for each iteration */}
+          {[
+            { bottom: '90px', right: '400px' },
+            { bottom: '120px', right: '380px' },
+            { bottom: '150px', right: '371px' },
+            { bottom: '180px', right: '362px' },
+            { bottom: '210px', right: '353px' },
+            { bottom: '240px', right: '344px' },
+            { bottom: '270px', right: '335px' },
+            { bottom: '300px', right: '326px' },
+            { bottom: '330px', right: '317px' },
+            { bottom: '360px', right: '305px' },
+            { bottom: '390px', right: '300px' },
+          ].map((bubble, index) => (
+            <img
+              key={index}
+              src="https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/gallery_uploads//vecteezy_colorful-transparent-soap-bubble-isolated-on-transparent_49580421.png"
+              style={{
+                height: '30px',
+                width: '30px',
+                position: 'absolute',
+                bottom: bubble.bottom,
+                right: bubble.right,
+                animation: `float ${getRandomDuration()} ease-in-out infinite`, // Random animation for each bubble
+              }}
+            />
+          ))}
+  
+          {/* Comments Container */}
           <div
+            className={`comments-container ${showComments ? 'show' : ''}`}
             style={{
-              flex: 1,
-              overflowY: 'auto',
-              padding: '16px',
+              position: 'fixed',
+              right: 0,
+              overflowY: 'scroll',
+              height: '770px',
+              width: '300px',
+              background: '',
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px #000000',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            {comments
-              .filter((comment) => comment.post_id === postID) // Ensure only comments for the current post are displayed
-              .map((comment) => (
-                <div key={comment.comment_id} style={{ marginBottom: '16px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+            {/* Header */}
+            <div
+              style={{
+                padding: '16px',
+                borderBottom: '1px solid #eee',
+                fontWeight: '600',
+              }}
+            >
+              Comments
+            </div>
+  
+            {/* Comments List */}
+            <div
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                padding: '16px',
+              }}
+            >
+              {comments
+                .filter((comment) => comment.post_id === postID) // Ensure only comments for the current post are displayed
+                .map((comment) => {
+                  // Generate a random duration for each comment's animation
+                  const randomDuration = getRandomDuration();
+  
+                  return (
                     <div
+                      key={comment.comment_id}
                       style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '50%',
-                        backgroundColor: '#ddd',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: '8px',
+                        marginBottom: '16px',
+                        background: 'linear-gradient(135deg, #66b3ff, rgb(149, 110, 175))',
+                        padding: '10px',
+                        borderRadius: '30px',
+                        animation: `float ${randomDuration} ease-in-out infinite`, // Unique animation for each comment
                       }}
                     >
-                      <User size={12} /> {/* Assuming User is an icon or component */}
+                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                        <div
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '50%',
+                            backgroundColor: '#ddd',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginRight: '8px',
+                          }}
+                        >
+                          <User size={12} /> {/* Assuming User is an icon or component */}
+                        </div>
+                        <span style={{ fontWeight: '600', fontSize: '14px' }}>{comment.username}</span>
+                      </div>
+                      <p style={{ fontSize: '14px', marginLeft: '32px' }}>{comment.msg}</p>
+                      <div
+                        style={{
+                          fontSize: '12px',
+                          color: 'dark-gray',
+                          marginLeft: '32px',
+                          marginTop: '4px',
+                        }}
+                      >
+                        {formatDate(comment.created_at)}
+                      </div>
                     </div>
-                    <span style={{ fontWeight: '600', fontSize: '14px' }}>{comment.username}</span>
-                  </div>
-                  <p style={{ fontSize: '14px', marginLeft: '32px' }}>{comment.msg}</p>
-                  <div
-                    style={{
-                      fontSize: '12px',
-                      color: '#999',
-                      marginLeft: '32px',
-                      marginTop: '4px',
-                    }}
-                  >
-                    {formatDate(comment.created_at)}
-                  </div>
-                </div>
-              ))}
-          </div>
+                  );
+                })}
+            </div>
   
-          {/* Comment Input */}
-          <div
-            style={{
-              padding: '16px',
-              borderTop: '1px solid #eee',
-            }}
-          >
-            <form onSubmit={handleAddComment} style={{ display: 'flex' }}>
-              <input
-                type="text"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Add a comment..."
-                style={{
-                  flex: 1,
-                  border: '1px solid #ddd',
-                  borderRadius: '20px',
-                  padding: '8px 16px',
-                  outline: 'none',
-                  fontSize: '14px',
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!comment.trim()}
-                style={{
-                  marginLeft: '8px',
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  backgroundColor: comment.trim() ? '#3897f0' : '#ddd',
-                  color: 'white',
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Send size={16} />
-              </button>
-            </form>
+            {/* Comment Input */}
+            <div
+              style={{
+                padding: '16px',
+                borderTop: '1px solid #eee',
+              }}
+            >
+              <form onSubmit={handleAddComment} style={{ display: 'flex' }}>
+                <input
+                  type="text"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  style={{
+                    flex: 1,
+                    border: '1px solid #ddd',
+                    borderRadius: '20px',
+                    padding: '8px 16px',
+                    outline: 'none',
+                    fontSize: '14px',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={!comment.trim()}
+                  style={{
+                    marginLeft: '8px',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: comment.trim() ? '#3897f0' : '#ddd',
+                    color: 'white',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Send size={16} />
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
+        </>
       )
     );
   };
@@ -498,6 +546,7 @@ function Exhibit({ user, post }) {
       </Modal.Body>
     );
   };
+  
   return (
     <div className="posts-container" style={{
       display: 'flex',
@@ -511,12 +560,15 @@ function Exhibit({ user, post }) {
       transform: 'translate(-50%, -50%)'
     }}>
       {/* Left Side - Instagram Post */}
+      
+      
       { exhibitLoaded ? (
       <ExhibitList exhibits={exhibits}/>):
       (<>
         Loading
       </>)
       }
+      
       
 
       {/*Comments Container */}

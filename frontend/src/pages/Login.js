@@ -88,8 +88,20 @@ function Login({ onLogin }) {
 
     return (
         <div>
+            <div className="flex justify-center items-center h-screen w-screen">
+  <div>
+    <img 
+      src="https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/gallery_uploads//3b910723-2325-4972-bb45-9f6d831f94a4-2.png" 
+      alt="Post" 
+      className="w-full h-full object-cover max-w-md max-h-[90vh] rounded-lg shadow-xl"
+      style={{animation: `float2 1.5s ease-in-out infinite`}}
+    />
+  </div>
+</div>
             {showLogin ? (
+                
                 <div className="wrapper">
+                    
                     <form onSubmit={handleLoginSubmit}>
                         <h1>Login</h1>
                         <div className="input-box">
@@ -110,6 +122,7 @@ function Login({ onLogin }) {
                         </div>
                     </form>
                 </div>
+                
             ) : (
                 <div className="wrapper">
                     <form onSubmit={handleRegisterSubmit}>
