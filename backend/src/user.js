@@ -6,27 +6,81 @@ import { supabase } from "./server.js";
 router.use(express.json());
 
 router.put("/api/newusername", async (req, res) => {
-  const { user_id, newUsername } = req.body; // Get the user ID and new username from the request body
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+  const { newUsername } = req.body; // Get the user ID and new username from the request body
 
   // Validate input
-  if (!user_id || !newUsername) {
-    return res
-      .status(400)
-      .json({ msg: "User ID and new username are required" });
-  }
+  if (error || !user) {
+    return res.status(401).json(error);
+}
 
   // Update the username in the database
   const { data, error: databaseError } = await supabase
     .from("Users")
     .update({ username: newUsername })
-    .eq("user_id", user_id); // Update the user with the matching ID
+    .eq("user_id", user.id); // Update the user with the matching ID
 
   if (databaseError) {
-    return res.status(400).json({ msg: error.message });
+    return res.status(400).json({ msg: databaseError.message });
   }
 
+
+ 
   // Return success response
-  res.status(200).json({ msg: "Username updated successfully", data });
+ return res.status(200).json({ msg: "Username updated successfully", data });
 });
 
+
+router.post("/api/newaboutme", async (req, res) => {
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);
+  const { newAboutMe } = req.body; // Get the user ID and new username from the request body
+
+  if (error || !user) {
+    return res.status(401).json(error);
+}
+  // Update user's about me
+  const{data, error: databaseError} = await supabase
+  .from('Users')
+  .update({about_me: newAboutMe}  )
+  .eq("user_id", user.id);
+
+  if (databaseError) {
+    return res.status(400).json({ msg: databaseError.message });
+  }
+
+  return res.status(200).json({ msg: "About me updated successfully" });
+});
+
+router.post("/api/newpassword", async (req, res) => {
+
+  const { data: { user }, error } = await supabase.auth.getUser(req.headers.authorization?.split(" ")[1]);  
+  const { newPassword } = req.body; // Get the user ID and new username from the request body
+
+  if (error || !user || !newPassword ) {
+    console.log("There was an error fetching the data.")
+    return res.status(401).json(error);
+  }
+
+  const { data: updatedUser, error: authError } = await supabase.auth.updateUser({
+    password: newPassword, // User's new password
+  });
+
+  if (authError){
+    console.log("There was an error with the authentication.")
+    return res.status(400).json({ msg: databaseError.message });
+  }
+
+  // Update password
+  const{ data, error: databaseError} = await supabase
+    .from('Users')
+    .update({password: newPassword}  )
+    .eq("user_id", user.id);
+
+  if (databaseError) {
+    console.log("There was an error with the database.")
+    return res.status(400).json({ msg: databaseError.message });
+  }
+
+  return res.status(200).json({ msg: "Password updated successfully" });
+});
 export default router;
