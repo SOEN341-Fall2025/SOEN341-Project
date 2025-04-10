@@ -55,4 +55,41 @@ router.get("/api/exhibit/comments", authenticateUser, async (req, res) => {
     res.json({ msg: "Comments fetched successfully.", data });
 });
 
+// Add a comment on an ehibit
+router.post("/api/exhibit/comments", async (req, res) => {
+    const token = req.headers.authorization?.split(" ")[1] ?? "";
+    const { data: { user }, error: authError } =
+      await supabase.auth.getUser(token);
+  
+    if (authError || !user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+  
+    // Validate payload
+    const { post_id, msg } = req.body;
+    if (!post_id || !msg) {
+      return res.status(400).json({ error: "post_id and msg are required" });
+    }
+  
+    // Insert into ExhibitComments
+    const { data, error: dbError } = await supabase
+      .from("ExhibitComments")
+      .insert([{
+        post_id,
+        commenter_id: user.id,
+        msg,
+        created_at: new Date().toISOString()
+      }]);
+  
+    if (dbError) {
+      console.error("Error inserting comment:", dbError);
+      return res.status(500).json({ error: "Could not save comment" });
+    }
+  
+    res.status(201).json({
+      message: "Comment added",
+      comment: data[0]
+    });
+  });
+  
 export default router;
