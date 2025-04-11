@@ -208,7 +208,7 @@ const uploadFile = async (dmID) => {
 
       // Parse the response data
       const result = await response.json();
-      console.log('Message saved:', result.data);
+      console.log('Message saved:', result);
 
       // Call file upload if needed
       if (result.data && result.data.Msg_id) {
@@ -216,7 +216,7 @@ const uploadFile = async (dmID) => {
       }
   
       // Handle success (e.g., update UI, state, etc.)
-      return result.data; // You might want to return the message data here for further use
+      return result; // You might want to return the message data here for further use
   
     } catch (error) {
       console.error('Error saving message:', error.message);
