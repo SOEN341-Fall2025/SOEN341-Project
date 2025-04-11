@@ -54,3 +54,12 @@ Follow this tutorial for installation: https://www.youtube.com/watch?v=06X51c6WH
 <b>Dotenv</b>: Allows a safe storage location for important variables such as API keys.
 
 <b>Express</b>: This is used to connect the frontend to the backend.
+
+++++++++ BONUS FEATURE ++++++++++
+Exhibit is a feature that allows users to share their artworks or pictures 
+Users can:
+- Post their artworks by uploading images and writing a description
+- View other user's posts
+- Like and comment on posts
+- See the number of likes and comments on each post
+  
