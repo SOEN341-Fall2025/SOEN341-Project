@@ -441,9 +441,9 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
         }
       
         try {
-          const galleryId = await getGalleryID(item.GalleryName);
+          const galleryId = await getGalleryID(galleryItem.GalleryName);
           if (!galleryId) throw new Error("Couldn't get gallery ID");
-      const token = localStorage.getItem('authToken');
+          const token = localStorage.getItem('authToken');
           const userResponse = await fetch(`/api/get/userid-username/${usernameToAdd}`, {
             headers: {
               'Authorization': `Bearer ${token}`
