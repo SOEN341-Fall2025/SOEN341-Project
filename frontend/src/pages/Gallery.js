@@ -13,6 +13,8 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
+  const [userGalleries, setUserGalleries] = useState(""); 
+
     const [newChannelName, setNewChannelName] = useState("");
     const [newTitle, setNewTitle] = useState("");
     const handleClose = () => setShowState(false);
@@ -106,6 +108,23 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
       }
     };
 
+    const GalleryChannelList = ({ channels }) => {
+      if(channels.length > 0){
+        return (
+          channels.map((item, index) => (
+              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
+                fetchChannelMessages(item.ChannelName);
+              }}>
+                <span className="channel-icon">
+                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
+                </span>
+                {item.ChannelName}
+              </Nav.Link>
+            ))
+        );
+      }
+    };
+ 
     const handleChannels = (newname, galleryname) => {
       setTheseChannels(prevChannels => {
         const updatedChannels = [...prevChannels, { GalleryName: galleryname, ChannelName: newname }];
@@ -145,22 +164,7 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
         );
     };
 
-    const GalleryChannelList = ({ channels }) => {
-      if(channels.length > 0){
-        return (
-          channels.map((item, index) => (
-              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
-                fetchChannelMessages(item.ChannelName);
-              }}>
-                <span className="channel-icon">
-                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
-                </span>
-                {item.ChannelName}
-              </Nav.Link>
-            ))
-        );
-      }
-    };
+
 
     const ChannelPagesList = ({ channels, channelName }) => {
         return (
@@ -240,80 +244,353 @@ function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {
 
   const fetchChannelMessages = async (channelName) =>{
 
-    const token = localStorage.getItem('authToken');
-
-    try {
+        const token = localStorage.getItem('authToken');
     
-        // Fetch the messages for the channel
-        const response = await fetch(`/gal/msgChannel/${channelName}`, {
-          method: 'GET',  // Use GET if you're not sending a body in the request. Otherwise, use POST.
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,  // Assuming authToken is the user's JWT token
+        try {
+        
+            // Fetch the messages for the channel
+            const response = await fetch(`/gal/msgChannel/${channelName}`, {
+              method: 'GET',  // Use GET if you're not sending a body in the request. Otherwise, use POST.
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,  // Assuming authToken is the user's JWT token
+              }
+            });
+        
+            if (!response.ok) {
+              throw new Error('Failed to fetch messages');
+            }
+        
+            // Parse the response JSON
+            const data = await response.json();
+            console.log(data);
+        
+            // Handle the updated data (i.e., render the messages)
+            if (data.updatedData) {
+              // Do something with the updatedData, e.g., set state in React
+              console.log(data.updatedData);
+            }
+    
+            const messagesAndUsernames = data.updatedData.map(item => ({
+                message: item.Msg,
+                username: item.Username,
+              }));
+            console.log(messagesAndUsernames);
+            setChannelMessage(messagesAndUsernames);
+        
+          } catch (error) {
+            console.error('Error fetching channel messages:', error.message);
           }
-        });
-    
-        if (!response.ok) {
-          throw new Error('Failed to fetch messages');
-        }
-    
-        // Parse the response JSON
-        const data = await response.json();
-        console.log(data);
-    
-        // Handle the updated data (i.e., render the messages)
-        if (data.updatedData) {
-          // Do something with the updatedData, e.g., set state in React
-          console.log(data.updatedData);
-        }
+        
+      };
 
-        const messagesAndUsernames = data.updatedData.map(item => ({
-            message: item.Msg,
-            username: item.Username,
-          }));
-        console.log(messagesAndUsernames);
-        setChannelMessage(messagesAndUsernames);
-    
-      } catch (error) {
-        console.error('Error fetching channel messages:', error.message);
-      }
-    
-  };
-  return (
-    <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
-          <Tab.Container id="">
-            <Col id="sidebar-channels" style={{ width: user.sizeInnerSidebar}} >
-              <Nav
-                id="dm-list"
-                variant="pills"
-                defaultActiveKey="Me"
-                className="flex-column d-flex align-items-start"
-              >
-                <Row id="sidebar-dm-options">
-                  <Col>Channels</Col>
-                </Row>
-                <Nav.Link className="seperator" disabled>
-                  <hr />
+      const getCurrentUserId = async () => {
+        try {
+          const token = localStorage.getItem('authToken');
+          if (!token) throw new Error('No authentication token found');
+      
+          const response = await fetch('/api/get/me', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to fetch user data');
+          }
+      
+          const data = await response.json();
+          return data.user[0].user_id; // Adjust based on your actual response structure
+        } catch (error) {
+          console.error('Error getting current user ID:', error);
+          return null;
+        }
+      };
+      const [username, setUsername] = useState('');
+     
+      const handleSubmitAdmin = async (e) => {
+        e.preventDefault();
+        
+        if (!username.trim()) {
+          alert('Please enter a username');
+          return;
+        }
+      
+        try {
+          const galleryId = await getGalleryID(item.GalleryName);
+          if (!galleryId) throw new Error("Couldn't get gallery ID");
+      
+          const adminUserId = await getCurrentUserId();
+
+          const token = localStorage.getItem('authToken');
+          if (!token) throw new Error("Not authenticated");
+
+          console.log("Sending:", { galleryId, username, adminUserId });
+
+          const response = await fetch(`/api/gallery/${galleryId}/members/admin`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ username,adminUserId }), // Only send username
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Failed to promote user');
+          }
+      
+          const responseData = await response.json();
+          alert(responseData.msg || 'User promoted successfully');
+          setUsername('');
+          handleClose();
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
+
+      const handleSubmitOwner = async (e) => {
+        e.preventDefault();
+        
+        if (!username.trim()) {
+          alert('Please enter a username');
+          return;
+        }
+      
+        try {
+          const galleryId = await getGalleryID(item.GalleryName);
+          if (!galleryId) throw new Error("Couldn't get gallery ID");
+      
+          const OwnerUserId = await getCurrentUserId();
+
+          const token = localStorage.getItem('authToken');
+          if (!token) throw new Error("Not authenticated");
+
+          console.log("Sending:", { galleryId, username, OwnerUserId });
+
+          const response = await fetch(`/api/gallery/${galleryId}/members/owner`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ username, OwnerUserId }), // Only send username
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Failed to demote user');
+          }
+      
+          const responseData = await response.json();
+          alert(responseData.msg || 'User demoted successfully');
+          setUsername('');
+          handleClose();
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
+      const [usernameToAdd, setUsernameToAdd] = useState('');
+      const handleAddUserToGallery = async (e) => {
+        e.preventDefault();
+        
+        if (!usernameToAdd.trim()) {
+          alert('Please enter a username');
+          return;
+        }
+      
+        try {
+          const galleryId = await getGalleryID(item.GalleryName);
+          if (!galleryId) throw new Error("Couldn't get gallery ID");
+      const token = localStorage.getItem('authToken');
+          const userResponse = await fetch(`/api/get/userid-username/${usernameToAdd}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+      
+          if (!userResponse.ok) {
+            const errorData = await userResponse.json();
+            throw new Error(errorData.error || errorData.msg || 'User not found');
+          }
+          const userData = await userResponse.json();
+          const userIdToAdd = userData.data.user_id;
+          
+          if (!token) throw new Error("Not authenticated");
+          console.log("Sending:", { galleryId, username, userIdToAdd });
+
+      
+          const response = await fetch(`/api/gal/${galleryId}/addusertogal`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+              username: usernameToAdd,
+              user_id: userIdToAdd, // The admin/owner who is adding the user
+              role: 'false' // Default role
+            }),
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Failed to add user');
+          }
+      
+          const responseData = await response.json();
+          alert(responseData.msg || 'User added successfully');
+          setUsernameToAdd('');
+          handleClose();
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
+    return (
+      <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
+            <Tab.Container id="">
+              <Col id="sidebar-channels" style={{ width: user.sizeInnerSidebar}} >
+                <Nav
+                  id="dm-list"
+                  variant="pills"
+                  defaultActiveKey="Me"
+                  className="flex-column d-flex align-items-start"
+                >
+
+              <Col  id="sidebar-dm-options" style={{ width: user.sizeInnerSidebar }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
+                <Nav.Link onClick={() => handleClick('addAdmin-modal')} className="add-admin" style={{ display: 'flex', alignItems: 'center', marginRight: '2px' }}>
+                <Plus />
                 </Nav.Link>
-                <GalleryChannelList channels={thisChannels}/>
+                <div style={{ fontWeight: 'bold' }}>Channels</div>
+                <Nav.Link onClick={() => handleClick('addOwner-modal')} className="add-owner" style={{ display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
+                <icons.Minus />
+                </Nav.Link>
+              </div>
+              </Col>
+
+              <Nav.Link className="seperator" disabled>
+                <hr />
+                <hr />
+              </Nav.Link>
+              <GalleryChannelList channels={thisChannels}/>
                 <Nav.Link
                   onClick={() => handleClick("addChannel-modal")}
                   className="add-channel"
                 >
-                  <span className="channel-icon">
-                    <Plus />
-                  </span>{" "}
-                  Add a Channel
-                </Nav.Link>
-              </Nav>
-            </Col>
-          </Tab.Container>
+                <span className="channel-icon">
+                  <Plus />
+                </span>{" "}
+                Add a Channel
+              </Nav.Link>
+              <Nav.Link
+                  onClick={() => handleClick("addUser-modal")}
+                  className="add-user"
+                >
+                <span className="channel-icon">
+                  <Plus />
+                </span>{" "}
+                Add a User
+              </Nav.Link>
+            </Nav>
+          </Col>
+        </Tab.Container>
         <ChannelPagesList channels={thisChannels} channelName={newChannelName}/>
-        <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
-          <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalAddChannel /></Modal.Dialog>
+        <Modal show={showState === 'addAdmin-modal'} onHide={handleClose} id="addAdmin-modal" className="modal-dialog-centered">
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          </Modal.Dialog>
+          <Modal.Body>
+            <h5 className="text-center">Add an admin</h5>
+            <form onSubmit={handleSubmitAdmin}>
+              <Col>
+                <Row><label>Username:</label></Row>
+                <Row>
+                  <input
+                    type='text'
+                    id='username'
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                  />
+                </Row>
+                <Row>
+                  <Button type="submit">Add admin</Button>
+                </Row>
+              </Col>
+            </form>
+          </Modal.Body>
+          
         </Modal>
-    </Tab.Pane>
-  );
+        <Modal show={showState === 'addOwner-modal'} onHide={handleClose} id="addOwner-modal" className="modal-dialog-centered">
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          </Modal.Dialog>
+          <Modal.Body></Modal.Body>
+        <Modal.Body>
+            <h5 className="text-center">Remove an admin</h5>
+            <form onSubmit={handleSubmitOwner}>
+              <Col>
+                <Row><label>Username:</label></Row>
+                <Row>
+                  <input
+                    type='text'
+                    id='username'
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                  />
+                </Row>
+                <Row>
+                  <Button type="submit">Remove admin</Button>
+                </Row>
+              </Col>
+            </form>
+          </Modal.Body>
+          </Modal>
+        <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+            <ModalAddChannel />
+          </Modal.Dialog>
+        </Modal>
+        <Modal show={showState === 'addUser-modal'} onHide={handleClose} id="addUser-modal" className="modal-dialog-centered">
+  <Modal.Dialog>
+    <Modal.Header>
+      <Modal.Title>Add User to Gallery</Modal.Title>
+      <Button className="btn-close" onClick={handleClose}></Button>
+    </Modal.Header>
+    <Modal.Body>
+      <form onSubmit={handleAddUserToGallery}>
+        <div className="mb-3">
+          <label htmlFor="usernameInput" className="form-label">Username:</label>
+          <input
+            type="text"
+            className="form-control"
+            id="usernameInput"
+            value={usernameToAdd}
+            onChange={(e) => setUsernameToAdd(e.target.value)}
+            placeholder="Enter username to add"
+            autoFocus
+            required
+          />
+        </div>
+        <div className="d-grid gap-2">
+          <Button variant="primary" type="submit">
+            Add User
+          </Button>
+        </div>
+      </form>
+    </Modal.Body>
+  </Modal.Dialog>
+</Modal>
+      </Tab.Pane>
+    );
 }
 
 export default Gallery;

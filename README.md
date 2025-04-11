@@ -14,6 +14,7 @@
 This project implements a platform where users can communicate in an individual and group manner. Users are allowed to message people privately (1-on-1) and to create a group channel for people or friends to communicate with one another. Other features will be added for users' entertainment. 
 
 **Objective:**
+
 The group will be implementing 3 core features that the customers are requiring to use:
 
 - Website UI/UX Layout
