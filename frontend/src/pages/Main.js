@@ -51,7 +51,7 @@ function Main({ userData, galleries}) {
   const [newUserName, setNewUserName] = useState("");
   const [currentUser, setCurrentUser] = useState("");
   const [currentAuthUser, setCurrentAuthUser] = useState("");
-
+ 
   const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
   const [dmNavWidth, setDmNavWidth] = useState(17);  
   const [userGalleries, setUserGalleries] = useState(galleries); 
@@ -168,7 +168,7 @@ useEffect(() => {
     
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
-   function handleClick(key) { setShowState(key); }
+  function handleClick(key) { setShowState(key); }
   const handleChannels = (newGalleryName, newChannelName, newIcon) => {
     setUserChannels([...userChannels, { galleryName: newGalleryName, channelName: newChannelName, icon: newIcon }]);
   };
@@ -239,7 +239,7 @@ useEffect(() => {
       );
     }
   };
-
+  
   const getChannels = useCallback(async (name) => {
     try {      
         const token = localStorage.getItem('auth-token');        
@@ -262,7 +262,7 @@ useEffect(() => {
           console.warn("Channels is not an array:", channels);
           channels = [];
         }
-
+        
         setGalleryChannels(channels);
     } catch (error) {
       console.error("Error fetching channels:", error);
@@ -273,7 +273,7 @@ useEffect(() => {
   useEffect(() => {
     console.log("Channels have been updated:", galleryChannels);
   }, [galleryChannels]);
-
+  
   const GalleryList = React.memo(() => {
     const galleryNames = userGalleries.map((membership) => membership.GalleryName);
     const handleGalleryClick = useCallback((galleryName) => {
@@ -300,7 +300,7 @@ useEffect(() => {
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery item={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar} name={item.GalleryName}/>
+        <Gallery galleryItem={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar} name={item.GalleryName}/>
       ))
     
     );
@@ -318,7 +318,7 @@ useEffect(() => {
       )
     );
   };
-
+  
   useEffect(() => {
     console.log("currentUser:",currentUser);
     console.log("currentAuthUser:",currentAuthUser);
@@ -416,7 +416,7 @@ useEffect(() => {
         </Modal.Body>
     );
   };
-
+  /*
   const userProfile = {
     // GET items from database
     username: "@John",
@@ -431,7 +431,7 @@ useEffect(() => {
     Displayname: "Johnny Dough",
     Aboutme: "John Doe is a mysteriously unlucky man, whose name is mostly found on corpses.",
   };
-
+  */
   const fetchUser = async (username) => {
     let verifyUser = false;
     try {
@@ -714,13 +714,12 @@ useEffect(() => {
         <Modal.Dialog className="modal-dialog-centered modal-fullscreen">
           <Modal.Header><div id="settings-close-button"><Button className="btn-close" onClick={handleClose}></Button></div></Modal.Header>
           <Modal.Body>
-            <AppContext.Provider value={contextValue}>
-              <Settings userVars={userVar}/>
-              <Gallery 
-                userGalleries={userGalleries} 
-                setUserGalleries={setUserGalleries} 
-              />
-            </AppContext.Provider>
+              <Settings userVars={userVar} ProfilePic={ProfilePic}/>
+            
+            <Gallery 
+              userGalleries={userGalleries} 
+              setUserGalleries={setUserGalleries} 
+            />
           </Modal.Body>
         </Modal.Dialog>
       </Modal>

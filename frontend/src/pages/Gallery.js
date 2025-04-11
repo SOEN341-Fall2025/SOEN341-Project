@@ -5,13 +5,16 @@ import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 're
 import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
+import { ContextMenu } from './CssComponents.js';
 
-function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels, name }) {  
+function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryChannels, name }) {  
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
     const [newChannelName, setNewChannelName] = useState("");
     const [newTitle, setNewTitle] = useState("");
+    
+    const [clickedName, setClickedName] = useState("");
     const handleClose = () => setShowState(false);
     function handleClick(key) { setShowState(key); }
 
@@ -32,20 +35,59 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           return null; // Ensure the map function returns something in all cases
       });
     };
-
+    
+    const handleChannelRename = async (event) => {
+      event.preventDefault();        
+      if (!newTitle.trim()) {
+        alert("Channel name cannot be empty!");
+        return;
+      }
+      console.log("Gallery Name", galleryItem.GalleryName);
+        
+      await renameChannel();
+      //handleChannels(newTitle, galleryName); 
+      handleClose();  //Close the modal *after* form is submitted.
+    };
     const GalleryChannelList = ({ channels }) => {
-      if(channels.length > 0){
-        return (
-          channels.map((item, index) => (
-              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
-                fetchChannelMessages(item.ChannelName);
-              }}>
+      const [clicked, setClicked] = useState(false);
+      const [points, setPoints] = useState({x: 0,y: 0});
+      console.log(thisChannels);
+      useEffect(() => {
+        const handleClick = () => setClicked(false);
+        window.addEventListener("click", handleClick);
+        return () => {
+          window.removeEventListener("click", handleClick);
+        };
+      }, []);
+      if(channels){
+       return (
+          <div>
+              {channels.map((item, index) => (
+                <Nav.Link 
+                eventKey={item.ChannelName} 
+                key={index} 
+                onClick={() => setNewChannelName(item.ChannelName)} 
+                onContextMenu={(e) => {
+                    e.preventDefault();
+                    setClicked(true);
+                    setClickedName(item.ChannelName);
+                    setPoints({x: (50 * e.pageX /100), y: e.pageY});
+                  }}>
                 <span className="channel-icon">
-                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
+                    <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
                 </span>
                 {item.ChannelName}
-              </Nav.Link>
-            ))
+                </Nav.Link>
+            ))}
+            {clicked && (
+              <ContextMenu $top={points.y} $left={points.x}>
+                <ul>
+                  <h5 style={{textAlign: "center"}}>{clickedName}</h5>
+                  <li onClick={() => handleClick("renameChannel-modal")}>Rename</li>
+                </ul>
+              </ContextMenu>
+            )}
+            </div>
         );
       }
     };
@@ -90,7 +132,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           </Modal.Body>
         );
     };
-
+    
     const ChannelPagesList = ({ channels, channelName }) => {
       return (
         <>
@@ -131,7 +173,36 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
         console.error("Error fetching GalleryID:", error);
         return null;  // Return null if error occurs
     }};
-
+    const renameChannel = async () => {
+  
+      const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
+      const galleryId = await getGalleryID(galleryItem.GalleryName);
+        try {
+          const renameResponse = await fetch('/gal/renameChannel', {
+            method: 'PUT', // or 'PUT', depending on your API
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}` // Pass token as Bearer in the Authorization header
+            },
+            body: JSON.stringify({ clickedName, galleryId, newTitle }),
+          });
+          
+          const result = await renameResponse.json();
+  
+          if (!renameResponse.ok) {
+            console.error('Error:', result);
+            alert('Failed to create channel: ' + result.msg || 'Unknown error');
+            return;
+          }
+        
+          console.log('Channel renamed:', result);
+          alert('Channel renamed successfully!');
+    
+        } catch (error) {
+          console.error('An error occurred:', error);
+          alert('An error occurred while renaming the channel.', error);
+        }
+    };
       const createChannel = async (channelName, galleryName) => {
         // Get the auth token, for example from localStorage or a cookie
         const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
@@ -242,7 +313,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
         }
       
         try {
-          const galleryId = await getGalleryID(item.GalleryName);
+          const galleryId = await getGalleryID(galleryItem.GalleryName);
           if (!galleryId) throw new Error("Couldn't get gallery ID");
       
           const adminUserId = await getCurrentUserId();
@@ -286,7 +357,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
         }
       
         try {
-          const galleryId = await getGalleryID(item.GalleryName);
+          const galleryId = await getGalleryID(galleryItem.GalleryName);
           if (!galleryId) throw new Error("Couldn't get gallery ID");
       
           const OwnerUserId = await getCurrentUserId();
@@ -321,8 +392,28 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
         }
       };
       
+    const ModalRenameChannel = () => {
+      return(
+        <Modal.Body> 
+            <h5 className="text-center">Rename {clickedName} Channel</h5>
+            <form onSubmit={handleChannelRename}>
+              <Col>
+                <Row><label>Name:</label></Row>
+                <Row>
+                  <input type='textarea' value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder='New name of your Channel' 
+                  autoFocus
+                  />
+                  </Row>
+                <Row><input type='submit' value="Submit" /></Row>
+              </Col>
+            </form>
+        </Modal.Body>
+      );
+  };
     return (
-      <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
+      <Tab.Pane eventKey={galleryItem.GalleryName} className="gallery-pane" >
             <Tab.Container id="">
               <Col id="sidebar-channels" style={{ width: user.sizeInnerSidebar}} >
                 <Nav
@@ -349,15 +440,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
                 <hr />
               </Nav.Link>
               <GalleryChannelList channels={thisChannels}/>
-                <Nav.Link
-                  onClick={() => handleClick("addChannel-modal")}
-                  className="add-channel"
-                >
-                <span className="channel-icon">
-                  <Plus />
-                </span>{" "}
-                Add a Channel
-              </Nav.Link>
+                
             </Nav>
           </Col>
         </Tab.Container>
@@ -418,6 +501,9 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
             <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
             <ModalAddChannel />
           </Modal.Dialog>
+        </Modal>
+        <Modal show={showState === 'renameChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
+          <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalRenameChannel /></Modal.Dialog>
         </Modal>
       </Tab.Pane>
     );

@@ -1,11 +1,10 @@
 import '../style/settings.css';
 import React from 'react';
 import { AppContext, RGB_A } from '../AppContext';
-import { useContext } from 'react';
 import { useState } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
-function Settings({userVars}) {
+function Settings({userVars, ProfilePic}) {
     
       const [modalState, setModalState] = useState("close");
       const handleClose = () => setModalState(false);
@@ -56,7 +55,7 @@ function Settings({userVars}) {
           const userId = userVars.userID;    
           updateUser(userId, "settings", userVars.settings);
       }
-      const { ProfilePic, Username, Displayname, Aboutme } = useContext(AppContext);
+      const { Username, Displayname, Aboutme } = useState("");
     return (      
       <section>
         <div className="settings">
