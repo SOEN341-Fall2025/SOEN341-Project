@@ -56,48 +56,56 @@ router.delete("/api/messages/:MsgId", async (req, res) => {
 
 //Delete Channels
 router.delete("/api/channels/:channelname", async (req, res) => {
-    
   const { channelname } = req.params;
-  const { userId } = req.body; 
-  console.log("Verifying admin privileges for:", { userId, channelname });
-  const { data: message, error: messageError } = await supabase
-      .from("Channels")
-      .select("GalleryID") 
-      .eq("ChannelName", channelname)
-      .single();
-       console.log("MSG:", channelname)       
-       console.log("Message:", message)
-  if (messageError || !message) {
-      return res.status(404).json({ msg: "Message not found." });
+  const { userId } = req.query; 
+
+  console.log("Attempting to delete channel:", channelname);
+  console.log("Requested by user ID:", userId);
+
+  if (!userId) {
+    return res.status(400).json({ msg: "Missing user ID in query string." });
   }
 
-  const messageGalleryId = message.GalleryID;
+  const { data: channelData, error: channelError } = await supabase
+    .from("Channels")
+    .select("GalleryID")
+    .eq("ChannelName", channelname)
+    .single();
+
+  if (channelError || !channelData) {
+    console.error("Channel lookup failed:", channelError);
+    return res.status(404).json({ msg: "Channel not found." });
+  }
+
+  const galleryId = channelData.GalleryID;
 
   const { data: adminCheck, error: adminError } = await supabase
-      .from("GalleryMembers")
-      .select("GalleryRole") 
-      .eq("UserID", userId)
-      .eq("GalleryID", messageGalleryId) 
-      .single();
+    .from("GalleryMembers")
+    .select("GalleryRole")
+    .eq("UserID", userId)
+    .eq("GalleryID", galleryId)
+    .single();
 
-      if (adminError) {
-          console.error("Supabase error:", adminError);
-          return res.status(500).json({ msg: "Database error." });
-      }
-  
-      if (!adminCheck || adminCheck.GalleryRole !== true) {
-          return res.status(403).json({ msg: "You are not an admin or not part of this gallery." });
-      }
-
-  const { error: deleteError } = await supabase
-      .from("Channels")
-      .delete()
-      .eq("ChannelName", channelname);
-
-  if (deleteError) {
-      return res.status(500).json({ msg: "Failed to delete channel." });
+  if (adminError) {
+    console.error("Error checking admin role:", adminError);
+    return res.status(500).json({ msg: "Database error." });
   }
 
+  if (!adminCheck || adminCheck.GalleryRole !== true) {
+    return res.status(403).json({ msg: "You are not authorized to delete this channel." });
+  }
+
+  const { error: deleteError } = await supabase
+    .from("Channels")
+    .delete()
+    .eq("ChannelName", channelname);
+
+  if (deleteError) {
+    console.error("Error deleting channel:", deleteError);
+    return res.status(500).json({ msg: "Failed to delete channel." });
+  }
+
+  console.log("Channel deleted successfully:", channelname);
   return res.status(200).json({ msg: "Channel deleted successfully." });
 });
 
