@@ -111,14 +111,19 @@ router.post("/api/dm/save", async (req, res) => {
                 Message: message,
                 Timestamp: new Date().toISOString(),
             }
-            ]);
+            ])
+        .select("DmID")
+        .single();
 
     if (databaseError) {
         console.log("MADE IT HEREEE")
         return res.status(500).json({msg:"Message could not be saved.", databaseError});
     }
 
-    res.status(200).json({msg:"Message was saved successfully", data});
+    res.status(200).json({
+        msg:"Message was saved successfully",
+        data
+    });
 
 });
 

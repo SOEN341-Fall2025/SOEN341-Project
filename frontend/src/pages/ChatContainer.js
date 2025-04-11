@@ -10,6 +10,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   const [bubblerUser, setBubblerUser] = useState(header); // Assuming header is the current user's name
   const [newMessage, setNewMessage] = useState(""); // Input for new messages
   const [directMessages, setDirectMessages] = useState(messages);  // Messages list
+  const [selectedFile, setSelectedFile] = useState(null); // Selected File
 
   // Update popper user based on the header and messages
   useEffect(() => {
@@ -93,12 +94,40 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
         // If successful, log the result and alert the user
         console.log('Message saved:', result);
         alert('Message saved successfully!');
+
+        // Call file upload if needed
+        if (result.data && result.data.DmID) {
+          await uploadFile(result.data.DmID);
+        }
   
     } catch (error) {
         // Handle any unexpected errors
         console.error('An error occurred:', error);
         alert('An error occurred while saving the message.');
     }
+};
+
+const uploadFile = async (dmID) => {
+  if (!selectedFile) return; // Nothing to upload
+
+  const token = localStorage.getItem('authToken');
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+  formData.append('DmID', dmID);
+
+  try {
+      const response = await fetch('/dm/upload-file', {
+          method: 'POST',
+          headers: {
+              'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+      });
+      const result = await response.json();
+      console.log('File uploaded:', result);
+  } catch (error) {
+      console.error('Error uploading file:', error);
+  }
 };
 
   const bars = Math.abs(barSizes);  // Absolute value of bar sizes
@@ -191,7 +220,17 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
     }
   };
 
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      // Store the file to upload later
+      setSelectedFile(e.target.files[0]);
+      console.log('File selected:', e.target.files[0]);
+    }
+  };
 
+  const handlePlusClick = () => {
+    document.getElementById('fileInput').click();
+  };
 
   return (
     <>
@@ -217,10 +256,19 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
           <MessageList messages={directMessages} />
         </div>
 
+        {/* Hidden file input */}
+        <input
+          type="file"
+          id="fileInput"
+          style={{ display: 'none' }}
+          onChange={handleFileSelect}
+        />
+
+
         {/* Input Section */}
         <Row id="chat-box" className="d-flex align-items-center">
           <Col className="d-flex gap-2">
-            <div id="plus">
+            <div id="plus" onClick={handlePlusClick}>
               <Plus />
             </div>
             <div id="camera">
