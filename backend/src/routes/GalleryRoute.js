@@ -355,7 +355,9 @@ router.post("/gal/channel/sendMsg", async(req, res) => {
                 Gallery_id: galleryID,
                 Channel_name: channelName
             }
-            ]);
+            ])
+        .select("*")
+        .single();
 
     if (databaseError) {
         return res.status(500).json({msg:"Message could not be saved.", databaseError});

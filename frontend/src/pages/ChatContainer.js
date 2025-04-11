@@ -205,18 +205,46 @@ const uploadFile = async (dmID) => {
         console.error('Error from server:', errorData.msg || 'Failed to save message');
         throw new Error(errorData.msg || 'Failed to save message');
       }
-  
+
       // Parse the response data
-      const data = await response.json();
-      console.log('Message saved:', data);
+      const result = await response.json();
+      console.log('Message saved:', result.data);
+
+      // Call file upload if needed
+      if (result.data && result.data.Msg_id) {
+        await uploadChannelFile(result.data.Msg_id);
+      }
   
       // Handle success (e.g., update UI, state, etc.)
-      return data; // You might want to return the message data here for further use
+      return result.data; // You might want to return the message data here for further use
   
     } catch (error) {
       console.error('Error saving message:', error.message);
       // Optionally return or display an error message
       return { error: error.message }; // You can return an error object or perform other UI updates
+    }
+  };
+
+  const uploadChannelFile = async (msg_id) => {
+    if (!selectedFile) return; // Nothing to upload
+  
+    const token = localStorage.getItem('authToken');
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('Msg_id', msg_id);
+  
+    try {
+        const response = await fetch('/channel/upload-file', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+        const result = await response.json();
+        console.log('File uploaded:', result);
+    } catch (error) {
+        console.error('Error uploading file:', error);
     }
   };
 
@@ -318,11 +346,19 @@ const uploadFile = async (dmID) => {
             {/* Display Messages */}
             <ChannelMessageList messages={channelMessages} />
           </div>
+
+          {/* Hidden file input */}
+          <input
+            type="file"
+            id="fileInput"
+            style={{ display: 'none' }}
+            onChange={handleFileSelect}
+          />
   
           {/* Input Section */}
           <Row id="chat-box" className="d-flex align-items-center">
             <Col className="d-flex gap-2">
-              <div id="plus">
+              <div id="plus" onClick={handlePlusClick}>
                 <Plus />
               </div>
               <div id="camera">
