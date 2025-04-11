@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+
+
+import React, { useState } from 'react';
 import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToVW, ToPX } from '../AppContext';
 import { Resizable } from 're-resizable';
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
@@ -6,7 +8,8 @@ import * as icons from 'lucide-react';
 import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
 
-function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels, name }) {  
+function Gallery({ item, index, galleryChannels, gallerySize, user, name }) {  
+  
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
@@ -17,10 +20,12 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
     const handleClose = () => setShowState(false);
     function handleClick(key) { setShowState(key); }
 
+
+
     const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
     const [dmNavWidth, setDmNavWidth] = useState(17);
     const [channelMessages, setChannelMessage] = useState([]);
-    
+
     const ChannelsList = () => {
       thisChannels.map((item, index) => {
           return (
@@ -59,7 +64,6 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
         return updatedChannels;
       });
     };
-	
     const handleSubmitChannel = (event) => {
       event.preventDefault();
       if (!newTitle.trim()) {
@@ -71,7 +75,6 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       createChannel(newTitle, name); 
       handleClose();  //Close the modal *after* form is submitted.
     };
-	
     const ModalAddChannel = () => {
         return(
           <Modal.Body> 
@@ -93,33 +96,35 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
         );
     };
 
-    const ChannelPagesList = ({ channels, channelName }) => {
-      return (
-        <>
-          {channels.map((item, index) => {
-            // Check if the channel name matches the item’s ChannelName
-            if (channelName === item.ChannelName) {
-              return (
-                <ChatContainer
-                  key={index} // Add a key to help React identify each item in the list
-                  eventKey={item.ChannelName}
-                  barSizes={galleryNavWidth + dmNavWidth}
-                  user={user}
-                  header={item.ChannelName}
-                  messages={channelMessages}
-                  type={"Channel"}
-                  galleryName={name}
-                  channelName={item.ChannelName}
-                />
-              );
-            }
-            return null; // If the condition is not met, return null to render nothing
-          })}
-        </>
-      );
-    };
 
-    const getGalleryID = async (galleryName) => {
+
+    const ChannelPagesList = ({ channels, channelName }) => {
+        return (
+          <>
+            {channels.map((item, index) => {
+              // Check if the channel name matches the item’s ChannelName
+              if (channelName === item.ChannelName) {
+                return (
+                  <ChatContainer
+                    key={index} // Add a key to help React identify each item in the list
+                    eventKey={item.ChannelName}
+                    barSizes={galleryNavWidth + dmNavWidth}
+                    user={user}
+                    header={item.ChannelName}
+                    messages={channelMessages}
+                    type={"Channel"}
+                    galleryName={name}
+                    channelName={item.ChannelName}
+                  />
+                );
+              }
+              return null; // If the condition is not met, return null to render nothing
+            })}
+          </>
+        );
+      };
+
+  const getGalleryID = async (galleryName) => {
       try {
         const response = await fetch(`/api/gal/getID/${galleryName}`);
         const data = await response.json();
@@ -132,44 +137,44 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       } catch (error) {
         console.error("Error fetching GalleryID:", error);
         return null;  // Return null if error occurs
-    }};
+      }};
 
-      const createChannel = async (channelName, galleryName) => {
-        // Get the auth token, for example from localStorage or a cookie
-        const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
-    
-        const galleryId = await getGalleryID(galleryName);
-        console.log("GalleryId ", galleryId);
-    
-        try {
-          const response = await fetch('/gal/createChannel', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}` // Pass token as Bearer in the Authorization header
-            },
-            body: JSON.stringify({ channelName, galleryId }), 
-          });
-    
-          const result = await response.json();
-    
-          if (!response.ok) {
-            console.error('Error:', result);
-            alert('Failed to create channel: ' + result.msg || 'Unknown error');
-            return;
-          }
-    
-          console.log('Channel created:', result);
-          alert('Channel created successfully!');
-    
-    
-        } catch (error) {
-          console.error('An error occurred:', error);
-          alert('An error occurred while creating the channel.');
-        }
-      };
+  const createChannel = async (channelName, galleryName) => {
+    // Get the auth token, for example from localStorage or a cookie
+    const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
 
-      const fetchChannelMessages = async (channelName) =>{
+    const galleryId = await getGalleryID(galleryName);
+    console.log("GalleryId ", galleryId);
+
+    try {
+      const response = await fetch('/gal/createChannel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Pass token as Bearer in the Authorization header
+        },
+        body: JSON.stringify({ channelName, galleryId }), 
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('Error:', result);
+        alert('Failed to create channel: ' + result.msg || 'Unknown error');
+        return;
+      }
+
+      console.log('Channel created:', result);
+      alert('Channel created successfully!');
+
+
+    } catch (error) {
+      console.error('An error occurred:', error);
+      alert('An error occurred while creating the gallery.');
+    }
+  };
+
+  const fetchChannelMessages = async (channelName) =>{
 
         const token = localStorage.getItem('authToken');
     
@@ -430,7 +435,6 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           </Col>
         </Tab.Container>
         <ChannelPagesList channels={thisChannels} channelName={newChannelName}/>
-        {/* Modals below */}
         <Modal show={showState === 'addAdmin-modal'} onHide={handleClose} id="addAdmin-modal" className="modal-dialog-centered">
           <Modal.Dialog>
             <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
@@ -520,4 +524,5 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       </Tab.Pane>
     );
 }
+
 export default Gallery;
