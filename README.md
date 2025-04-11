@@ -58,6 +58,7 @@ Follow this tutorial for installation: https://www.youtube.com/watch?v=06X51c6WH
 ++++++++ BONUS FEATURE ++++++++++
 
 Exhibit is a feature that allows users to share their artworks or pictures 
+
 Users can:
 - Post their artworks by uploading images and writing a description
 - View other user's posts
