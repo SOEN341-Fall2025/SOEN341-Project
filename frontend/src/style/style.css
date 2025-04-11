@@ -128,15 +128,15 @@ body::before {
     display: none;
 }
 
-
+/* Instagram Post Styling */
 .instagram-post {
     width: 100%;
     max-width: 470px;
-    background: rgb(164, 202, 229);
+    background: white;
     margin: 0 auto 24px;
   }
   
-
+  /* Input field styling */
   .instagram-post input {
     border: none;
     padding: 0;
@@ -162,53 +162,10 @@ body::before {
 
   .post-image-container {
     width: 100%;
-    aspect-ratio: 1/1; 
+    aspect-ratio: 1/1; /* Square ratio */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
   }
   
-  .comments-container {
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: translateX(20px);
-    opacity: 0;
-  }
-  
-  .comments-container.show {
-    transform: translateX(0);
-    opacity: 1;
-  }
-
-  /* Create Exhibit Button */
-.create-exhibit-btn {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #66b3ff, #3399ff);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.create-exhibit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-  background: linear-gradient(135deg, #5ca8f0, #2d8bef);
-}
-
-.create-exhibit-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
  
