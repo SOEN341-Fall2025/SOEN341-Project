@@ -190,7 +190,7 @@ function Exhibit({ user, post }) {
 
   const toggleComments = (postID) => {
 
-    setShowComments(true);
+    setShowComments(!showComments);
     setpostID(postID);
   };
 
@@ -217,9 +217,7 @@ function Exhibit({ user, post }) {
               borderRadius: '12px',
               overflow: 'hidden',
               boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              flexShrink: 0, // important for scrollable children
-
-              animation: 'float 1.5s ease-in-out infinite'
+              flexShrink: 0 // important for scrollable children
             }}
           >
             {/* Your post content... */}
@@ -280,9 +278,6 @@ function Exhibit({ user, post }) {
               </div>
             </div>
           </div>
-          
-          
-          
         ))}
       </div>
       
@@ -327,7 +322,6 @@ function Exhibit({ user, post }) {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   
     return (
-        
       showComments && (
         <div className={`comments-container ${showComments ? 'show' : ''}`}
           style={{
@@ -336,14 +330,13 @@ function Exhibit({ user, post }) {
             overflowY: 'scroll',
             height: '770px',
             width: '300px',
-            background: 'rgba(28, 150, 202, 0.5)',
+            background: 'white',
             borderRadius: '12px',
             boxShadow: '0 4px 12px #000000',
             display: 'flex',
             flexDirection: 'column',
           }}
         >
-          
           {/* Header */}
           <div style={{
             padding: '16px',
@@ -515,7 +508,6 @@ function Exhibit({ user, post }) {
       </Modal.Body>
     );
   };
-  
   return (
     <div className="posts-container" style={{
       display: 'flex',
