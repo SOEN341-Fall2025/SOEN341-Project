@@ -628,7 +628,14 @@ useEffect(() => {
             </Col>
           </Resizable>
           <Col id="pages">
-            <Tab.Content id="pages-content">                  
+            <Tab.Content id="pages-content">
+                {/*<div>
+                <img 
+                src={"https://syipugxeidvveqpbpnum.supabase.co/storage/v1/object/public/exhibituploads//3b910723-2325-4972-bb45-9f6d831f94a4-2.png"} 
+                alt="Post" 
+                className="w-full h-full object-cover"
+              />
+                </div>*/       }           
                 <Tab.Pane eventKey="page-dm" className="no-parent-padding">
                     <Col id="sidebar-dm">
                     <Nav id="dm-list" variant="pills" defaultActiveKey="Me" className="flex-column d-flex align-items-start">
@@ -714,10 +721,6 @@ useEffect(() => {
           <Modal.Body>
             <AppContext.Provider value={contextValue}>
               <Settings userVars={userVar}/>
-              <Gallery 
-                userGalleries={userGalleries} 
-                setUserGalleries={setUserGalleries} 
-              />
             </AppContext.Provider>
           </Modal.Body>
         </Modal.Dialog>
