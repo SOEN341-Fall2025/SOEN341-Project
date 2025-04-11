@@ -14,7 +14,7 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
   const [userGalleries, setUserGalleries] = useState(""); 
-
+    
     const [newChannelName, setNewChannelName] = useState("");
     const [newTitle, setNewTitle] = useState("");
     
@@ -23,7 +23,7 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
     function handleClick(key) { setShowState(key); }
 
 
-
+    
     const [galleryNavWidth, setGalleryNavWidth] = useState(3.5);  
     const [dmNavWidth, setDmNavWidth] = useState(17);
     const [channelMessages, setChannelMessage] = useState([]);
@@ -153,7 +153,9 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
           </Modal.Body>
         );
     };
-    const ChannelPagesList = ({ channels, channelName }) => {
+    const ChannelPagesList = ({ channels, channelName }) => {      
+      let navWidth = Number(parseFloat(user.sizeNavbar));
+      let channWidth = Number(parseFloat(user.sizeChannelBar));
         return (
           <>
             {channels.map((item, index) => {
@@ -163,7 +165,7 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
                   <ChatContainer
                     key={index} // Add a key to help React identify each item in the list
                     eventKey={item.ChannelName}
-                    barSizes={galleryNavWidth + dmNavWidth}
+                    barSizes={navWidth + channWidth}
                     user={user}
                     header={item.ChannelName}
                     messages={channelMessages}
@@ -492,7 +494,7 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
     return (
       <Tab.Pane eventKey={galleryItem.GalleryName} className="gallery-pane" >
             <Tab.Container id="">
-              <Col id="sidebar-channels" style={{ width: user.sizeInnerSidebar}} >
+              <Col id="sidebar-channels" style={{ width: user.sizeChannelBar}} >
                 <Nav
                   id="dm-list"
                   variant="pills"
@@ -500,7 +502,7 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
                   className="flex-column d-flex align-items-start"
                 >
 
-              <Col  id="sidebar-dm-options" style={{ width: user.sizeInnerSidebar }}>
+              <Col  id="sidebar-dm-options" style={{ width: user.sizeChannelBar }}>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
                 <Nav.Link onClick={() => handleClick('addAdmin-modal')} className="add-admin" style={{ display: 'flex', alignItems: 'center', marginRight: '2px' }}>
                 <Plus />

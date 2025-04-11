@@ -36,12 +36,41 @@ function Main({ userData, galleries}) {
     } catch (err) {
       setError(err.message);
     }
-  }
-
+  }  
   fetchUser();
-  
   },[]);
       
+  
+  useEffect(() => {
+    
+    async function fetchUserMetadata() {
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch('/api/getMe', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) throw new Error('Failed to retrieve me');
+        const result = await response.json();
+        console.log("Metadata: ", result[0]);
+        
+        setUserVar((prevState) => ({
+          ...prevState,
+          settings: result[0].settings,
+          aboutme: result[0].aboutme,
+          userID: result[0].user_id,
+        }));
+      } catch (error) {
+        console.error('Error fetching metadata:', error);
+      }
+    };
+    
+    fetchUserMetadata();
+  }, []);
   // VARIABLES AND DATA  
   const [showState, setShowState] = useState("close");
   const [newName, setNewName] = useState("");
@@ -74,19 +103,71 @@ function Main({ userData, galleries}) {
     localStorage.removeItem('authToken');
   }
   const [userVar, setUserVar] = useState({
-    sizeGallerySidebar: "3.5vw",
-    sizeInnerSidebar: "17vw",
+    sizeNavbar: "3.5vw",
+    sizeChannelBar: "17vw",
     clrAccent: '#d2a292',
     clrChat: '#f0ffff',
     clrNavbar: '#f0ffff',
     clrNavbarGradient: '#d2a292',
     userGalleries: JSON.stringify(galleries),
-    username: userData.username,
+    username: null,
     profilepic: userData.profile_picture_url,
-    aboutme: userData.aboutme,
-    userID: userData.id,
-    settings: userData.settings
+    aboutme: null,
+    userID: null,
+    settings: null
   });
+  
+
+useEffect(() => {
+    function setStyles() {
+      if (!userVar?.settings) {
+        console.warn("userData.settings is undefined, skipping setStyles.");
+        return; // Exit the function early if settings are not available
+      }
+      console.log("Incoming:", userVar.settings);
+      const newUserVar = { ...userVar };
+      newUserVar.clrAccent = userVar.settings.clrAccent || userVar.clrNavbar;
+      newUserVar.clrChat = userVar.settings.clrChat || userVar.clrNavbar;
+      newUserVar.clrNavbar = userVar.settings.clrNavbar || userVar.clrNavbar;
+      newUserVar.clrNavbarGradient = userVar.settings.clrNavbarGradient || userVar.clrNavbarGradient;
+      newUserVar.sizeNavbar = userVar.settings.sizeNavbar || userVar.sizeNavbar;
+      newUserVar.sizeChannelBar = userVar.settings.sizeChannelBar || userVar.sizeChannelBar;
+  
+      setUserVar(newUserVar);
+  
+      UpdateStyle('--color-accent', newUserVar.clrAccent);
+      UpdateStyle('--color-bar', newUserVar.clrNavbar);
+      UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
+      UpdateStyle('--user-navbar-length', newUserVar.sizeNavbar);
+      UpdateStyle('--user-channelbar-length', newUserVar.sizeChannelBar);
+    }
+  
+      setStyles();
+      updateUser(userVar.userID, "settings", userVar.settings);
+  }, [userVar.settings]);
+    
+  
+  const updateUser = async (userId, columnName, newValue) => {
+    const token = localStorage.getItem('authToken');    
+    try {       
+      const updateResponse = await fetch('/api/updateUser', {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId, columnName, newValue })
+      });
+      if (!updateResponse.ok) {
+        throw new Error(`HTTP error! status: ${updateResponse.status}`);
+      }
+      const updateData = await updateResponse.json();
+      console.log("User response ", updateData);       
+      return updateData;
+  } catch (error) {
+    console.error('Request failed:', error);
+  } 
+};
   // Add this with your other state declarations
 const [exhibitPosts, setExhibitPosts] = useState([
   {
@@ -139,32 +220,7 @@ useEffect(() => {
     />
   ))}
 </Tab.Pane>
-  
-
-
-  useEffect(() => {
-    console.log(JSON.stringify(userData.settings));
-    function setStyles() {
-      if (!userData?.settings) {
-        console.warn("userData.settings is undefined, skipping setStyles.");
-        return; // Exit the function early if settings are not available
-      }
-  
-      const newUserVar = { ...userVar };
-      newUserVar.clrAccent = userData.settings?.clrAccent || userVar.clrNavbar;
-      newUserVar.clrChat = userData.settings?.clrChat || userVar.clrNavbar;
-      newUserVar.clrNavbar = userData.settings?.clrNavbar || userVar.clrNavbar;
-      newUserVar.clrNavbarGradient = userData.settings?.clrNavbarGradient || userVar.clrNavbarGradient;
-  
-      setUserVar(newUserVar);
-  
-      UpdateStyle('--color-accent', newUserVar.clrAccent);
-      UpdateStyle('--color-bar', newUserVar.clrNavbar);
-      UpdateStyle('--color-bar-gradient', newUserVar.clrNavbarGradient);
-    }
-  
-      setStyles();
-  }, [userVar.settings]);
+    
     
   /*SECTION - FUNCTIONS */
    const handleClose = () => setShowState(false);
@@ -218,7 +274,7 @@ useEffect(() => {
 
 
   /*SECTION - ELEMENTS */
-
+  
   const ProfilePic = () => {
     let picUrl = userVar.profilepic;
     let name = userVar.username;
@@ -226,9 +282,9 @@ useEffect(() => {
       let words = name.split(' ');
       let initials = words.map(word => word.charAt(0).toUpperCase()).join('');
       return (
-        <span style={{ width: '50%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <span style={{ width: '10vw', height: '10vw', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: userVar.clrAccent }}>
           <Image src='bublii_bubble.png' id="avatar" style={{ height: '100%', width: '100%' }} />
-          <h1 className="carousel-caption" style={{ position: 'absolute', color: 'black' }}>&nbsp;{initials}</h1>
+          <h1 style={{ position: 'absolute', color: 'black' }}>&nbsp;{initials}</h1>
         </span>
       );
     } else {
@@ -242,7 +298,7 @@ useEffect(() => {
   
   const getChannels = useCallback(async (name) => {
     try {      
-        const token = localStorage.getItem('auth-token');        
+        const token = localStorage.getItem('authToken');        
         
         const channelsResponse = await fetch(`/api/gallery/getChannels?galleryName=${encodeURIComponent(name)}`, {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -300,7 +356,7 @@ useEffect(() => {
   const GalleryPageList = ({ galleries }) => {
     return (        
         galleries.map((item, index) => (
-        <Gallery galleryItem={item} key={index} galleryChannels={galleryChannels} gallerySize={galleryNavWidth} user={userVar} name={item.GalleryName}/>
+        <Gallery galleryItem={item} key={index} galleryChannels={galleryChannels} gallerySize={userVar.sizeNavbar} user={userVar} name={item.GalleryName}/>
       ))
     
     );
@@ -330,6 +386,8 @@ useEffect(() => {
 
 
   const UserChatList = ({usernames}) => {
+    let navWidth = Number(parseFloat(userVar.sizeNavbar));
+    let channWidth = Number(parseFloat(userVar.sizeChannelBar));
     return (
       <>
         {usernames.map((item, index) => {
@@ -339,7 +397,7 @@ useEffect(() => {
               <ChatContainer
                 key={index}  // Add a key to help React identify each item in the list
                 eventKey={item.username}
-                barSizes={galleryNavWidth + dmNavWidth}
+                barSizes={navWidth + channWidth}
                 user={userVar}
                 header={item.username}
                 messages={directMessages}
@@ -606,13 +664,20 @@ useEffect(() => {
     <section>
       <Tab.Container className="tab-content text-start" defaultActiveKey="page-1">
         <Row className='justify-content-start' id="main-container">
-          <Resizable id="gallery-sidebar-resizable" maxWidth={"15vw"} minWidth={"3vw"} enable={{ right: true }} size={{ width: ToPX(galleryNavWidth) }}
+          <Resizable id="gallery-sidebar-resizable" maxWidth={"17vw"} minWidth={"2.6vw"} enable={{ right: true }} size={{ width: userVar.sizeNavbar }}
             onResizeStop={(e, direction, ref, d) => {  
                 if(d.width != 0){      
                     let ratio = Number((100 * (d.width) / window.innerWidth).toFixed(2));
-                    let prev = Number(parseFloat(galleryNavWidth));
-                    let newWidth = (prev + ratio).toFixed(2);           
-                    setGalleryNavWidth(newWidth);
+                    let prev = Number(parseFloat(userVar.sizeNavbar));
+                    let newWidth = (prev + ratio).toFixed(2); 
+                    if (newWidth < 2.6) newWidth = 2.6;
+                    if (newWidth > 17) newWidth = 17;
+                    
+                    const newSettings = { ...userVar.settings };    
+                    newSettings.sizeNavbar = newWidth + "vw";
+                    const newUserVar = { ...userVar };        
+                    newUserVar.settings = newSettings;     
+                    setUserVar(newUserVar);
                 }
             }}>
             <Col id="sidebar-list">
