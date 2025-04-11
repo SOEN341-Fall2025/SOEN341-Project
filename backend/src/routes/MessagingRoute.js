@@ -112,7 +112,7 @@ router.post("/api/dm/save", async (req, res) => {
                 Timestamp: new Date().toISOString(),
             }
             ])
-        .select("DmID")
+        .select("*")
         .single();
 
     if (databaseError) {
