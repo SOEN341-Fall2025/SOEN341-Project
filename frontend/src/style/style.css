@@ -208,7 +208,7 @@ body::before {
   /* Create Exhibit Button */
 .create-exhibit-btn {
   position: fixed;
-  bottom: 20px;
+  bottom: 35px;
   left: 20px;
   padding: 12px 24px;
   background: linear-gradient(135deg, #66b3ff, #3399ff);
