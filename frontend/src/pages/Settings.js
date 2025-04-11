@@ -1,7 +1,7 @@
 import '../style/settings.css';
 import React from 'react';
 import { AppContext, RGB_A } from '../AppContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
 function Settings({userVars, ProfilePic}) {

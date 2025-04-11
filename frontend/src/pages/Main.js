@@ -714,18 +714,12 @@ useEffect(() => {
         <Modal.Dialog className="modal-dialog-centered modal-fullscreen">
           <Modal.Header><div id="settings-close-button"><Button className="btn-close" onClick={handleClose}></Button></div></Modal.Header>
           <Modal.Body>
-              <Settings userVars={userVar} ProfilePic={ProfilePic}/>
-            
-            <Gallery 
-              userGalleries={userGalleries} 
-              setUserGalleries={setUserGalleries} 
-            />
+              <Settings userVars={userVar} ProfilePic={ProfilePic}/>         
           </Modal.Body>
         </Modal.Dialog>
       </Modal>
-
     </section>
     );
 }
-
+/* <Gallery userGalleries={userGalleries} setUserGalleries={setUserGalleries} />*/
 export default Main;
