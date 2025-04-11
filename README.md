@@ -29,7 +29,7 @@ There are tabs that can be created at will, called galleries. Within a gallery, 
 
 Within a gallery, users can be either admins or regular users. If admin, the user can delete channels, delete messages or give admin privileges to other users. When a gallery is created, there is only the owner as an admin, so they will have to promote other users to admin first. Regular users, on the other hand, will only have the possibility of inviting other users to the gallery. 
 
-- Exhibits where art or any form of media can be shared to all users
+- Exhibits where art or any form of media can be shared to all users (**_Bonus feature_**)
 
 This feature's main purpose is for all users to share their creations, may it be in image or video format. Similarly to apps like Instagram, an user can share an artwork to every other user via the exhibits tab, and they can receive comments. This is a way for users to share their work for everyone in the platform to see.
 
