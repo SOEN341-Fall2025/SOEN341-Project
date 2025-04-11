@@ -13,6 +13,8 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
+  const [userGalleries, setUserGalleries] = useState(""); 
+
     const [newChannelName, setNewChannelName] = useState("");
     const [newTitle, setNewTitle] = useState("");
     
@@ -95,7 +97,24 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
         );
       }
     };
-
+/*
+    const GalleryChannelList = ({ channels }) => {
+      if(channels.length > 0){
+        return (
+          channels.map((item, index) => (
+              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
+                fetchChannelMessages(item.ChannelName);
+              }}>
+                <span className="channel-icon">
+                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
+                </span>
+                {item.ChannelName}
+              </Nav.Link>
+            ))
+        );
+      }
+    };*/
+ 
     const handleChannels = (newname, galleryname) => {
       setTheseChannels(prevChannels => {
         const updatedChannels = [...prevChannels, { GalleryName: galleryname, ChannelName: newname }];
@@ -134,24 +153,6 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
           </Modal.Body>
         );
     };
-    /*
-    const GalleryChannelList = ({ channels }) => {
-      if(channels.length > 0){
-        return (
-          channels.map((item, index) => (
-              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
-                fetchChannelMessages(item.ChannelName);
-              }}>
-                <span className="channel-icon">
-                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
-                </span>
-                {item.ChannelName}
-              </Nav.Link>
-            ))
-        );
-      }
-    };
-    */
     const ChannelPagesList = ({ channels, channelName }) => {
         return (
           <>
@@ -430,6 +431,64 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
         </Modal.Body>
       );
   };
+      const [usernameToAdd, setUsernameToAdd] = useState('');
+      const handleAddUserToGallery = async (e) => {
+        e.preventDefault();
+        
+        if (!usernameToAdd.trim()) {
+          alert('Please enter a username');
+          return;
+        }
+      
+        try {
+          const galleryId = await getGalleryID(item.GalleryName);
+          if (!galleryId) throw new Error("Couldn't get gallery ID");
+      const token = localStorage.getItem('authToken');
+          const userResponse = await fetch(`/api/get/userid-username/${usernameToAdd}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+      
+          if (!userResponse.ok) {
+            const errorData = await userResponse.json();
+            throw new Error(errorData.error || errorData.msg || 'User not found');
+          }
+          const userData = await userResponse.json();
+          const userIdToAdd = userData.data.user_id;
+          
+          if (!token) throw new Error("Not authenticated");
+          console.log("Sending:", { galleryId, username, userIdToAdd });
+
+      
+          const response = await fetch(`/api/gal/${galleryId}/addusertogal`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+              username: usernameToAdd,
+              user_id: userIdToAdd, // The admin/owner who is adding the user
+              role: 'false' // Default role
+            }),
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Failed to add user');
+          }
+      
+          const responseData = await response.json();
+          alert(responseData.msg || 'User added successfully');
+          setUsernameToAdd('');
+          handleClose();
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
     return (
       <Tab.Pane eventKey={galleryItem.GalleryName} className="gallery-pane" >
             <Tab.Container id="">
@@ -462,21 +521,113 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
                   onClick={() => handleClick("addChannel-modal")}
                   className="add-channel"
                 >
-                  <span className="channel-icon">
-                    <Plus />
-                  </span>{" "}
-                  Add a Channel
-                </Nav.Link>
-              </Nav>
-            </Col>
-          </Tab.Container>
+                <span className="channel-icon">
+                  <Plus />
+                </span>{" "}
+                Add a Channel
+              </Nav.Link>
+              <Nav.Link
+                  onClick={() => handleClick("addUser-modal")}
+                  className="add-user"
+                >
+                <span className="channel-icon">
+                  <Plus />
+                </span>{" "}
+                Add a User
+              </Nav.Link>
+            </Nav>
+          </Col>
+        </Tab.Container>
         <ChannelPagesList channels={thisChannels} channelName={newChannelName}/>
+        <Modal show={showState === 'addAdmin-modal'} onHide={handleClose} id="addAdmin-modal" className="modal-dialog-centered">
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          </Modal.Dialog>
+          <Modal.Body>
+            <h5 className="text-center">Add an admin</h5>
+            <form onSubmit={handleSubmitAdmin}>
+              <Col>
+                <Row><label>Username:</label></Row>
+                <Row>
+                  <input
+                    type='text'
+                    id='username'
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                  />
+                </Row>
+                <Row>
+                  <Button type="submit">Add admin</Button>
+                </Row>
+              </Col>
+            </form>
+          </Modal.Body>
+          
+        </Modal>
+        <Modal show={showState === 'addOwner-modal'} onHide={handleClose} id="addOwner-modal" className="modal-dialog-centered">
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+          </Modal.Dialog>
+          <Modal.Body></Modal.Body>
+        <Modal.Body>
+            <h5 className="text-center">Remove an admin</h5>
+            <form onSubmit={handleSubmitOwner}>
+              <Col>
+                <Row><label>Username:</label></Row>
+                <Row>
+                  <input
+                    type='text'
+                    id='username'
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                  />
+                </Row>
+                <Row>
+                  <Button type="submit">Remove admin</Button>
+                </Row>
+              </Col>
+            </form>
+          </Modal.Body>
+          </Modal>
         <Modal show={showState === 'addChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
-          <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalAddChannel /></Modal.Dialog>
+          <Modal.Dialog>
+            <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+            <ModalAddChannel />
+          </Modal.Dialog>
         </Modal>
         <Modal show={showState === 'renameChannel-modal'} onHide={handleClose} id="addChannel-modal" className="modal-dialog-centered">
           <Modal.Dialog><Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header><ModalRenameChannel /></Modal.Dialog>
         </Modal>
+        <Modal show={showState === 'addUser-modal'} onHide={handleClose} id="addUser-modal" className="modal-dialog-centered">
+  <Modal.Dialog>
+    <Modal.Header>
+      <Modal.Title>Add User to Gallery</Modal.Title>
+      <Button className="btn-close" onClick={handleClose}></Button>
+    </Modal.Header>
+    <Modal.Body>
+      <form onSubmit={handleAddUserToGallery}>
+        <div className="mb-3">
+          <label htmlFor="usernameInput" className="form-label">Username:</label>
+          <input
+            type="text"
+            className="form-control"
+            id="usernameInput"
+            value={usernameToAdd}
+            onChange={(e) => setUsernameToAdd(e.target.value)}
+            placeholder="Enter username to add"
+            autoFocus
+            required
+          />
+        </div>
+        <div className="d-grid gap-2">
+          <Button variant="primary" type="submit">
+            Add User
+          </Button>
+        </div>
+      </form>
+    </Modal.Body>
+  </Modal.Dialog>
+</Modal>
       </Tab.Pane>
     );
 }
