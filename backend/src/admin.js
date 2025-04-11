@@ -54,6 +54,9 @@ router.delete("/api/messages/:MsgId", async (req, res) => {
     return res.status(200).json({ msg: "Message deleted successfully." });
 });
 
+
+
+
 router.delete("/api/Dm/:DmId", async (req, res) => {
     
   const { DmId } = req.params;
@@ -89,14 +92,14 @@ if (deleteError) {
   return res.status(500).json({ msg: "Failed to delete message." });
 }
 
-  return res.status(200).json({ msg: "Message deleted successfully." });
+return res.status(200).json({ msg: "Message deleted successfully." });
 return res.status(200).json({ msg: "Message deleted successfully." });
 });
 
 router.delete("/api/Dm/:DmId", async (req, res) => {
     
   const { DmId } = req.params;
-  const { userId } = req.body; 
+  const { userId } = req.query; 
 
   const { data: message, error: messageError } = await supabase
   .from("DMs")

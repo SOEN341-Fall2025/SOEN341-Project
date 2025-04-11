@@ -507,7 +507,8 @@ useEffect(() => {
           const messageDetails = result.updatedData.map(item => ({
               PopperUsername: item.PopperUsername,
               BubblerUsername: item.BubblerUsername,
-              Message: item.Message
+              Message: item.Message,
+              DmId: item.DmId
           }));
 
           // Log the message details to see the output

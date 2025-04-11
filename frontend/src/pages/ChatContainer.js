@@ -65,7 +65,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
               <Trash2
                 className="ml-2 cursor-pointer hover:text-red-500 transition"
                 size={18}
-                onClick={() => deleteDirectMessage(item.Msg_id, index)}
+                onClick={() => deleteDirectMessage(item.DmId, index)}
               />
             </div>
           );
@@ -76,12 +76,11 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 
   //Delete DMs
   const deleteDirectMessage = async (DmId, index) => {
+    setDirectMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+  
     const token = localStorage.getItem("authToken");
     const userId = user.id;
-
-    const originalMessages = [...directMessages];
-    setDirectMessages((prev) => prev.filter((_, i) => i !== index));
-    console.log(DmId);
+  
     try {
       const response = await fetch(`/api/messages/${DmId}?userId=${userId}`, {
         method: "DELETE",
@@ -89,21 +88,16 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
           Authorization: `Bearer ${token}`,
         },
       });
-
       const result = await response.json();
+  
       if (!response.ok) {
         console.warn("Backend deletion failed:", result.msg);
-        alert("Failed to delete message: " + result.msg);
-        setDirectMessages(originalMessages); 
-      } else {
-        console.log("Direct message deleted successfully.");
       }
     } catch (error) {
       console.error("Error deleting direct message:", error);
-      alert("An error occurred deleting the direct message.");
-      setDirectMessages(originalMessages); 
     }
   };
+  
 
   const saveMessage = async (username, newMessage) => {
     // Retrieve the auth token from localStorage
@@ -191,37 +185,31 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
       </span>
     );
   };
-
-const deleteChannelMessage = async (msgId, index) => {
-  const token = localStorage.getItem("authToken");
-  const userId = user.id;
-
-  const originalMessages = [...channelMessages];
-  setChannelMessages((prev) => prev.filter((_, i) => i !== index));
-
-  try {
-    const response = await fetch(`/api/messages/${msgId}?userId=${userId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.warn("Backend deletion failed:", result.msg);
-      alert("Failed to delete: " + result.msg);
-      setChannelMessages(originalMessages); // Rollback if failure
-    } else {
-      console.log("Message deleted successfully.");
+//Delete Channnel messages
+  const deleteChannelMessage = async (msgId, index) => {
+    setChannelMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+  
+    const token = localStorage.getItem("authToken");
+    const userId = user.id;
+  
+    try {
+      const response = await fetch(`/api/messages/${msgId}?userId=${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.warn("Backend deletion failed:", result.msg);
+      }
+    } catch (error) {
+      console.error("Error deleting channel message:", error);
     }
-  } catch (error) {
-    console.error("Error deleting message:", error);
-    alert("An error occurred while deleting the message.");
-    setChannelMessages(originalMessages); // Rollback on error
-  }
-};
+  };
+  
 
   const saveChannelMessage = async (channelName, newMessage) => {
     const token = localStorage.getItem('authToken');
