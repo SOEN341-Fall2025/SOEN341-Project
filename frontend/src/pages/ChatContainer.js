@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { User, ArrowLeft, Camera, Mic, Plus } from 'lucide-react';  // Assuming you're using lucide-react
 import { Row, Col, Nav } from 'react-bootstrap';
 import { HexToRGBA } from '../AppContext';
+import { Trash2 } from 'lucide-react';
 
 function ChatContainer({ barSizes, user, header, messages= [], type, galleryName, channelName }) {
   console.log("AuthUser please",user.username);
@@ -43,23 +44,59 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 
   // Message List Component
   const MessageList = ({ messages }) => {
-    
     return (
       <span>
         {messages.map((item, index) => {
           const isUserMessage = item.PopperUsername !== popperUser;
-          return(
-          <div key={index} className={`message ${!isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
-            {item.BubblerUsername}
-            <User className="icon" />
-            <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
-              {item.Message}
+  
+          return (
+            <div
+              key={index}
+              className={`message ${!isUserMessage ? "user" : "recipient"} flex items-center my-2`}
+            >
+              <User className="icon mr-1" />
+              <span className="mr-2">{item.BubblerUsername}</span>
+              <div
+                className={`text ${
+                  isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"
+                } p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}
+              >
+                {item.Message}
+              </div>
+              <Trash2
+                className="ml-2 cursor-pointer hover:text-red-500 transition"
+                size={18}
+                onClick={() => deleteDirectMessage(item.DmId, index)}
+              />
             </div>
-            
-          </div>
-  )})}
+          );
+        })}
       </span>
     );
+  };
+
+  //Delete DMs
+  const deleteDirectMessage = async (DmId, index) => {
+    setDirectMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+  
+    const token = localStorage.getItem("authToken");
+    const userId = user.id;
+  
+    try {
+      const response = await fetch(`/api/messages/${DmId}?userId=${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.warn("Backend deletion failed:", result.msg);
+      }
+    } catch (error) {
+      console.error("Error deleting direct message:", error);
+    }
   };
 
   const saveMessage = async (username, newMessage) => {
@@ -125,12 +162,10 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 
   // Message List Component
   const ChannelMessageList = ({ messages }) => {
-
     return (
       <span>
         {messages.map((item, index) => {
           const isUserMessage = item.username !== user.username;
-          console.log(`Message from: ${item.username}, Current User: ${user.username}, Is User Message: ${isUserMessage}`);
   
           return (
             <div key={index} className={`message ${isUserMessage ? "user" : "recipient"} flex items-center my-2`}>
@@ -139,15 +174,41 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
               <div className={`text ${isUserMessage ? "bg-[#5592ed]" : "bg-[#7ed957]"} p-2 rounded-lg ${isUserMessage ? "ml-2" : "mr-2"} max-w-[60%]`}>
                 {item.message}
               </div>
-              
-
+              <Trash2
+                className="ml-2 cursor-pointer hover:text-red-500 transition"
+                size={18}
+                onClick={() => deleteChannelMessage(item.Msg_id, index)}
+              />
             </div>
           );
         })}
       </span>
     );
   };
-
+  
+  const deleteChannelMessage = async (msgId, index) => {
+    setChannelMessages((prevMessages) => prevMessages.filter((_, i) => i !== index));
+  
+    const token = localStorage.getItem("authToken");
+    const userId = user.id;
+  
+    try {
+      const response = await fetch(`/api/messages/${msgId}?userId=${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const result = await response.json();
+  
+      if (!response.ok) {
+        console.warn("Backend deletion failed:", result.msg);
+      }
+    } catch (error) {
+      console.error("Error deleting channel message:", error);
+    }
+  };
 
   const saveChannelMessage = async (channelName, newMessage) => {
     const token = localStorage.getItem('authToken');
