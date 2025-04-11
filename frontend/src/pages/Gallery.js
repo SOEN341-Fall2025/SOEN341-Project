@@ -1,6 +1,6 @@
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToVW, ToPX } from '../AppContext';
 import { Resizable } from 're-resizable';
 import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
@@ -227,7 +227,7 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
       const token = localStorage.getItem('authToken');  // Adjust according to where you store your token
       
       const galleryId = await getGalleryID(galleryName);
-      console.log("Creating Channel in GalleryId ", gallery.GalleryID);
+      console.log("Creating Channel in GalleryId ", galleryId);
   
       try {
         const response = await fetch('/gal/createChannel', {
