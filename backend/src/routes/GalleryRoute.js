@@ -554,4 +554,47 @@ router.post("/api/gal/saveChannelMessages", async (req, res) => {
   res.status(200).json({ msg: "Message was saved successfully", data });
 });
 
+router.post("/api/gal/:gallery_id/addusertogal", async (req, res) => {
+  const { gallery_id } = req.params;
+  const { user_id, role, username } = req.body;
+    
+    try {
+      // Check if user is already a member
+      const { data: existingMember, error: existingError } = await supabase
+        .from('GalleryMembers')
+        .select('*')
+        .eq('GalleryID', gallery_id)
+        .eq('UserID', user_id)
+        .single();
+
+      if (existingMember) {
+        return res.status(400).json({ msg: 'User is already a member of this gallery' });
+      }
+      const { data: userData, error: userError } = await supabase
+      .from("Users")
+      .select("user_id")
+      .eq("username", username)
+      .single();
+  
+    if (userError || !userData?.user_id) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+      // Add the user to the gallery
+      const { data, error } = await supabase
+        .from('GalleryMembers')
+        .insert([
+          { 
+            GalleryID: gallery_id,
+            UserID: user_id,
+            GalleryRole: role || 'false',
+          }
+        ]);
+
+      if (error) throw error;
+
+      return res.status(200).json({ msg: 'User added successfully', data });
+    } catch (error) {
+      return res.status(500).json({ msg: error.message });
+  }
+  });
 export default router;
