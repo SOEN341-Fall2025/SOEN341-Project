@@ -48,7 +48,7 @@ input.form-control-color{
 #settings-pages{    
     background-color: var(--color-bkg);
     height: 100vh;
-    position: absolute;
+    /* position: absolute; */
     top: 0;
     left: 30vw;
     width: auto !important;

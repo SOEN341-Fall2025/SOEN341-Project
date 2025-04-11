@@ -10,6 +10,8 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
     const [showState, setShowState] = useState("close"); 
     const [channelNavWidth, setChannelSize] = useState(17);  
     const [thisChannels, setTheseChannels] = useState(galleryChannels);  
+  const [userGalleries, setUserGalleries] = useState(""); 
+
     const [newChannelName, setNewChannelName] = useState("");
     const [newTitle, setNewTitle] = useState("");
     const handleClose = () => setShowState(false);
@@ -101,6 +103,7 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
       }
     };
 
+ 
     const handleChannels = (newname, galleryname) => {
       setTheseChannels(prevChannels => {
         const updatedChannels = [...prevChannels, { GalleryName: galleryname, ChannelName: newname }];
@@ -371,7 +374,64 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
           alert(`Error: ${error.message}`);
         }
       };
+      const [usernameToAdd, setUsernameToAdd] = useState('');
+      const handleAddUserToGallery = async (e) => {
+        e.preventDefault();
+        
+        if (!usernameToAdd.trim()) {
+          alert('Please enter a username');
+          return;
+        }
       
+        try {
+          const galleryId = await getGalleryID(item.GalleryName);
+          if (!galleryId) throw new Error("Couldn't get gallery ID");
+      const token = localStorage.getItem('authToken');
+          const userResponse = await fetch(`/api/get/userid-username/${usernameToAdd}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+      
+          if (!userResponse.ok) {
+            const errorData = await userResponse.json();
+            throw new Error(errorData.error || errorData.msg || 'User not found');
+          }
+          const userData = await userResponse.json();
+          const userIdToAdd = userData.data.user_id;
+          
+          if (!token) throw new Error("Not authenticated");
+          console.log("Sending:", { galleryId, username, userIdToAdd });
+
+      
+          const response = await fetch(`/api/gal/${galleryId}/addusertogal`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+              username: usernameToAdd,
+              user_id: userIdToAdd, // The admin/owner who is adding the user
+              role: 'false' // Default role
+            }),
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.msg || 'Failed to add user');
+          }
+      
+          const responseData = await response.json();
+          alert(responseData.msg || 'User added successfully');
+          setUsernameToAdd('');
+          handleClose();
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert(`Error: ${error.message}`);
+        }
+      };
     return (
       <Tab.Pane eventKey={item.GalleryName} className="gallery-pane" >
             <Tab.Container id="">
@@ -409,11 +469,19 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
                 </span>{" "}
                 Add a Channel
               </Nav.Link>
+              <Nav.Link
+                  onClick={() => handleClick("addUser-modal")}
+                  className="add-user"
+                >
+                <span className="channel-icon">
+                  <Plus />
+                </span>{" "}
+                Add a User
+              </Nav.Link>
             </Nav>
           </Col>
         </Tab.Container>
         <ChannelPagesList channels={thisChannels} channelName={newChannelName}/>
-        {/* Modals below */}
         <Modal show={showState === 'addAdmin-modal'} onHide={handleClose} id="addAdmin-modal" className="modal-dialog-centered">
           <Modal.Dialog>
             <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
@@ -470,6 +538,36 @@ function Gallery({ item, index, userChannels, gallerySize, user, galleryChannels
             <ModalAddChannel />
           </Modal.Dialog>
         </Modal>
+        <Modal show={showState === 'addUser-modal'} onHide={handleClose} id="addUser-modal" className="modal-dialog-centered">
+  <Modal.Dialog>
+    <Modal.Header>
+      <Modal.Title>Add User to Gallery</Modal.Title>
+      <Button className="btn-close" onClick={handleClose}></Button>
+    </Modal.Header>
+    <Modal.Body>
+      <form onSubmit={handleAddUserToGallery}>
+        <div className="mb-3">
+          <label htmlFor="usernameInput" className="form-label">Username:</label>
+          <input
+            type="text"
+            className="form-control"
+            id="usernameInput"
+            value={usernameToAdd}
+            onChange={(e) => setUsernameToAdd(e.target.value)}
+            placeholder="Enter username to add"
+            autoFocus
+            required
+          />
+        </div>
+        <div className="d-grid gap-2">
+          <Button variant="primary" type="submit">
+            Add User
+          </Button>
+        </div>
+      </form>
+    </Modal.Body>
+  </Modal.Dialog>
+</Modal>
       </Tab.Pane>
     );
 }
