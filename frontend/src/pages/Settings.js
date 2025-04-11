@@ -1,19 +1,26 @@
 import '../style/settings.css';
 import React from 'react';
-import {AppContext} from '../AppContext.js';
-import { useContext } from 'react';
-import { useState } from 'react';
-
-
+import { AppContext, RGB_A } from '../AppContext';
+import { useState, useEffect } from 'react';
 import { Image, Button, Form , Modal, Row, Col, Tab, Nav } from 'react-bootstrap';
 
-function Settings() {
+function Settings({userVars, ProfilePic}) {
     
     const [modalState, setModalState] = useState("close");
     const [newAboutMe, setNewAboutMe] = useState("About me text");
     const [newUsername, setNewUsername] = useState("Enter new username");
-    const [newPassword, setNewPassword] = useState( "Enter new Password");
-
+    const [newPassword, setNewPassword] = useState( "Enter new Password");    
+    const [currentUsername, setUsername] = useState(userVars.username);
+    const [currentAboutme, setAboutMe] = useState(userVars.aboutme);
+    const [currentSettings, setSettings] = useState(userVars.settings);
+    
+    useEffect(() => {
+      setUsername(userVars.username);
+      setAboutMe(userVars.aboutme);
+      setSettings(userVars.settings);
+    }, [userVars]);
+    
+    
     const getCookie = (name) => {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       return match ? match[2] : null;
@@ -21,6 +28,11 @@ function Settings() {
     const handleClose = () => setModalState(false);
     function handleClick(key) {
         setModalState(key);
+    }
+    
+    const handleDone = () => {
+      console.log(JSON.stringify(userVars.settings));
+      window.location.reload();      
     }
 
     const changeAboutMe = async ( newAboutMe) => {
@@ -113,10 +125,44 @@ function Settings() {
           console.error("There was an error in updating password.", error);
         }
     };
+    
+    const updateUser = async (userId, columnName, newValue) => {
+      const token = localStorage.getItem('authToken');    
+      try {       
+        const updateResponse = await fetch('/api/updateUser', {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ userId, columnName, newValue })
+        });
+        if (!updateResponse.ok) {
+          throw new Error(`HTTP error! status: ${updateResponse.status}`);
+        }
+        const updateData = await updateResponse.json();
+        console.log("Updated response ", updateData);       
+        return updateData;
+    } catch (error) {
+      console.error('Request failed:', error);
+    } 
+  };
 
-    const { ProfilePic } = useContext(AppContext);
-
-  return (      
+    const handleColorChange = (event) => {
+          const color = event.target.value; // Get the selected color
+          const id = event.target.id;      // Get the ID of the input
+          console.log(`Before ${id} change: ${userVars.settings[id]}`);
+          /*const a = alphas[id];
+          if(a){color = RGB_A(color, a)}*/
+          /*console.log(`Seetings: ${id}, ${userVars.settings[id]}`);
+          console.log(`Seetings: ${id}, new: ${userVars.settings[id]}`);
+          console.log(userVars.settings);*/
+          userVars.settings[id] = color;
+          console.log(`After ${id} change: ${userVars.settings[id]}`);
+          const userId = userVars.userID;    
+          updateUser(userId, "settings", userVars.settings);
+      }
+    return (      
       <section>
         <div className="settings">
           <Tab.Container className="tab-content settings-page col-6 col-md-7 ps-5 pe-10 pt-10 text-start" defaultActiveKey="settings-profile">            
@@ -125,7 +171,7 @@ function Settings() {
               <Nav variant="pills" className="flex-column ps-30">
                   <Form.Label className="label labelnav px-3">User Settings</Form.Label>
                   <Nav.Item><Nav.Link eventKey="settings-profile">My Profile</Nav.Link></Nav.Item>
-                  <Nav.Item><Nav.Link eventKey="settings-account">My Accounts</Nav.Link></Nav.Item>
+                  <Nav.Item><Nav.Link eventKey="settings-account">My Account</Nav.Link></Nav.Item>
                   <Form.Label className="label labelnav px-3">App Settings</Form.Label>
                   <Nav.Item><Nav.Link eventKey="settings-view">Appearance</Nav.Link></Nav.Item>
                   <Nav.Item><Nav.Link eventKey="settings-chats">Chat & Channels</Nav.Link></Nav.Item>
@@ -137,19 +183,14 @@ function Settings() {
                   <Tab.Pane eventKey="settings-profile">
                     <h3>Profile</h3>       
                     <Form.Group className="divframe">
-                      <Form.Label className="label px-1">Password</Form.Label>
-                      <div className="justify-between">
-                      <input type="password" row={1} placeholder={"Enter new password"} disabled />      
-                        <Button variant="secondary" id="modal-profile-1" onClick={() => handleClick('modal-profile-1')}>🖊</Button>
-                      </div>                    
                       <Form.Label className="label px-1">User Name</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control type="textarea" row={1} placeholder={newUsername} disabled />
+                        <Form.Control type="textarea" row={1} placeholder={currentUsername} disabled />
                         <Button variant="secondary" id="modal-profile-2" onClick={() => handleClick('modal-profile-2')}>🖊</Button>
                       </div>                    
                       <Form.Label className="label px-1">About Me</Form.Label>
                       <div className="justify-between">      
-                        <Form.Control as="textarea" rows={5} placeholder={newAboutMe} disabled />
+                        <Form.Control as="textarea" rows={5} placeholder={currentAboutme} disabled />
                         <Button variant="secondary" id="modal-profile-3" onClick={() => handleClick('modal-profile-3')}>🖊</Button>
                       </div>      
                       <Form.Label className="label px-1">Avatar</Form.Label>   
@@ -160,27 +201,9 @@ function Settings() {
                     </Form.Group>        
                   
                   
-                    <Modal show={modalState === 'modal-profile-1'} onHide={handleClose} id="modal-profile-1" >
-                      <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
-                          <Modal.Body>            
-                            <h5 className="text-center">Change Your Password</h5>
-                            <h6 className="label text-center">Enter new Password</h6>
-                            <Form>
-                              <Form.Group>      
-                                <small id="emailHelp" className="form-text text-muted">Please only use numbers, letter, underscores, or periods.</small>
-                              </Form.Group>
-                              <Form.Group>
-                                <input type="password" rows={1} cols={40} onChange={(e) => setNewPassword(e.target.value)}/> 
-                              <Button onClick={() => changePassword(newPassword)}>Submit</Button> 
-                             </Form.Group>                        
-                             </Form>
-                          </Modal.Body>
-                      </Modal.Dialog>
-                    </Modal>
                     <Modal show={modalState === "modal-profile-2"} onHide={handleClose} eventKey="modal-profile-2" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
                           <Modal.Body> 
                             <Form>      
                                <Form.Group>   
@@ -202,7 +225,7 @@ function Settings() {
                     </Modal>
                     <Modal show={modalState === "modal-profile-3"} onHide={handleClose} eventKey="modal-profile-3" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
                           <Modal.Body>
                            <div>
                              <label>
@@ -221,7 +244,7 @@ function Settings() {
                     </Modal>
                     <Modal show={modalState === "modal-profile-4"} onHide={handleClose} eventKey="modal-profile-4" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
                           <Modal.Body>                      
                             <h5 className="text-center">Change Your Avatar</h5>
                             <h6 className="label text-center">Enter Modified Image</h6>
@@ -240,22 +263,41 @@ function Settings() {
                   </Tab.Pane>
                   
                   <Tab.Pane className="tab-pane" eventKey="settings-account" role="tabpanel">
-                    <h3>Account</h3>              
+                    <h3>Account</h3>         
                     <Form.Group className="divframe">
                       <Form.Label className="label px-1">Password</Form.Label>   
-                      <div className="justify-between">   
-                        <Form.Control plaintext type="password" value="********" id="email" aria-label="********" disabled />
-                        <Button  className="btn edit btn-primary" data-bs-toggle="modal" data-bs-target="#modal-profile-4">🖊</Button>
-                      </div>      
+                      <div className="justify-between">
+                      <input type="password" row={1} placeholder={"Enter new password"} disabled />      
+                        <Button variant="secondary" id="modal-account-1" onClick={() => handleClick('modal-account-1')}>🖊</Button>
+                      </div>                  
                       <Form.Label className="label px-1">Email</Form.Label>   
                       <div className="justify-between">   
                         <Form.Control plaintext type="email" defaultValue="j.smith77@gmail.com" id="email" disabled />
                         <Button  className="btn edit btn-primary" data-bs-toggle="modal" data-bs-target="#modal-profile-3">🖊</Button>
                       </div>  
-                    </Form.Group>            
+                    </Form.Group>      
+                    
+                    <Modal show={modalState === 'modal-account-1'} onHide={handleClose} id="modal-account-1" >
+                      <Modal.Dialog className="modal-dialog modal-dialog-centered">
+                          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
+                          <Modal.Body>            
+                            <h5 className="text-center">Change Your Password</h5>
+                            <h6 className="label text-center">Enter new Password</h6>
+                            <Form>
+                              <Form.Group>      
+                                <small id="emailHelp" className="form-text text-muted">Please only use numbers, letter, underscores, or periods.</small>
+                              </Form.Group>
+                              <Form.Group>
+                                <input type="password" rows={1} cols={40} onChange={(e) => setNewPassword(e.target.value)}/> 
+                              <Button onClick={() => changePassword(newPassword)}>Submit</Button> 
+                             </Form.Group>                        
+                             </Form>
+                          </Modal.Body>
+                      </Modal.Dialog>
+                    </Modal>      
                     <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-account-modal-1" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                          <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                          <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
                           <Modal.Body>                      
                             <h5 className="text-center">Change Your Password</h5>
                             <h6 className="label text-center">Enter Modified Name and Password</h6>
@@ -276,33 +318,64 @@ function Settings() {
                   
                   <Tab.Pane className="tab-pane" eventKey="settings-view" role="tabpanel">
                     <h3>Appearance</h3>         
-                    <Form.Group className="divframe"> 
-                      <Form.Label for="colorForm.Control" className="form-label">Accent Color</Form.Label>
+                    <Form.Group > 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Color</Form.Label>
                       <div className="d-flex flex-column">   
-                        <div className="justify-between"> 
-                          <Form.Control type="color" id="colorForm.Control1" defaultValue="#c9ffed" title="Choose your color" />                   
-                          <Button type="submit" className="btn btn-secondary" id="colorEdit-accent">Change 🖊</Button>
+                        <Form.Control 
+                              type="color" 
+                              id="clrNavbar" 
+                              defaultValue={currentSettings.clrNavbar} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> </div>
+                    </Form.Group>
+                    <Form.Group > 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Navbar Gradient Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrNavbarGradient" 
+                              defaultValue={currentSettings.clrNavbarGradient} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> </div>
+                    </Form.Group>
+                    <Form.Group > 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Chatbox Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrChat" 
+                              defaultValue={currentSettings.clrChat} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> 
                         </div>
-                        <Form.Label className="form-control form-control-color" id="prevColor1"></Form.Label>
-                      </div>
+                    </Form.Group>                    
+                    <Form.Group > 
+                      <Form.Label htmlFor="colorForm.Control" className="form-label">Accent Color</Form.Label>
+                      <div className="d-flex flex-column">   
+                        <Form.Control 
+                              type="color" 
+                              id="clrAccent" 
+                              defaultValue={currentSettings.clrAccent} 
+                              onChange={handleColorChange} 
+                              title="Choose your color"/> 
+                        </div>
                     </Form.Group>
                     <Form.Group className="divframe"> 
-                      <Form.Label for="colorForm.Control" className="form-label">Background Color</Form.Label>
-                      <div className="d-flex flex-column">   
-                        <div className="justify-between"> 
-                          <Form.Control type="color" id="colorForm.Control2" defaultValue="#f0ffff" title="Choose your color" />                   
-                          <Button type="submit" className="btn btn-secondary" id="colorEdit-bkg">Change 🖊</Button>
-                        </div>
-                        <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
+                    <Form.Label className="form-control form-control-color" id="prevColor2"></Form.Label>
+                    <Row>
+                      <div className="hover-text" style={{ width:'fit-content'}}>
+                        <input className='btn btn-primary' type='submit' value="Done" onClick={handleDone}/>
+                        <span className="hover-text-content">Warning: This will reload the page!</span>
                       </div>
-                    </Form.Group>
+                    </Row>  
+                    </Form.Group> 
                     <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-modal" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
                         <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
                           <Modal.Body>                      
                           </Modal.Body>
                       </Modal.Dialog>
-                    </Modal>
+                    </Modal>   
                   </Tab.Pane>
                   
                   <Tab.Pane className="tab-pane" eventKey="settings-chats" role="tabpanel">
@@ -311,7 +384,7 @@ function Settings() {
                     
                     <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-chats-modal" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                        <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                        <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
                           <Modal.Body>                      
                           </Modal.Body>
                       </Modal.Dialog>
@@ -324,7 +397,7 @@ function Settings() {
                     
                     <Modal show={modalState === "modal-one"} onHide={handleClose} eventKey="settings-notif-modal" >
                       <Modal.Dialog className="modal-dialog modal-dialog-centered">
-                        <Modal.Header><Button className="btn-close" data-bs-dismiss="modal"></Button></Modal.Header>
+                        <Modal.Header><Button className="btn-close" onClick={handleClose}></Button></Modal.Header>
                           <Modal.Body>                      
                           </Modal.Body>
                       </Modal.Dialog>

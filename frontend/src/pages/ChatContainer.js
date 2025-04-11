@@ -102,7 +102,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 };
 
   const bars = Math.abs(barSizes);  // Absolute value of bar sizes
-  const bg = HexToRGBA(user.clrAccent, 0.7);  // Background color with transparency
+  const bg = HexToRGBA(user.clrChat, 0.7);  // Background color with transparency
 
   //Channel Messaging
 
@@ -197,7 +197,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
     <>
       {type === 'DM' ? (
     <div className="mainview no-parent-padding">
-      <div id="top-box" style={{ backgroundColor: bg, left: `calc(${user.sizeInnerSidebar} + 5vw)` }}>
+      <div id="top-box" style={{ backgroundColor: bg, left: `calc(${user.sizeChannelBar} + 5vw)` }}>
         <Nav.Link>
           <span></span> {header}
         </Nav.Link>
@@ -205,7 +205,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
 
       <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{
         position: 'absolute', right: '2vw', backgroundColor: bg, height: '80vh', bottom: '8vh',
-        maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)`
+        maxWidth: '85%', left: `calc(${user.sizeChannelBar} + 1vw)`
       }}>
         {/* Chat Box */}
         <div className="chat-box border rounded-lg p-4 bg-gray-100">
@@ -259,7 +259,7 @@ function ChatContainer({ barSizes, user, header, messages= [], type, galleryName
   
         <div className="chat-container rounded-lg p-4 shadow-lg text-center" style={{
           position: 'absolute', right: '2vw', backgroundColor: bg, height: '80vh', bottom: '8vh',
-          maxWidth: '85%', left: `calc(${user.sizeInnerSidebar} + 1vw)`
+          maxWidth: '85%', left: `calc(${user.sizeChannelBar} + 1vw)`
         }}>
           {/* Chat Box */}
           <div className="chat-box border rounded-lg p-4 bg-gray-100">

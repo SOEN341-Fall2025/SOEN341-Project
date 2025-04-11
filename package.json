@@ -211,6 +211,8 @@
     "strip-final-newline": "^2.0.0",
     "strip-indent": "^3.0.0",
     "strip-json-comments": "^3.1.1",
+    "styled-component": "^2.8.0",
+    "styled-components": "^6.1.17",
     "superagent": "^9.0.2",
     "supports-color": "^7.2.0",
     "supports-preserve-symlinks-flag": "^1.0.0",
