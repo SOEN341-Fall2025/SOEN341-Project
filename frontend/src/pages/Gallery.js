@@ -102,14 +102,33 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
       if(channels.length > 0){
         return (
           channels.map((item, index) => (
-              <Nav.Link eventKey={item.ChannelName} key={index} onClick={() => {setNewChannelName(item.ChannelName)
+            <Nav.Link
+            eventKey={item.ChannelName}
+            key={index}
+            className="d-flex justify-content-between align-items-center"
+            style={{ width: '100%' }}
+          >
+            <span
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                setNewChannelName(item.ChannelName);
                 fetchChannelMessages(item.ChannelName);
-              }}>
-                <span className="channel-icon">
-                  <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} />
-                </span>
-                {item.ChannelName}
-              </Nav.Link>
+              }}
+            >
+              <Icon name={item.icon || FindClosestIcon(item.ChannelName)} size={24} /> {item.ChannelName}
+            </span>
+          
+            <icons.Minus
+             size={18}
+             className="cursor-pointer text-[#4F6FF7] hover:text-white transition"
+             onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm(`Are you sure you want to delete ${item.ChannelName}?`)) {
+                handleDeleteChannel(item.ChannelName);
+              }
+             }}
+            />
+          </Nav.Link>
             ))
         );
       }
@@ -259,7 +278,9 @@ function Gallery({ galleryItem, index, userChannels, gallerySize, user, galleryC
         alert('An error occurred while creating the channel.');
       }
     };
-    const fetchChannelMessages = async (channelName) =>{
+
+
+  const fetchChannelMessages = async (channelName) =>{
 
         const token = localStorage.getItem('authToken');
     
