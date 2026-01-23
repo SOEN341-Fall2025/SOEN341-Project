@@ -54,11 +54,14 @@ input.form-control-color{
     width: auto !important;
     padding-left: 3%;
 }
+
 .divframe button{
     height: fit-content !important;
     width: fit-content !important;
-    padding: 1% !important
-}#settings-pages h3{
+    padding: 1% !important;
+    margin-left: 30%;
+}
+#settings-pages h3{
     padding-top: 10%;
 }
 .settings-nav-list{
@@ -84,12 +87,12 @@ input.form-control-color{
     padding-top: 10% !important;
     padding-bottom: 10% !important;    
 }
-.justify-between, .justify-between *{
+.justify-between{
     display: flex !important;
     justify-content: space-between !important;
 }
-.justify-between *{
-    max-width: 30% !important;
+.justify-between > *{
+    max-width: 50% !important;
 }
 .justify-end, .justify-end *{
     display: flex !important;
@@ -105,5 +108,6 @@ input.form-control-color{
     z-index: 999;    
 }
 .divframe{
-    padding: 10% 10% 10% 0;
+    padding: 8vh 8vw 8vh 0 !important;
+    width: 40vw !important
 }

@@ -261,6 +261,71 @@ router.post("/gal/createChannel", async (req, res) => {
 
 });
 
+//Renaming of a channel in a gallery if user is gallery admin
+router.put("/gal/renameChannel", async (req, res) => {    
+  
+  const token = req.header("Authorization")?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized: No token provided" });
+  }
+  
+  const { clickedName, galleryId, newTitle } = req.body;      
+  
+  try{
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (authError || !user) {
+          console.error('Authentication Error:', authError); // Log error for debugging
+          return res.status(401).json({ msg: "Invalid or expired token.", error: authError });
+      }  
+      
+      // Verify Admin Status of current user
+      const galAdmin = await supabase
+        .from("GalleryMembers")
+        .select("GalleryRole")
+        .eq('UserID', user.id)
+        .eq('GalleryID', galleryId);
+      
+      //console.log('User role:', user.role);
+      console.log(req.body);  // Log error for debugging
+      console.log(clickedName, galleryId, newTitle);  // Log error for debugging
+      console.log("Admin Role: ", galAdmin.data[0].GalleryRole);  // Log error for debugging
+      
+      if (galAdmin.data[0].GalleryRole == false) {
+        console.log("Unauthorized: Not admin of this gallery.");
+        return res.status(401).json({ error: "Unauthorized: Not admin of this gallery." });
+      }             
+      
+      const { data: row, error: Error } = await supabase
+        .from("Channels")
+        .select("*")
+        .eq("ChannelName", clickedName)
+        .eq("GalleryID", galleryId);
+      
+      
+      console.log("DEBUG SELECT", row);
+        
+      const { data: updatingRow, error: databaseError } = await supabase
+        .from("Channels")
+        .update({ChannelName: newTitle})
+        .eq("ChannelName", clickedName)
+        .eq("GalleryID", galleryId);
+      
+      if (databaseError) {
+          console.log("Database Error", databaseError);
+          return res.status(500).json({msg:"Channel could not be renamed.", databaseError});
+      }        
+      console.log(updatingRow);
+      return res.status(200).json({ msg: "Channel renamed successfully" });  
+  }
+  catch (err) {
+      console.log("Internal Server Error", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+  }
+
+});
+
+
 //Retrieving channel messages
 router.get("/gal/msgChannel/:channelName", async (req, res) => {
 
