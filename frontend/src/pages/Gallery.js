@@ -1,11 +1,10 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Icon, FindClosestIcon, AppContext, UpdateStyle, GetStyle, ToVW, ToPX } from '../AppContext';
-import { Resizable } from 're-resizable';
-import { Image, Modal, Tab, Col, Row, Button, Nav, Form, TabContainer } from 'react-bootstrap'
+import { Icon, FindClosestIcon } from '../AppContext';
+import { Modal, Tab, Col, Row, Button, Nav } from 'react-bootstrap'
 import * as icons from 'lucide-react';
-import { LoaderPinwheel, Plus, CircleUser, MessageCircleDashed, Camera, Mic, ArrowLeft, User } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import ChatContainer from './ChatContainer.js';
 import { ContextMenu } from './CssComponents.js';
 
